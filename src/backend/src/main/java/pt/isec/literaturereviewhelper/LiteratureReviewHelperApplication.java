@@ -1,4 +1,4 @@
-package pt.isec.literature_review_helper;
+package pt.isec.literaturereviewhelper;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,4 +1,4 @@
-package pt.isec.literature_review_helper;
+package pt.isec.literaturereviewhelper;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;

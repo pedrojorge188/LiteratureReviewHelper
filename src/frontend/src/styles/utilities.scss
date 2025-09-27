@@ -1,0 +1,26 @@
+@use "sass:math";
+//Limit text lines
+@mixin linelimit($clamp, $height, $fixedHeight: false) {
+  display: -webkit-box;
+  -webkit-line-clamp: $clamp;
+  -webkit-box-orient: vertical;
+  @if $fixedHeight {
+    height: $height;
+  }
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+//mixin to font
+@mixin font($size, $line-height: 0, $letter-spacing: 0) {
+  font-size: #{$size}px;
+
+  @if $line-height != 0 {
+    line-height: math.div($line-height, $size); //calculate line-height in percent based in given font and line-height ratio
+  } @else {
+    line-height: 1.2;
+  }
+
+  @if ($letter-spacing != 0) {
+    letter-spacing: letterspace($letter-spacing, $size);
+  }
+}

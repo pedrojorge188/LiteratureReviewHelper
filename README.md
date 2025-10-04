@@ -46,7 +46,7 @@ The (MVP) will include:
 |-----------|----------------|-------------|
 | Search | API integration with at least two academic search engines | Retrieve relevant papers and metadata |
 | Reporting | Report generation  | Compile results, summaries, and parameters |
-| Persistence | Search history storage | Save and re-run previous searches |
+| Persistence | Search history storage | Save and re-run previous searches & Export search queries|
 | UI/UX | Simple and intuitive web interface | Dashboard for managing searches and reports |
 
 ---

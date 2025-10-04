@@ -53,6 +53,6 @@ The MVP will include:
 
 ## Proposed Technology Stack
 
-- **Frontend:** React (TypeScript, TailwindCSS)  
+- **Frontend:** React (Javascript)
 - **Backend:** Spring Boot (Java)  
 - **Build & Deployment:** Maven, GitHub Actions (CI/CD)

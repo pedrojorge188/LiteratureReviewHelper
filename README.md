@@ -18,7 +18,7 @@ The main goal is to simplify and accelerate the literature review process by:
 
 ---
 
-## Target Users
+## App Users
 
 - University and postgraduate students  
 - Researchers and academics  

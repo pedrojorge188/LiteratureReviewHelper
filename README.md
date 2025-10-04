@@ -33,7 +33,7 @@ The main goal is to simplify and accelerate the literature review process by:
 To become a reference platform for automated literature reviews, improving **efficiency, reproducibility, and scientific quality**.
 
 ### Scope
-The initial version (MVP) will include:
+The (MVP) will include:
 - User input for a **research topic or query**  
 - Integration with multiple **academic search APIs**.
 - Storage of search history for **future replication**
@@ -45,7 +45,6 @@ The initial version (MVP) will include:
 | Category | Functionality | Description |
 |-----------|----------------|-------------|
 | Search | API integration with at least two academic search engines | Retrieve relevant papers and metadata |
-| Processing | Automatic summarization | Use NLP to generate short summaries of papers |
 | Reporting | Report generation  | Compile results, summaries, and parameters |
 | Persistence | Search history storage | Save and re-run previous searches |
 | UI/UX | Simple and intuitive web interface | Dashboard for managing searches and reports |

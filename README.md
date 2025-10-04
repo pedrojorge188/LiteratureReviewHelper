@@ -12,7 +12,6 @@ The application will integrate with **external research engines via APIs** to co
 
 The main goal is to simplify and accelerate the literature review process by:
 - Retrieving relevant academic papers from multiple sources;
-- Generating concise summaries and identifying key themes;
 - Producing structured reports with metadata and reproducibility parameters;
 - Enabling repeatable searches and report regeneration.
 
@@ -45,10 +44,12 @@ The MVP will include:
 | Category | Functionality | Description |
 |-----------|----------------|-------------|
 | Search | API integration with at least two academic search engines | Retrieve relevant papers and metadata |
-| Reporting | Report generation  | Compile results, summaries, and parameters |
+| Reporting | Report generation  | Compile results, and parameters |
 | Persistence | Search history storage | Save and re-run previous searches & Export search queries|
 | UI/UX | Simple and intuitive web interface | Dashboard for managing searches and reports |
 
+## MVP Use Case Diagram
+![US_Diagram](docs/diagrams/UseCaseDiagram.svg)
 ---
 
 ## Proposed Technology Stack

@@ -36,11 +36,6 @@ To become a reference platform for automated literature reviews, improving **eff
 The initial version (MVP) will include:
 - User input for a **research topic or query**  
 - Integration with multiple **academic search APIs**.
-- Automated summarization of search results  
-- Generation of **structured reports**including:
-  - List of retrieved articles  
-  - Summary and insights  
-  - Search parameters and metadata  
 - Storage of search history for **future replication**
 
 ---
@@ -51,7 +46,7 @@ The initial version (MVP) will include:
 |-----------|----------------|-------------|
 | Search | API integration with at least two academic search engines | Retrieve relevant papers and metadata |
 | Processing | Automatic summarization | Use NLP to generate short summaries of papers |
-| Reporting | Report generation (PDF/Markdown) | Compile results, summaries, and parameters |
+| Reporting | Report generation  | Compile results, summaries, and parameters |
 | Persistence | Search history storage | Save and re-run previous searches |
 | UI/UX | Simple and intuitive web interface | Dashboard for managing searches and reports |
 

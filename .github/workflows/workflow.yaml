@@ -2,14 +2,14 @@ name: Literature Review Helper CI
 
 on:
   push:
-    branches: [ $default-branch ]
+    branches: [ "**" ]
   pull_request:
-    branches: [ $default-branch ]
+    branches: [ "**" ]
 
 
 jobs:
   default:
     runs-on: ubuntu-latest
     steps:
-      - name: Hello World
-        run: echo "Hello World!"
+      - name: Pipeline Executed
+        run: echo "Execution Not Implemented!"

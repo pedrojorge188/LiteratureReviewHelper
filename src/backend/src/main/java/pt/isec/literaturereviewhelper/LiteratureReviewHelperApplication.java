@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class LiteratureReviewHelperApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(LiteratureReviewHelperApplication.class, args);
-	}
-
+        SpringApplication.run(LiteratureReviewHelperApplication.class, args);
+    }
 }

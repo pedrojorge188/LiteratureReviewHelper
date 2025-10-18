@@ -8,10 +8,11 @@ on:
 
 
 jobs:
-  default:
+  build-backend:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      
       - name: Build backend
         run: docker build -f ci/backend/Dockerfile -t backend-build .

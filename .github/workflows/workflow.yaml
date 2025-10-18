@@ -16,3 +16,12 @@ jobs:
       
       - name: Build backend
         run: docker build -f ci/backend/Dockerfile -t backend-build .
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Build frontend
+        run: docker build -f ci/frontend/Dockerfile -t frontend-build .

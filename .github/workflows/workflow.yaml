@@ -2,14 +2,73 @@ name: Literature Review Helper CI
 
 on:
   push:
-    branches: [ "**" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "**" ]
+    branches: [ "main" ]
 
 
 jobs:
-  default:
+  build-and-push-backend-ci-image:
     runs-on: ubuntu-latest
     steps:
-      - name: Pipeline Executed
-        run: echo "Execution Not Implemented!"
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Login to registry
+        run: docker login ghcr.io -u ${{ github.actor }} --password-stdin <<<${{ secrets.GITHUB_TOKEN }}
+      - name: Build backend CI image
+        run: docker build -f ci/backend/Dockerfile -t ghcr.io/${{ github.repository_owner }}/backend-builder:latest .
+      - name: Push backend CI image
+        run: docker push ghcr.io/${{ github.repository_owner }}/backend-builder:latest
+  
+  run-static-analysis-backend:
+    runs-on: ubuntu-latest
+    needs: build-and-push-backend-ci-image
+    container:
+      image: ghcr.io/${{ github.repository_owner }}/backend-builder:latest
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION }}
+        SONAR_PROJECT: ${{ vars.SONAR_PROJECT }}
+    steps:
+      - name: Run static analysis on backend code
+        working-directory: /app
+        run: >
+          mvn compile org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -B
+          -Dsonar.organization=$SONAR_ORGANIZATION
+          -Dsonar.projectKey=$SONAR_PROJECT
+
+  build-backend:
+    runs-on: ubuntu-latest
+    needs: run-static-analysis-backend
+    container:
+      image: ghcr.io/${{ github.repository_owner }}/backend-builder:latest
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION }}
+        SONAR_PROJECT: ${{ vars.SONAR_PROJECT }}
+    steps:
+      - name: Build backend
+        working-directory: /app
+        run: mvn clean package -DskipTests -B
+
+  build-and-push-frontend-ci-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Login to registry
+        run: docker login ghcr.io -u ${{ github.actor }} --password-stdin <<<${{ secrets.GITHUB_TOKEN }}
+      - name: Build frontend CI image
+        run: docker build -f ci/frontend/Dockerfile -t ghcr.io/${{ github.repository_owner }}/frontend-builder:latest .
+      - name: Push frontend CI image
+        run: docker push ghcr.io/${{ github.repository_owner }}/frontend-builder:latest
+  
+  build-frontend:
+    runs-on: ubuntu-latest
+    needs: build-and-push-frontend-ci-image
+    container:
+      image: ghcr.io/${{ github.repository_owner }}/frontend-builder:latest
+    steps:
+      - name: Build frontend
+        working-directory: /app
+        run: npm run build

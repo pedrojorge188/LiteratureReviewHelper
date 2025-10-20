@@ -4,10 +4,6 @@ WORKDIR /app
 
 COPY src/backend/pom.xml .
 
-# Download dependencies (this layer will be cached unless pom.xml changes)
 RUN mvn dependency:go-offline -B
 
 COPY src/backend/src ./src
-
-
-RUN mvn clean package -DskipTests -B

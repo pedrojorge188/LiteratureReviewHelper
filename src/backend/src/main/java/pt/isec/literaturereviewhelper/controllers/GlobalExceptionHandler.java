@@ -64,7 +64,8 @@ public class GlobalExceptionHandler {
                 : "unknown";
 
         Throwable cause = ex.getMostSpecificCause();
-        if (cause != null) {
+
+        if (cause.getMessage() != null) {
             String msg = cause.getMessage() != null ? cause.getMessage() : "";
 
             if (msg.contains("For input string")) {

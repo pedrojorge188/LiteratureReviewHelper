@@ -66,13 +66,24 @@
             fullURL += path.startsWith("/") ? path.substring(1) : path;
             if (!rawQuery.isEmpty()) fullURL += "?" + rawQuery;
 
+            final String aux = fullURL;
+
             return webClient.get()
                     .uri(URI.create(fullURL))
                     .accept(mediaType)
                     .retrieve()
-                    .bodyToMono(responseType)      // generic response type
-                    //.doOnNext(resp -> System.out.println("Response received: " + resp))
-                    .map(extractor);               // use the extractor function passed in
+                    .bodyToMono(responseType)
+                    .doOnError(e -> log.error("❌ Error fetching URL {}: {}", aux, e.getMessage()))
+                    .doOnNext(resp -> log.info("✅ Response received from {}", baseUrl))
+                    .map(extractor);
+
+//            return webClient.get()
+//                    .uri(URI.create(fullURL))
+//                    .accept(mediaType)
+//                    .retrieve()
+//                    .bodyToMono(responseType)      // generic response type
+//                    .doOnNext(resp -> System.out.println("Response received: " + resp))
+//                    .map(extractor);               // use the extractor function passed in
         }
 
         // ---------------- Extractors ---------------- //

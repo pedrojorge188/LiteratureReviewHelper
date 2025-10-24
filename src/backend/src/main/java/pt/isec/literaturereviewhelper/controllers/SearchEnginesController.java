@@ -1,6 +1,7 @@
 package pt.isec.literaturereviewhelper.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,15 +10,15 @@ import org.springframework.web.bind.annotation.RestController;
 import pt.isec.literaturereviewhelper.model.Article;
 import pt.isec.literaturereviewhelper.services.ApiService;
 import reactor.core.publisher.Mono;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.validation.annotation.Validated;
 
+@Validated
 @RestController
 @RequestMapping("api")
 public class SearchEnginesController {
-    /** Controller to execute search queries */
 
     private final ApiService apiService;
 
@@ -25,22 +26,29 @@ public class SearchEnginesController {
         this.apiService = apiService;
     }
 
+    /**
+     * Springer Nature RequestParams
+     *
+     * @param q       Query string
+     * @param s       From which article index it starts
+     * @param p       Number of articles to return
+     * @param api_key In order to use this API a unique key is needed
+     * required       parameter and its value must not be empty
+     */
 
     @GetMapping("/searchSpringer")
     public Mono<List<Article>> searchSpringer(
-            @RequestParam String q,
-            @RequestParam int start,
-            @RequestParam int count,
-            @RequestParam String api_key) {
-        if (api_key == null || api_key.isBlank()) {
-            return Mono.error(new IllegalArgumentException("API key is required for Springer search."));
-        }
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("q", q);  // Pass encoded query
-        params.put("s", start);
-        params.put("p", count);
-        params.put("api_key", api_key);
+            @RequestParam(name = "q") @NotBlank(message = "Query string 'q' is empty") String q,
+            @RequestParam(name = "s") @Min(value = 0, message = "article index 's' must be >= 0") Integer s,
+            @RequestParam(name = "p") @Min(value = 1, message = "Number of articles 'p' must be > 0") Integer p,
+            @RequestParam(name = "api_key") @NotBlank(message = "API key is empty") String api_key)
+    {
+        Map<String, Object> params = Map.of(
+                "q", q,
+                "s", s,
+                "p", p,
+                "api_key", api_key
+        );
 
         return apiService.searchAsync(
                 "https://api.springernature.com",
@@ -52,60 +60,70 @@ public class SearchEnginesController {
         ).doOnNext(System.out::println);
     }
 
-
-
+    /**
+     * Hal Open Science RequestParams
+     *
+     * @param q      Query string
+     * @param start  From which article index it starts
+     * @param rows   Number of items to return
+     * @param wt     Content-type API returns response (x-bibtex, json)
+     * required      parameter and its value must not be empty
+     * produces      defined as JSON so we can specify how the mapping is going to occur
+     */
     @GetMapping(value = "/searchHal", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<List<Article>> searchHal(
-            @RequestParam String q,
-            @RequestParam int start,
-            @RequestParam int rows,
-            @RequestParam String wt) {
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("q", q);
-        params.put("start", start);
-        params.put("rows", rows);
-        params.put("wt", wt); // request BibTeX format
-
-        String baseUrl = "https://api.archives-ouvertes.fr";
-        String path = "/search/";
+            @RequestParam(name = "q") @NotBlank(message = "Query 'q' is empty") String q,
+            @RequestParam(name = "start") @Min(value = 0, message = "'start' must be >= 0") Integer start,
+            @RequestParam(name = "rows") @Min(value = 1, message = "'rows' must be > 0") Integer rows,
+            @RequestParam(name = "wt") @NotBlank(message = "Parameter 'wt' is empty") String wt)
+    {
+        Map<String, Object> params = Map.of(
+                "q", q,
+                "start", start,
+                "rows", rows,
+                "wt", wt
+        );
 
         return apiService.searchAsync(
-                baseUrl,
-                path,
+                "https://api.archives-ouvertes.fr",
+                "/search/",
                 params,
                 String.class,
                 apiService::extractHalInformation,
-                MediaType.TEXT_PLAIN // HAL API returns text/plain content
+                MediaType.TEXT_PLAIN
         ).doOnNext(System.out::println);
     }
 
-
-
+    /**
+     * Hal Open Science RequestParams
+     *
+     * @param querybibliographic Base URL of the API
+     * @param filter  Which database crossref is pointing at
+     * @param rows    Number of items to return
+     * @param offset  Content-type API returns response (x-bibtex, json)
+     * required parameter and its value must not be empty
+     */
     @GetMapping("/searchACM")
     public Mono<List<Article>> searchACM(
-            @RequestParam String q,
-            @RequestParam int start,
-            @RequestParam int count) {
-
-        // Base URL for Crossref works API
-        String baseUrl = "https://api.crossref.org";
-        String path = "/works";
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("query.bibliographic", q);
-        params.put("filter", "prefix:10.1145"); // ACM database reference
-        params.put("rows", count);
-        params.put("offset", start);
+            @RequestParam(name = "querybibliographic") @NotBlank(message = "'querybibliographic' is empty") String querybibliographic,
+            @RequestParam(name = "filter") @NotBlank(message = "'filter' is empty") String filter,
+            @RequestParam(name = "rows") @Min(value = 1, message = "'rows' must be > 0") Integer rows,
+            @RequestParam(name = "offset") @Min(value = 0, message = "'offset' must be >= 0") Integer offset)
+    {
+        Map<String, Object> params = Map.of(
+                "query.bibliographic", querybibliographic,
+                "filter", filter,
+                "rows", rows,
+                "offset", offset
+        );
 
         return apiService.searchAsync(
-                baseUrl,
-                path,
+                "https://api.crossref.org",
+                "/works",
                 params,
                 Map.class,
                 apiService::extractACMInformation,
                 MediaType.APPLICATION_JSON
         ).doOnNext(System.out::println);
     }
-
 }

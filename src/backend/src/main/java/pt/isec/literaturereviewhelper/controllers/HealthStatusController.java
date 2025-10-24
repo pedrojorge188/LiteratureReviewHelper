@@ -33,8 +33,8 @@ public class HealthStatusController {
             @RequestParam(defaultValue = "machine learning") String q,
             @RequestParam(defaultValue = "0") int start,
             @RequestParam(defaultValue = "25") int count,
-            // @RequestParam String api_key) {
-            @RequestParam(defaultValue = SPRINGER_API_KEY) String api_key) {
+            @RequestParam String api_key) {
+            // @RequestParam(defaultValue = SPRINGER_API_KEY) String api_key) {
         if (api_key == null || api_key.isBlank()) {
             return Mono.error(new IllegalArgumentException("API key is required for Springer search."));
         }

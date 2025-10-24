@@ -1,5 +1,7 @@
     package pt.isec.literaturereviewhelper.services;
 
+    import org.slf4j.Logger;
+    import org.slf4j.LoggerFactory;
     import org.springframework.http.MediaType;
     import org.springframework.stereotype.Service;
     import org.springframework.web.reactive.function.client.WebClient;
@@ -14,6 +16,8 @@
     import java.util.stream.Collectors;
     import java.util.*;
     import java.util.function.Function;
+    import java.util.stream.Stream;
+
     import org.jbibtex.*;
     import org.jbibtex.BibTeXParser;
 
@@ -22,6 +26,7 @@
     @Service
     public class ApiService {
 
+        private static final Logger log = LoggerFactory.getLogger(ApiService.class);
         private final WebClient webClient;
 
         public ApiService(WebClient webClient) {
@@ -52,14 +57,14 @@
 
             StringBuilder rawQuery = new StringBuilder();
             queryParams.forEach((k, v) -> {
-                if (rawQuery.length() > 0) rawQuery.append("&");
+                if (!rawQuery.isEmpty()) rawQuery.append("&");
                 rawQuery.append(k).append("=").append(URLEncoder.encode(v.toString(), StandardCharsets.UTF_8));
             });
 
             String fullURL = baseUrl;
             if (!baseUrl.endsWith("/")) fullURL += "/";
             fullURL += path.startsWith("/") ? path.substring(1) : path;
-            if (rawQuery.length() > 0) fullURL += "?" + rawQuery;
+            if (!rawQuery.isEmpty()) fullURL += "?" + rawQuery;
 
             return webClient.get()
                     .uri(URI.create(fullURL))
@@ -73,32 +78,57 @@
         // ---------------- Extractors ---------------- //
 
         public List<Article> extractSpringerInformation(Map<String, Object> data) {
-            List<Map<String, Object>> records = (List<Map<String, Object>>) data.get("records");
-            if (records == null) return List.of();
+            Object recordsObj = data.get("records");
+            if (!(recordsObj instanceof List<?> recordsList)) {
+                return List.of();
+            }
 
-            return records.stream().map(record -> {
-                String title = Optional.ofNullable((String) record.get("title"))
-                        .orElse("").replace("\n", " ").trim();
+            return recordsList.stream()
+                    .filter(recordObj -> recordObj instanceof Map<?, ?>)
+                    .map(recordObj -> {
+                        Map<?, ?> record = (Map<?, ?>) recordObj;
 
-                String pubDate = Optional.ofNullable((String) record.get("publicationDate")).orElse("");
-                String publicationYear = pubDate.contains("-") ? pubDate.split("-")[0] : pubDate;
+                        // Title
+                        String title = Optional.ofNullable(record.get("title"))
+                                .map(Object::toString)
+                                .map(s -> s.replace("\n", " ").trim())
+                                .orElse("");
 
-                String venue = (String) record.get("publicationName");
-                String venueType = (String) record.get("contentType");
+                        // Publication Year
+                        String pubDate = Optional.ofNullable(record.get("publicationDate"))
+                                .map(Object::toString)
+                                .orElse("");
+                        String publicationYear = pubDate.contains("-") ? pubDate.split("-")[0] : pubDate;
 
-                List<Map<String, String>> creators = (List<Map<String, String>>) record.get("creators");
-                String authors = creators != null
-                        ? creators.stream().map(c -> c.get("creator")).collect(Collectors.joining(", "))
-                        : "";
+                        // Venue and Type
+                        String venue = Optional.ofNullable(record.get("publicationName")).map(Object::toString).orElse("");
+                        String venueType = Optional.ofNullable(record.get("contentType")).map(Object::toString).orElse("");
 
-                List<Map<String, String>> urls = (List<Map<String, String>>) record.get("url");
-                String link = (urls != null && !urls.isEmpty()) ? urls.get(0).get("value") : null;
+                        // Authors
+                        String authors = "";
+                        Object creatorsObj = record.get("creators");
+                        if (creatorsObj instanceof List<?> creatorsList) {
+                            authors = creatorsList.stream()
+                                    .filter(c -> c instanceof Map<?, ?>)
+                                    .map(c -> ((Map<?, ?>) c).get("creator"))
+                                    .filter(Objects::nonNull)
+                                    .map(Object::toString)
+                                    .collect(Collectors.joining(", "));
+                        }
 
-                return new Article(title, publicationYear, venue, venueType, authors, link, "SpringerNature");
-            }).collect(Collectors.toList());
+                        // Link
+                        String link = null;
+                        Object urlsObj = record.get("url");
+                        if (urlsObj instanceof List<?> urlsList && !urlsList.isEmpty() && urlsList.get(0) instanceof Map<?, ?> firstUrl) {
+                            link = Optional.ofNullable(firstUrl.get("value")).map(Object::toString).orElse(null);
+                        }
+
+                        return new Article(title, publicationYear, venue, venueType, authors, link, "SpringerNature");
+                    })
+                    .collect(Collectors.toList());
         }
+
         public List<Article> extractHalInformation(String bibtexData) {
-            System.out.println("Parsed entries count: ");
             List<Article> articles = new ArrayList<>();
             try {
                 BibTeXParser parser = new BibTeXParser();
@@ -107,29 +137,35 @@
                 System.out.println("Parsed entries count: " + database.getEntries().size());
 
                 for (BibTeXEntry entry : database.getEntries().values()) {
+                    // Title
                     String title = Optional.ofNullable(entry.getField(new Key("TITLE")))
                             .map(Value::toUserString)
                             .map(s -> s.replace("{", "").replace("}", ""))
                             .orElse("");
 
+                    // Authors
                     String authors = Optional.ofNullable(entry.getField(new Key("AUTHOR")))
                             .map(Value::toUserString)
                             .map(s -> s.replace(" and ", ", "))
                             .orElse("");
 
+                    // Year
                     String year = Optional.ofNullable(entry.getField(new Key("YEAR")))
                             .map(Value::toUserString)
                             .orElse("");
 
-                    String venue = Optional.ofNullable(
-                                    entry.getField(new Key("JOURNAL")) != null ? entry.getField(new Key("JOURNAL")) :
-                                            entry.getField(new Key("BOOKTITLE")) != null ? entry.getField(new Key("BOOKTITLE")) :
-                                                    entry.getField(new Key("SCHOOL")) != null ? entry.getField(new Key("SCHOOL")) :
-                                                            entry.getField(new Key("PUBLISHER"))
-                            ).map(Value::toUserString)
+                    // Venue: JOURNAL > BOOKTITLE > SCHOOL > PUBLISHER
+                    String venue = Stream.of("JOURNAL", "BOOKTITLE", "SCHOOL", "PUBLISHER")
+                            .map(key -> entry.getField(new Key(key)))
+                            .filter(Objects::nonNull)
+                            .map(Value::toUserString)
+                            .findFirst()
                             .orElse("");
 
-                    String entryType = entry.getType().getValue().toLowerCase();
+                    // Venue type
+                    String entryType = Optional.ofNullable(entry.getType())
+                            .map(type -> type.getValue().toLowerCase())
+                            .orElse("");
 
                     Map<String, String> venueTypeMapping = Map.of(
                             "inproceedings", "Conference Proceedings",
@@ -142,6 +178,7 @@
                     );
                     String venueType = venueTypeMapping.getOrDefault(entryType, "");
 
+                    // Link
                     String link = Optional.ofNullable(entry.getField(new Key("URL")))
                             .map(Value::toUserString)
                             .orElse("");
@@ -149,10 +186,11 @@
                     articles.add(new Article(title, year, venue, venueType, authors, link, "HAL Open Science"));
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                log.atError().log(e.getMessage());
             }
             return articles;
         }
+
         public List<Article> extractACMInformation(Map<String, Object> data) {
             List<Article> articles = new ArrayList<>();
 

@@ -42,7 +42,7 @@ class ApiServiceTest {
 
     // ---------------- Test searchAsync with WebClient error ----------------
     @Test
-    void testSearchAsync_ApiError() {
+    void testSearchAsyncApiError() {
         // Simulate WebClient error
         when(responseSpec.bodyToMono(Map.class))
                 .thenReturn(Mono.error(new WebClientResponseException(

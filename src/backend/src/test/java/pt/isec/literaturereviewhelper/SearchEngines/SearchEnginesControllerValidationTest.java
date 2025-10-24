@@ -15,9 +15,6 @@ class SearchEnginesControllerValidationTest {
     @Autowired
     private WebTestClient webClient;
 
-    @MockitoBean
-    private ApiService apiService; // mocked so we don’t call real API
-
     // ---------------- SPRINGER ----------------
     @Test
     void testSpringer_EmptyQuery() {
@@ -36,7 +33,7 @@ class SearchEnginesControllerValidationTest {
     }
 
     @Test
-    void testSpringer_InvalidIndexAndCount() {
+    void testSpringerInvalidIndexAndCount() {
         // s < 0
         webClient.get()
                 .uri(uriBuilder -> uriBuilder

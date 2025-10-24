@@ -2,7 +2,9 @@ package pt.isec.literaturereviewhelper.SearchEngines;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.support.WebExchangeBindException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.server.ServerWebInputException;
 import jakarta.validation.ConstraintViolation;
@@ -94,5 +96,41 @@ class GlobalExceptionHandlerTest {
         assertEquals(400, response.getStatusCodeValue());
         assertEquals("must be >= 0", response.getBody().get("s"));
     }
+
+    @Test
+    void testHandleMissingParams() {
+        MissingServletRequestParameterException ex =
+                new MissingServletRequestParameterException("rows", "Integer");
+
+        var response = handler.handleMissingParams(ex);
+
+        assertEquals(400, response.getStatusCodeValue());
+        assertEquals("Invalid value ''. Expected type: Integer", response.getBody().get("rows"));
+    }
+
+    @Test
+    void testHandleTypeMismatch() {
+        MethodArgumentTypeMismatchException ex =
+                new MethodArgumentTypeMismatchException("abc", Integer.class, "rows", null, null);
+
+        var response = handler.handleTypeMismatch(ex);
+
+        assertEquals(400, response.getStatusCodeValue());
+        assertEquals("Invalid value 'abc'. Expected type: Integer", response.getBody().get("rows"));
+    }
+
+    @Test
+    void testHandleInvalidOrMissingParams_EmptyInteger() {
+        // Simulate ServerWebInputException when Integer parameter is empty
+        Throwable cause = new IllegalArgumentException("Required request parameter 'rows' for method parameter type Integer is present but converted to null");
+        ServerWebInputException ex = mock(ServerWebInputException.class);
+        when(ex.getMethodParameter()).thenReturn(null);
+        when(ex.getMostSpecificCause()).thenReturn(cause);
+
+        var response = handler.handleInvalidOrMissingParams(ex);
+        assertEquals(400, response.getStatusCodeValue());
+        assertTrue(response.getBody().values().iterator().next().toString().contains("Invalid value ''"));
+    }
+
 
 }

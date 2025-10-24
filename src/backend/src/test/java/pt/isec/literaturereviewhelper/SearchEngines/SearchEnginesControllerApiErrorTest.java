@@ -26,7 +26,7 @@ class SearchEnginesControllerApiErrorTest {
 
     // ========================= SPRINGER =========================
     @Test
-    void testSearchSpringer_ApiError() {
+    void testSearchSpringerApiError() {
         when(apiService.searchAsync(anyString(), anyString(), anyMap(), eq(Map.class), any(), any()))
                 .thenReturn(Mono.error(new WebClientResponseException(
                         500,
@@ -56,7 +56,7 @@ class SearchEnginesControllerApiErrorTest {
 
     // ========================= HAL =========================
     @Test
-    void testSearchHal_ApiError() {
+    void testSearchHalApiError() {
         when(apiService.searchAsync(anyString(), anyString(), anyMap(), eq(String.class), any(), any()))
                 .thenReturn(Mono.error(new WebClientResponseException(
                         503, "Service Unavailable", null, null, StandardCharsets.UTF_8
@@ -79,7 +79,7 @@ class SearchEnginesControllerApiErrorTest {
 
     // ========================= ACM =========================
     @Test
-    void testSearchACM_ApiError() {
+    void testSearchACMApiError() {
         when(apiService.searchAsync(anyString(), anyString(), anyMap(), eq(Map.class), any(), any()))
                 .thenReturn(Mono.error(new WebClientResponseException(
                         502, "Bad Gateway", null, null, StandardCharsets.UTF_8

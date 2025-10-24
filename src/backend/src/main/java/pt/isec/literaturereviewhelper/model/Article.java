@@ -11,8 +11,8 @@ public class Article {
     private String link;
     private String source; // e.g., "Springer", "ACM", "HAL"
 
-    public Article() {
-    }
+//    public Article() {
+//    }
 
     public Article(String title, String publicationYear, String venue,
                    String venueType, String authors, String link, String source) {
@@ -27,25 +27,25 @@ public class Article {
 
     // Getters and Setters
     public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
+//    public void setTitle(String title) { this.title = title; }
 
     public String getPublicationYear() { return publicationYear; }
-    public void setPublicationYear(String publicationYear) { this.publicationYear = publicationYear; }
+//    public void setPublicationYear(String publicationYear) { this.publicationYear = publicationYear; }
 
     public String getVenue() { return venue; }
-    public void setVenue(String venue) { this.venue = venue; }
+//    public void setVenue(String venue) { this.venue = venue; }
 
     public String getVenueType() { return venueType; }
-    public void setVenueType(String venueType) { this.venueType = venueType; }
+//    public void setVenueType(String venueType) { this.venueType = venueType; }
 
     public String getAuthors() { return authors; }
-    public void setAuthors(String authors) { this.authors = authors; }
+//    public void setAuthors(String authors) { this.authors = authors; }
 
     public String getLink() { return link; }
-    public void setLink(String link) { this.link = link; }
+//    public void setLink(String link) { this.link = link; }
 
     public String getSource() { return source; }
-    public void setSource(String source) { this.source = source; }
+//    public void setSource(String source) { this.source = source; }
 
     @Override
     public String toString() {

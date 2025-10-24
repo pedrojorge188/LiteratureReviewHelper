@@ -2,6 +2,7 @@ package pt.isec.literaturereviewhelper.controllers;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,8 +40,8 @@ public class SearchEnginesController {
     @GetMapping("/searchSpringer")
     public Mono<List<Article>> searchSpringer(
             @RequestParam(name = "q") @NotBlank(message = "Query string 'q' is empty") String q,
-            @RequestParam(name = "s") @Min(value = 0, message = "article index 's' must be >= 0") Integer s,
-            @RequestParam(name = "p") @Min(value = 1, message = "Number of articles 'p' must be > 0") Integer p,
+            @RequestParam(name = "s")  @Min(value = 0, message = "article index 's' must be >= 0") Integer s,
+            @RequestParam(name = "p")  @Min(value = 1, message = "Number of articles 'p' must be > 0") Integer p,
             @RequestParam(name = "api_key") @NotBlank(message = "API key is empty") String api_key)
     {
         Map<String, Object> params = Map.of(
@@ -73,8 +74,8 @@ public class SearchEnginesController {
     @GetMapping(value = "/searchHal", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<List<Article>> searchHal(
             @RequestParam(name = "q") @NotBlank(message = "Query 'q' is empty") String q,
-            @RequestParam(name = "start") @Min(value = 0, message = "'start' must be >= 0") Integer start,
-            @RequestParam(name = "rows") @Min(value = 1, message = "'rows' must be > 0") Integer rows,
+            @RequestParam(name = "start")  @Min(value = 0, message = "'start' must be >= 0") Integer start,
+            @RequestParam(name = "rows")  @Min(value = 1, message = "'rows' must be > 0") Integer rows,
             @RequestParam(name = "wt") @NotBlank(message = "Parameter 'wt' is empty") String wt)
     {
         Map<String, Object> params = Map.of(
@@ -108,7 +109,7 @@ public class SearchEnginesController {
             @RequestParam(name = "querybibliographic") @NotBlank(message = "'querybibliographic' is empty") String querybibliographic,
             @RequestParam(name = "filter") @NotBlank(message = "'filter' is empty") String filter,
             @RequestParam(name = "rows") @Min(value = 1, message = "'rows' must be > 0") Integer rows,
-            @RequestParam(name = "offset") @Min(value = 0, message = "'offset' must be >= 0") Integer offset)
+            @RequestParam(name = "offset")  @Min(value = 0, message = "'offset' must be >= 0") Integer offset)
     {
         Map<String, Object> params = Map.of(
                 "query.bibliographic", querybibliographic,

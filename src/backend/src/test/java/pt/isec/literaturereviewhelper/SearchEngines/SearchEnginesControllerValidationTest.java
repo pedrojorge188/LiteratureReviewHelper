@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-
 import org.junit.jupiter.api.Test;
 import pt.isec.literaturereviewhelper.services.ApiService;
 import pt.isec.literaturereviewhelper.controllers.SearchEnginesController;
@@ -14,6 +13,10 @@ class SearchEnginesControllerValidationTest {
 
     @Autowired
     private WebTestClient webClient;
+
+    @MockitoBean
+    private ApiService apiService;
+
 
     // ---------------- SPRINGER ----------------
     @Test

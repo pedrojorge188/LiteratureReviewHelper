@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import pt.isec.literaturereviewhelper.controllers.LiteratureSearchController;
-import pt.isec.literaturereviewhelper.model.Article;
+import pt.isec.literaturereviewhelper.models.Article;
 import pt.isec.literaturereviewhelper.services.ApiService;
 import reactor.core.publisher.Mono;
 import java.util.List;

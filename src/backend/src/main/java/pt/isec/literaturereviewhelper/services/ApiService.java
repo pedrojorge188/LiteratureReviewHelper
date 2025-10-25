@@ -5,7 +5,7 @@
     import org.springframework.http.MediaType;
     import org.springframework.stereotype.Service;
     import org.springframework.web.reactive.function.client.WebClient;
-    import pt.isec.literaturereviewhelper.model.Article;
+    import pt.isec.literaturereviewhelper.models.Article;
     import reactor.core.publisher.Mono;
     import java.io.StringReader;
     import java.net.URI;

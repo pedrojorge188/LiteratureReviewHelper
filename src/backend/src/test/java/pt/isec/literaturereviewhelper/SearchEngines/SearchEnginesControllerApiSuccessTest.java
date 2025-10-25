@@ -3,8 +3,8 @@ package pt.isec.literaturereviewhelper.SearchEngines;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import pt.isec.literaturereviewhelper.controllers.SearchEnginesController;
-import pt.isec.literaturereviewhelper.model.Article;
+import pt.isec.literaturereviewhelper.controllers.LiteratureSearchController;
+import pt.isec.literaturereviewhelper.models.Article;
 import pt.isec.literaturereviewhelper.services.ApiService;
 import reactor.core.publisher.Mono;
 import java.util.List;
@@ -13,15 +13,15 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class SearchEnginesControllerApiSuccessTest {
+class LiteratureSearchControllerApiSuccessTest {
 
     private ApiService apiService;
-    private SearchEnginesController controller;
+    private LiteratureSearchController controller;
 
     @BeforeEach
     void setUp() {
         apiService = mock(ApiService.class);
-        controller = new SearchEnginesController(apiService);
+        controller = new LiteratureSearchController(apiService);
     }
 
     // ========================= SPRINGER =========================

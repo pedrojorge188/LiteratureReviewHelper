@@ -6,10 +6,10 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.junit.jupiter.api.Test;
 import pt.isec.literaturereviewhelper.services.ApiService;
-import pt.isec.literaturereviewhelper.controllers.SearchEnginesController;
+import pt.isec.literaturereviewhelper.controllers.LiteratureSearchController;
 
-@WebFluxTest(controllers = SearchEnginesController.class)
-class SearchEnginesControllerValidationTest {
+@WebFluxTest(controllers = LiteratureSearchController.class)
+class LiteratureSearchControllerValidationTest {
 
     @Autowired
     private WebTestClient webClient;

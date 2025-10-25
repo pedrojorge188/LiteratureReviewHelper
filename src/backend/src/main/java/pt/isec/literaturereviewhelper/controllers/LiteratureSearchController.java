@@ -19,11 +19,11 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @RestController
 @RequestMapping("api")
-public class SearchEnginesController {
+public class LiteratureSearchController {
 
     private final ApiService apiService;
 
-    public SearchEnginesController(ApiService apiService) {
+    public LiteratureSearchController(ApiService apiService) {
         this.apiService = apiService;
     }
 

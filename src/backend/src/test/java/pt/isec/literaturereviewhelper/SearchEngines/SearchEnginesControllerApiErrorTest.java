@@ -6,7 +6,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import pt.isec.literaturereviewhelper.controllers.SearchEnginesController;
+import pt.isec.literaturereviewhelper.controllers.LiteratureSearchController;
 import pt.isec.literaturereviewhelper.services.ApiService;
 import reactor.core.publisher.Mono;
 import java.nio.charset.StandardCharsets;
@@ -15,8 +15,8 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-@WebFluxTest(controllers = SearchEnginesController.class)
-class SearchEnginesControllerApiErrorTest {
+@WebFluxTest(controllers = LiteratureSearchController.class)
+class LiteratureSearchControllerApiErrorTest {
 
     @Autowired
     private WebTestClient webClient;

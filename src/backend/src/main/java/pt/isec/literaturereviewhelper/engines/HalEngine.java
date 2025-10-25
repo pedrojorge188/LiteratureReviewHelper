@@ -2,8 +2,6 @@ package pt.isec.literaturereviewhelper.engines;
 
 import java.io.StringReader;
 import java.net.URI;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,25 +14,29 @@ import org.jbibtex.BibTeXEntry;
 import org.jbibtex.BibTeXParser;
 import org.jbibtex.Key;
 import org.jbibtex.Value;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import pt.isec.literaturereviewhelper.interfaces.ISearchEngine;
 import pt.isec.literaturereviewhelper.models.Article;
 import reactor.core.publisher.Mono;
 
-public class HalEngine implements ISearchEngine {
+public class HalEngine extends EngineBase {
 
-    private static final Logger log = LoggerFactory.getLogger(HalEngine.class);
     private static final String BASE_URL = "https://api.archives-ouvertes.fr";
     private static final String ENDPOINT = "/search/";
-    
-    private final WebClient webClient;
 
     public HalEngine(WebClient webClient) {
-        this.webClient = webClient;
+        super(webClient);
+    }
+
+    @Override
+    protected String getBaseUrl() {
+        return BASE_URL;
+    }
+
+    @Override
+    protected String getEndpoint() {
+        return ENDPOINT;
     }
 
     @Override
@@ -54,21 +56,6 @@ public class HalEngine implements ISearchEngine {
     @Override
     public String getEngineName() {
         return "HAL";
-    }
-
-    private String buildURL(Map<String, Object> params) {
-        StringBuilder rawQuery = new StringBuilder();
-        params.forEach((k, v) -> {
-            if (!rawQuery.isEmpty()) rawQuery.append("&");
-            rawQuery.append(k).append("=").append(URLEncoder.encode(v.toString(), StandardCharsets.UTF_8));
-        });
-
-        String fullURL = BASE_URL + ENDPOINT;
-        if (!rawQuery.isEmpty()) {
-            fullURL += "?" + rawQuery;
-        }
-        
-        return fullURL;
     }
 
     private List<Article> extractInformation(String bibtexData) {

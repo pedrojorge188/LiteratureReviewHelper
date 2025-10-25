@@ -27,19 +27,11 @@ public class LiteratureSearchController {
     /**
      * Universal search endpoint that routes to different academic search engines.
      * Accepts dynamic parameters based on the source type.
-     * 
-     * Common parameters:
-     * - source: The search engine to use (springer, hal, acm)
-     * - q: The search query
-     * - start: Starting index for pagination
-     * - rows: Number of results to return
-     * 
      * Source-specific parameters are passed through and validated per source.
      */
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<List<Article>> search(@RequestParam Map<String, String> allParams) {
         
-        // Validate and parse source parameter
         String sourceStr = allParams.get("source");
         if (sourceStr == null || sourceStr.isBlank()) {
             throw new IllegalArgumentException("Parameter 'source' is required and cannot be empty");
@@ -56,10 +48,8 @@ public class LiteratureSearchController {
                             .toArray(String[]::new)));
         }
 
-        // Build engine-specific parameters
         Map<String, Object> params = buildEngineParams(source, allParams);
 
-        // Delegate to the appropriate engine via ApiService facade
         return apiService.search(source, params);
     }
 
@@ -72,17 +62,14 @@ public class LiteratureSearchController {
         switch (engine) {
             case SPRINGER -> {
                 validateRequiredParams(allParams, "q", "start", "rows", "api_key");
-                // Map generic params to Springer-specific param names
                 params.put("q", allParams.get("q"));
                 params.put("s", parseInteger(allParams.get("start"), "start"));
                 params.put("p", parseInteger(allParams.get("rows"), "rows"));
                 params.put("api_key", allParams.get("api_key"));
-                // Add any additional parameters
                 addAdditionalParams(params, allParams, "source", "q", "start", "rows", "api_key");
             }
             case HAL -> {
                 validateRequiredParams(allParams, "q", "start", "rows", "wt");
-                // HAL uses standard param names
                 params.put("q", allParams.get("q"));
                 params.put("start", parseInteger(allParams.get("start"), "start"));
                 params.put("rows", parseInteger(allParams.get("rows"), "rows"));
@@ -91,11 +78,9 @@ public class LiteratureSearchController {
             }
             case ACM -> {
                 validateRequiredParams(allParams, "q", "start", "rows");
-                // Map generic params to ACM/Crossref-specific param names
                 params.put("query.bibliographic", allParams.get("q"));
                 params.put("offset", parseInteger(allParams.get("start"), "start"));
                 params.put("rows", parseInteger(allParams.get("rows"), "rows"));
-                // Filter is optional
                 if (allParams.containsKey("filter")) {
                     params.put("filter", allParams.get("filter"));
                 }

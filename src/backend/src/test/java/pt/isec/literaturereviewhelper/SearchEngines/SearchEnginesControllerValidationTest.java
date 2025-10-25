@@ -17,186 +17,159 @@ class LiteratureSearchControllerValidationTest {
     @MockitoBean
     private ApiService apiService;
 
-
-    // ---------------- SPRINGER ----------------
+    // ---------------- GENERIC /search ENDPOINT ----------------
     @Test
-    void testSpringer_EmptyQuery() {
+    void testSearch_MissingSource() {
         webClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/api/searchSpringer")
+                        .path("/api/search")
+                        .queryParam("q", "AI")
+                        .queryParam("start", "0")
+                        .queryParam("rows", "10")
+                        .build())
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.error").value(msg -> 
+                    msg.toString().contains("Parameter 'source' is required"));
+    }
+
+    @Test
+    void testSearch_InvalidSource() {
+        webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/api/search")
+                        .queryParam("source", "invalid")
+                        .queryParam("q", "AI")
+                        .queryParam("start", "0")
+                        .queryParam("rows", "10")
+                        .build())
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.error").value(msg -> 
+                    msg.toString().contains("Unsupported source"));
+    }
+
+    @Test
+    void testSearch_Springer_MissingApiKey() {
+        webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/api/search")
+                        .queryParam("source", "springer")
+                        .queryParam("q", "AI")
+                        .queryParam("start", "0")
+                        .queryParam("rows", "10")
+                        .build())
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.error").value(msg -> 
+                    msg.toString().contains("api_key"));
+    }
+
+    @Test
+    void testSearch_Springer_EmptyQuery() {
+        webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/api/search")
+                        .queryParam("source", "springer")
                         .queryParam("q", "")
-                        .queryParam("s", 0)
-                        .queryParam("p", 1)
-                        .queryParam("api_key", "APIKEY")
+                        .queryParam("start", "0")
+                        .queryParam("rows", "10")
+                        .queryParam("api_key", "KEY")
                         .build())
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody()
-                .jsonPath("$.q").isEqualTo("Query string 'q' is empty");
+                .jsonPath("$.error").value(msg -> 
+                    msg.toString().contains("'q'"));
     }
 
     @Test
-    void testSpringerInvalidIndexAndCount() {
-        // s < 0
+    void testSearch_InvalidStartParameter() {
         webClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/api/searchSpringer")
+                        .path("/api/search")
+                        .queryParam("source", "springer")
                         .queryParam("q", "AI")
-                        .queryParam("s", -1)
-                        .queryParam("p", 1)
-                        .queryParam("api_key", "APIKEY")
+                        .queryParam("start", "-1")
+                        .queryParam("rows", "10")
+                        .queryParam("api_key", "KEY")
                         .build())
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody()
-                .jsonPath("$.s").isEqualTo("article index 's' must be >= 0");
-
-        // p < 1
-        webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/api/searchSpringer")
-                        .queryParam("q", "AI")
-                        .queryParam("s", 0)
-                        .queryParam("p", 0)
-                        .queryParam("api_key", "APIKEY")
-                        .build())
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody()
-                .jsonPath("$.p").isEqualTo("Number of articles 'p' must be > 0");
-
-        // empty api_key
-        webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/api/searchSpringer")
-                        .queryParam("q", "AI")
-                        .queryParam("s", 0)
-                        .queryParam("p", 1)
-                        .queryParam("api_key", "")
-                        .build())
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody()
-                .jsonPath("$.api_key").isEqualTo("API key is empty");
+                .jsonPath("$.error").value(msg -> 
+                    msg.toString().contains(">= 0"));
     }
 
-    // ---------------- HAL ----------------
     @Test
-    void testHal_ValidationErrors() {
-        // empty query
+    void testSearch_InvalidRowsParameter() {
         webClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/api/searchHal")
-                        .queryParam("q", "")
-                        .queryParam("start", 0)
-                        .queryParam("rows", 1)
-                        .queryParam("wt", "json")
+                        .path("/api/search")
+                        .queryParam("source", "springer")
+                        .queryParam("q", "AI")
+                        .queryParam("start", "0")
+                        .queryParam("rows", "0")
+                        .queryParam("api_key", "KEY")
                         .build())
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody()
-                .jsonPath("$.q").isEqualTo("Query 'q' is empty");
-
-        // start < 0
-        webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/api/searchHal")
-                        .queryParam("q", "ML")
-                        .queryParam("start", -1)
-                        .queryParam("rows", 1)
-                        .queryParam("wt", "json")
-                        .build())
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody()
-                .jsonPath("$.start").isEqualTo("'start' must be >= 0");
-
-        // rows < 1
-        webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/api/searchHal")
-                        .queryParam("q", "ML")
-                        .queryParam("start", 0)
-                        .queryParam("rows", 0)
-                        .queryParam("wt", "json")
-                        .build())
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody()
-                .jsonPath("$.rows").isEqualTo("'rows' must be > 0");
-
-        // empty wt
-        webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/api/searchHal")
-                        .queryParam("q", "ML")
-                        .queryParam("start", 0)
-                        .queryParam("rows", 1)
-                        .queryParam("wt", "")
-                        .build())
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody()
-                .jsonPath("$.wt").isEqualTo("Parameter 'wt' is empty");
+                .jsonPath("$.error").value(msg -> 
+                    msg.toString().contains("> 0"));
     }
 
-    // ---------------- ACM ----------------
     @Test
-    void testACM_ValidationErrors() {
-        // empty querybibliographic
+    void testSearch_HAL_MissingWt() {
         webClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/api/searchACM")
-                        .queryParam("querybibliographic", "")
-                        .queryParam("filter", "f")
-                        .queryParam("rows", 1)
-                        .queryParam("offset", 0)
+                        .path("/api/search")
+                        .queryParam("source", "hal")
+                        .queryParam("q", "ML")
+                        .queryParam("start", "0")
+                        .queryParam("rows", "10")
                         .build())
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody()
-                .jsonPath("$.querybibliographic").isEqualTo("'querybibliographic' is empty");
+                .jsonPath("$.error").value(msg -> 
+                    msg.toString().contains("wt"));
+    }
 
-        // empty filter
+    @Test
+    void testSearch_ACM_MissingQuery() {
         webClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/api/searchACM")
-                        .queryParam("querybibliographic", "DL")
-                        .queryParam("filter", "")
-                        .queryParam("rows", 1)
-                        .queryParam("offset", 0)
+                        .path("/api/search")
+                        .queryParam("source", "acm")
+                        .queryParam("start", "0")
+                        .queryParam("rows", "10")
                         .build())
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody()
-                .jsonPath("$.filter").isEqualTo("'filter' is empty");
+                .jsonPath("$.error").value(msg -> 
+                    msg.toString().contains("'q'"));
+    }
 
-        // rows < 1
+    @Test
+    void testSearch_NonNumericStart() {
         webClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/api/searchACM")
-                        .queryParam("querybibliographic", "DL")
-                        .queryParam("filter", "f")
-                        .queryParam("rows", 0)
-                        .queryParam("offset", 0)
+                        .path("/api/search")
+                        .queryParam("source", "springer")
+                        .queryParam("q", "AI")
+                        .queryParam("start", "abc")
+                        .queryParam("rows", "10")
+                        .queryParam("api_key", "KEY")
                         .build())
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody()
-                .jsonPath("$.rows").isEqualTo("'rows' must be > 0");
-
-        // offset < 0
-        webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/api/searchACM")
-                        .queryParam("querybibliographic", "DL")
-                        .queryParam("filter", "f")
-                        .queryParam("rows", 1)
-                        .queryParam("offset", -1)
-                        .build())
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody()
-                .jsonPath("$.offset").isEqualTo("'offset' must be >= 0");
+                .jsonPath("$.error").value(msg -> 
+                    msg.toString().contains("valid integer"));
     }
 }

@@ -13,9 +13,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Facade service that delegates search requests to appropriate search engine implementations
- */
+
 @Service
 public class ApiService {
 

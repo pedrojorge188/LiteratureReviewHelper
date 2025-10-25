@@ -1,4 +1,4 @@
-package pt.isec.literaturereviewhelper.model;
+package pt.isec.literaturereviewhelper.models;
 
 
 public class Article {

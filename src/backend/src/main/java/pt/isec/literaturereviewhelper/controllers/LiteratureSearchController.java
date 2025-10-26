@@ -137,9 +137,6 @@ public class LiteratureSearchController {
         }
     }
 
-    // ============ Deprecated - Use /search endpoint instead ============
-    // These endpoints are kept for backward compatibility
-
     /**
      * @deprecated Use /search?source=springer&q=...&start=...&rows=...&api_key=... instead
      */

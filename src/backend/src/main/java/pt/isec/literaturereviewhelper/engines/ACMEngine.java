@@ -1,19 +1,14 @@
-
-
 package pt.isec.literaturereviewhelper.engines;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import pt.isec.literaturereviewhelper.models.Article;
-import reactor.core.publisher.Mono;
 
 public class ACMEngine extends EngineBase {
 
@@ -35,17 +30,8 @@ public class ACMEngine extends EngineBase {
     }
 
     @Override
-    public Mono<List<Article>> search(Map<String, Object> params) {
-        String fullURL = buildURL(params);
-        
-        return webClient.get()
-                .uri(URI.create(fullURL))
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .bodyToMono(Map.class)
-                .doOnError(e -> log.error("❌ Error fetching from ACM/Crossref: {}", e.getMessage()))
-                .doOnNext(resp -> log.info("✅ Response received from ACM/Crossref"))
-                .map(this::extractInformation);
+    protected Class<?> getResponseType() {
+        return Map.class;
     }
 
     @Override
@@ -53,8 +39,10 @@ public class ACMEngine extends EngineBase {
         return "ACM";
     }
 
+    @Override
     @SuppressWarnings("unchecked")
-    private List<Article> extractInformation(Map<String, Object> data) {
+    protected List<Article> extractInformation(Object responseBody) {
+        Map<String, Object> data = (Map<String, Object>) responseBody;
         List<Article> articles = new ArrayList<>();
 
         if (data.containsKey("message")) {

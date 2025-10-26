@@ -1,7 +1,6 @@
 package pt.isec.literaturereviewhelper.engines;
 
 import java.io.StringReader;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import pt.isec.literaturereviewhelper.models.Article;
-import reactor.core.publisher.Mono;
 
 public class HalEngine extends EngineBase {
 
@@ -40,17 +38,13 @@ public class HalEngine extends EngineBase {
     }
 
     @Override
-    public Mono<List<Article>> search(Map<String, Object> params) {
-        String fullURL = buildURL(params);
-        
-        return webClient.get()
-                .uri(URI.create(fullURL))
-                .accept(MediaType.TEXT_PLAIN)
-                .retrieve()
-                .bodyToMono(String.class)
-                .doOnError(e -> log.error("❌ Error fetching from HAL: {}", e.getMessage()))
-                .doOnNext(resp -> log.info("✅ Response received from HAL"))
-                .map(this::extractInformation);
+    protected MediaType getMediaType() {
+        return MediaType.TEXT_PLAIN;
+    }
+
+    @Override
+    protected Class<?> getResponseType() {
+        return String.class;
     }
 
     @Override
@@ -58,7 +52,9 @@ public class HalEngine extends EngineBase {
         return "HAL";
     }
 
-    private List<Article> extractInformation(String bibtexData) {
+    @Override
+    protected List<Article> extractInformation(Object responseBody) {
+        String bibtexData = (String) responseBody;
         List<Article> articles = new ArrayList<>();
         try {
             BibTeXParser parser = new BibTeXParser();

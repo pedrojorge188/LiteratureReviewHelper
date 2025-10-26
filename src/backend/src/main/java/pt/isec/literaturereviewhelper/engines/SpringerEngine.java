@@ -1,17 +1,14 @@
 package pt.isec.literaturereviewhelper.engines;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import pt.isec.literaturereviewhelper.models.Article;
-import reactor.core.publisher.Mono;
 
 public class SpringerEngine extends EngineBase {
 
@@ -33,17 +30,8 @@ public class SpringerEngine extends EngineBase {
     }
 
     @Override
-    public Mono<List<Article>> search(Map<String, Object> params) {
-        String fullURL = buildURL(params);
-        
-        return webClient.get()
-                .uri(URI.create(fullURL))
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .bodyToMono(Map.class)
-                .doOnError(e -> log.error("❌ Error fetching from Springer: {}", e.getMessage()))
-                .doOnNext(resp -> log.info("✅ Response received from Springer"))
-                .map(this::extractInformation);
+    protected Class<?> getResponseType() {
+        return Map.class;
     }
 
     @Override
@@ -51,7 +39,10 @@ public class SpringerEngine extends EngineBase {
         return "Springer";
     }
 
-    private List<Article> extractInformation(Map<String, Object> data) {
+    @Override
+    @SuppressWarnings("unchecked")
+    protected List<Article> extractInformation(Object responseBody) {
+        Map<String, Object> data = (Map<String, Object>) responseBody;
         Object recordsObj = data.get("records");
         if (!(recordsObj instanceof List<?> recordsList)) {
             return List.of();

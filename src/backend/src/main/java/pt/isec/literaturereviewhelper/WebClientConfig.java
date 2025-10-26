@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import reactor.netty.http.client.HttpClient;
+import reactor.netty.resources.LoopResources;
 
 import java.net.InetSocketAddress;
 import java.util.Objects;
@@ -23,15 +24,19 @@ public class WebClientConfig {
 
     @Bean
     public WebClient webClient() {
-        // Create a Netty HttpClient with custom DNS resolver
+        // Create a Netty HttpClient with custom DNS resolver and NIO event loop
         String dnsServer = environment.getProperty("custom.dns.server");
         int dnsPort = Integer.parseInt(Objects.requireNonNull(environment.getProperty("custom.dns.port")));
-        assert dnsServer != null;
+        
+        // Force NIO event loop to match NioDatagramChannel
+        LoopResources loopResources = LoopResources.create("webflux-http", 1, true);
+        
         HttpClient httpClient = HttpClient.create()
+                .runOn(loopResources)
                 .resolver(new DnsAddressResolverGroup(
                         NioDatagramChannel.class,
                         new SingletonDnsServerAddressStreamProvider(
-                                new InetSocketAddress(dnsServer, dnsPort) // Google DNS
+                                new InetSocketAddress(dnsServer, dnsPort)
                         )
                 ));
 

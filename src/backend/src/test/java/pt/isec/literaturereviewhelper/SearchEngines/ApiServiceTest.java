@@ -2,142 +2,120 @@ package pt.isec.literaturereviewhelper.SearchEngines;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
-import org.springframework.web.reactive.function.client.*;
+import pt.isec.literaturereviewhelper.factory.SearchEngineFactory;
+import pt.isec.literaturereviewhelper.interfaces.ISearchEngine;
 import pt.isec.literaturereviewhelper.models.Article;
+import pt.isec.literaturereviewhelper.models.Engines;
 import pt.isec.literaturereviewhelper.services.ApiService;
 import reactor.core.publisher.Mono;
 
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Tests for ApiService facade
+ */
 class ApiServiceTest {
 
-    private WebClient webClient;
-    private WebClient.RequestHeadersUriSpec requestUriSpec;
-    private WebClient.RequestHeadersSpec requestHeadersSpec;
-    private WebClient.ResponseSpec responseSpec;
+    private SearchEngineFactory factory;
+    private ISearchEngine mockEngine;
     private ApiService apiService;
 
     @BeforeEach
     void setUp() {
-        webClient = mock(WebClient.class);
-        requestUriSpec = mock(WebClient.RequestHeadersUriSpec.class); // raw type
-        requestHeadersSpec = mock(WebClient.RequestHeadersSpec.class); // raw type
-        responseSpec = mock(WebClient.ResponseSpec.class);
-
-        // chain mocking using raw types
-        when(webClient.get()).thenReturn(requestUriSpec);
-        when(requestUriSpec.uri(any(URI.class))).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.accept(any(MediaType.class))).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-
-        apiService = new ApiService(webClient);
+        factory = mock(SearchEngineFactory.class);
+        mockEngine = mock(ISearchEngine.class);
+        apiService = new ApiService(factory);
     }
 
-    // ---------------- Test searchAsync with WebClient error ----------------
     @Test
-    void testSearchAsyncApiError() {
-        // Simulate WebClient error
-        when(responseSpec.bodyToMono(Map.class))
-                .thenReturn(Mono.error(new WebClientResponseException(
-                        500, "Internal Server Error", null,
-                        "Something went wrong".getBytes(StandardCharsets.UTF_8),
-                        StandardCharsets.UTF_8
-                )));
-
-        Mono<List<Article>> resultMono = apiService.searchAsync(
-                "http://dummy.com",
-                "/test",
-                Map.of("q", "AI"),
-                Map.class,
-                map -> List.of(),
-                MediaType.APPLICATION_JSON
+    void testSearchWithSpringer() {
+        // Arrange
+        Map<String, Object> params = Map.of("q", "AI", "s", 0, "p", 10, "api_key", "KEY");
+        Article expectedArticle = new Article(
+                "Test Article", "2023", "Springer Journal",
+                "Article", "John Doe", "http://example.com", "SpringerNature"
         );
+        
+        when(factory.createSearchEngine(Engines.SPRINGER)).thenReturn(mockEngine);
+        when(mockEngine.search(params)).thenReturn(Mono.just(List.of(expectedArticle)));
 
-        WebClientResponseException ex = assertThrows(WebClientResponseException.class, resultMono::block);
-        assertEquals(500, ex.getRawStatusCode());
-        assertEquals("Internal Server Error", ex.getStatusText());
+        // Act
+        List<Article> result = apiService.search(Engines.SPRINGER, params).block();
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("Test Article", result.get(0).getTitle());
+        verify(factory).createSearchEngine(Engines.SPRINGER);
+        verify(mockEngine).search(params);
     }
 
-    // ---------------- Test extractSpringerInformation ----------------
     @Test
-    void testExtractSpringerInformation() {
-        Map<String, Object> record = Map.of(
-                "title", "Test Article",
-                "publicationDate", "2023-05-01",
-                "publicationName", "Springer Journal",
-                "contentType", "Article",
-                "creators", List.of(Map.of("creator", "John Doe")),
-                "url", List.of(Map.of("value", "http://example.com"))
+    void testSearchWithHAL() {
+        // Arrange
+        Map<String, Object> params = Map.of("q", "ML", "start", 0, "rows", 10, "wt", "bibtex");
+        Article expectedArticle = new Article(
+                "HAL Paper", "2022", "HAL Conference",
+                "Conference", "Jane Doe", "http://hal.link", "HAL Open Science"
         );
-        Map<String, Object> data = Map.of("records", List.of(record));
+        
+        when(factory.createSearchEngine(Engines.HAL)).thenReturn(mockEngine);
+        when(mockEngine.search(params)).thenReturn(Mono.just(List.of(expectedArticle)));
 
-        List<Article> articles = apiService.extractSpringerInformation(data);
+        // Act
+        List<Article> result = apiService.search(Engines.HAL, params).block();
 
-        assertEquals(1, articles.size());
-        Article a = articles.get(0);
-        assertEquals("Test Article", a.getTitle());
-        assertEquals("Springer Journal", a.getVenue());
-        assertEquals("Article", a.getVenueType());
-        assertEquals("John Doe", a.getAuthors());
-        assertEquals("http://example.com", a.getLink());
-        assertEquals("SpringerNature", a.getSource());
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("HAL Paper", result.get(0).getTitle());
+        verify(factory).createSearchEngine(Engines.HAL);
+        verify(mockEngine).search(params);
     }
 
-    // ---------------- Test extractHalInformation ----------------
     @Test
-    void testExtractHalInformation() {
-        String bibtex = """
-                @article{test1,
-                  title={Sample HAL Paper},
-                  author={Alice Smith and Bob Jones},
-                  year={2022},
-                  journal={HAL Journal},
-                  url={http://hal.example.com}
-                }
-                """;
-
-        List<Article> articles = apiService.extractHalInformation(bibtex);
-
-        assertEquals(1, articles.size());
-        Article a = articles.get(0);
-        assertEquals("Sample HAL Paper", a.getTitle());
-        assertEquals("HAL Journal", a.getVenue());
-        assertEquals("Journal Article", a.getVenueType());
-        assertEquals("Alice Smith, Bob Jones", a.getAuthors());
-        assertEquals("http://hal.example.com", a.getLink());
-        assertEquals("HAL Open Science", a.getSource());
-    }
-
-    // ---------------- Test extractACMInformation ----------------
-    @Test
-    void testExtractACMInformation() {
-        Map<String, Object> entry = Map.of(
-                "title", List.of("ACM Paper"),
-                "published-print", Map.of("date-parts", List.of(List.of(2021))),
-                "author", List.of(Map.of("given", "Jane", "family", "Doe")),
-                "container-title", List.of("ACM Conference"),
-                "type", "inproceedings",
-                "link", List.of(Map.of("URL", "http://acm.example.com"))
+    void testSearchWithACM() {
+        // Arrange
+        Map<String, Object> params = Map.of(
+                "query.bibliographic", "Deep Learning",
+                "offset", 0,
+                "rows", 10
         );
-        Map<String, Object> message = Map.of("items", List.of(entry));
-        Map<String, Object> data = Map.of("message", message);
+        Article expectedArticle = new Article(
+                "ACM Paper", "2021", "ACM Journal",
+                "Journal", "Alice Smith", "http://acm.link", "ACM Digital Library"
+        );
+        
+        when(factory.createSearchEngine(Engines.ACM)).thenReturn(mockEngine);
+        when(mockEngine.search(params)).thenReturn(Mono.just(List.of(expectedArticle)));
 
-        List<Article> articles = apiService.extractACMInformation(data);
+        // Act
+        List<Article> result = apiService.search(Engines.ACM, params).block();
 
-        assertEquals(1, articles.size());
-        Article a = articles.get(0);
-        assertEquals("ACM Paper", a.getTitle());
-        assertEquals("ACM Conference", a.getVenue());
-        assertEquals("inproceedings", a.getVenueType());
-        assertEquals("Jane Doe", a.getAuthors());
-        assertEquals("http://acm.example.com", a.getLink());
-        assertEquals("ACM Digital Library", a.getSource());
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("ACM Paper", result.get(0).getTitle());
+        verify(factory).createSearchEngine(Engines.ACM);
+        verify(mockEngine).search(params);
+    }
+
+    @Test
+    void testSearchDelegatesCorrectly() {
+        // Verify that ApiService properly delegates to the factory
+        Map<String, Object> params = Map.of("test", "value");
+        
+        when(factory.createSearchEngine(any())).thenReturn(mockEngine);
+        when(mockEngine.search(any())).thenReturn(Mono.just(List.of()));
+
+        apiService.search(Engines.SPRINGER, params).block();
+
+        verify(factory, times(1)).createSearchEngine(Engines.SPRINGER);
+        verify(mockEngine, times(1)).search(params);
     }
 }

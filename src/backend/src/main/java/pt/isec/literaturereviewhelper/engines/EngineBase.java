@@ -106,16 +106,15 @@ public abstract class EngineBase<R> implements ISearchEngine {
     protected Integer parseInteger(String value, String paramName) {
         try {
             int parsed = Integer.parseInt(value);
-            if (paramName.contains("start") || paramName.contains("offset")) {
-                if (parsed < 0) {
-                    throw new IllegalArgumentException("Parameter '" + paramName + "' must be >= 0");
-                }
+
+            if ((paramName.contains("start") || paramName.contains("offset")) && parsed < 0) {
+                throw new IllegalArgumentException("Parameter '" + paramName + "' must be >= 0");
             }
-            if (paramName.contains("rows") || paramName.contains("p")) {
-                if (parsed < 1) {
-                    throw new IllegalArgumentException("Parameter '" + paramName + "' must be > 0");
-                }
+
+            if ((paramName.contains("rows") || paramName.contains("p")) && parsed < 1) {
+                throw new IllegalArgumentException("Parameter '" + paramName + "' must be > 0");
             }
+
             return parsed;
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Parameter '" + paramName + "' must be a valid integer");

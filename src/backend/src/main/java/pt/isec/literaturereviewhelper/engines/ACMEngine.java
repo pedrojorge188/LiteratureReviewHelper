@@ -10,6 +10,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import pt.isec.literaturereviewhelper.interfaces.IResultMapper;
 import pt.isec.literaturereviewhelper.models.ACMResponse;
 
+import static pt.isec.literaturereviewhelper.commons.Params.*;
+
 @Component
 public class ACMEngine extends EngineBase<ACMResponse> {
     private static final String BASE_URL = "https://api.crossref.org";
@@ -41,16 +43,16 @@ public class ACMEngine extends EngineBase<ACMResponse> {
 
     @Override
     protected List<String> getRequiredParameters() {
-        return List.of("q", "start", "rows");
+        return List.of(QUERY, START, ROWS);
     }
 
     @Override
     public Map<String, Object> mapParams(Map<String, String> raw) {
         Map<String, Object> p = new HashMap<>();
 
-        p.put("query.bibliographic", raw.get("q"));
-        p.put("offset", parseInteger(raw.get("start"), "start"));
-        p.put("rows",   parseInteger(raw.get("rows"), "rows"));
+        p.put("query.bibliographic", raw.get(QUERY));
+        p.put("offset", parseInteger(raw.get(START), START));
+        p.put("rows",   parseInteger(raw.get(ROWS), ROWS));
         p.put("filter", raw.getOrDefault("filter", "prefix:10.1145"));
 
         return p;

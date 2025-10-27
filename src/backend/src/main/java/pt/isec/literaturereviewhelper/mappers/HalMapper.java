@@ -10,9 +10,12 @@ import pt.isec.literaturereviewhelper.models.HalResponse;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Component("halResultMapper")
 public class HalMapper implements IResultMapper<String> {
+    private static final Pattern AND_SPLIT = Pattern.compile("\\s++and\\s++");
+
     @Override
     public List<Article> map(String bibtexData) {
         if (bibtexData == null || bibtexData.isBlank()) return List.of();
@@ -63,7 +66,7 @@ public class HalMapper implements IResultMapper<String> {
                 String rawAuthors = getField(entry, "AUTHOR");
                 if (!rawAuthors.isBlank()) {
                     // BibTeX joins authors
-                    String[] arr = rawAuthors.split("\\s+and\\s+");
+                    String[] arr = AND_SPLIT.split(rawAuthors);
                     for (String a : arr) {
                         String cleaned = a.trim();
                         if (!cleaned.isBlank()) e.getAuthors().add(cleaned);
@@ -89,7 +92,10 @@ public class HalMapper implements IResultMapper<String> {
 
                 response.addEntry(e);
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            // It won't throw an error here because parsing failures or malformed BibTeX won't throw nor crash.
+            // Returning an empty HalResponse is valid because it's treated on the caller side.
+        }
         return response;
     }
 

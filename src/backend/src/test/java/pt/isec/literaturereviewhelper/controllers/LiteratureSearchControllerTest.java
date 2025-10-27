@@ -137,8 +137,14 @@ class LiteratureSearchControllerTest {
     @Test
     void testForwardsAllParamsUnchangedToApiService() {
         // Check param passthrough
-        Map<String, String> q = Map.of("q", "ai", "start", "0", "rows", "5", "api_key", "k", "source", "ACM");
-        when(apiService.search(eq(Engines.ACM), eq(q))).thenReturn(Mono.just(List.of(a("x", Engines.ACM))));
+        Map<String, String> q = Map.of(
+                "q", "ai",
+                "start", "0",
+                "rows", "5",
+                "api_key", "k",
+                "source", "ACM"
+        );
+        when(apiService.search(Engines.ACM, q)).thenReturn(Mono.just(List.of(a("x", Engines.ACM))));
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
@@ -154,6 +160,6 @@ class LiteratureSearchControllerTest {
                 .expectBodyList(Article.class)
                 .hasSize(1);
 
-        verify(apiService).search(eq(Engines.ACM), eq(q));
+        verify(apiService).search(Engines.ACM, q);
     }
 }

@@ -41,10 +41,10 @@ public class SpringerResponse {
     }
 
     public static class Creator {
-        private String creator;
+        private String name;
 
-        public String getCreator() { return creator; }
-        public void setCreator(String creator) { this.creator = creator; }
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
     }
 
     public static class Url {

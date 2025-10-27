@@ -7,6 +7,9 @@ import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import pt.isec.literaturereviewhelper.interfaces.IResultMapper;
+
+import static pt.isec.literaturereviewhelper.commons.Params.*;
+
 public class HalEngine extends EngineBase<String> {
     private static final String BASE_URL = "https://api.archives-ouvertes.fr";
     private static final String ENDPOINT = "/search/";
@@ -42,17 +45,17 @@ public class HalEngine extends EngineBase<String> {
 
     @Override
     protected List<String> getRequiredParameters() {
-        return List.of("q", "start", "rows", "wt");
+        return List.of(QUERY, START, ROWS, WT);
     }
 
     @Override
     public Map<String, Object> mapParams(Map<String, String> raw) {
         Map<String, Object> p = new HashMap<>();
 
-        p.put("q", raw.get("q"));
-        p.put("start", parseInteger(raw.get("start"), "start"));
-        p.put("rows", parseInteger(raw.get("rows"), "rows"));
-        p.put("wt", raw.get("wt"));
+        p.put("q", raw.get(QUERY));
+        p.put("start", parseInteger(raw.get(START), START));
+        p.put("rows", parseInteger(raw.get(ROWS), ROWS));
+        p.put("wt", raw.get(WT));
 
         return p;
     }

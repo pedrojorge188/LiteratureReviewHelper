@@ -51,7 +51,7 @@ public class ACMResponse {
         public void setContainerTitle(List<String> containerTitle) { this.containerTitle = containerTitle; }
         public void setAuthor(List<Author> authors) { this.author = authors; }
         public void setPublishedPrint(PublishedDate publishedPrint) { this.publishedPrint = publishedPrint; }
-        public void setPublishedOnline(PublishedDate publishedOnline) { this.publishedPrint = publishedOnline; }
+        public void setPublishedOnline(PublishedDate publishedOnline) { this.publishedOnline = publishedOnline; }
         public void setLink(List<Map<String, String>> link) { this.link = link; }
     }
 

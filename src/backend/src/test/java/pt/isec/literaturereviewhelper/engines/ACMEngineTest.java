@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-class ACMResponseEngineTest {
+class ACMEngineTest {
     protected WebClient webClient;
     @SuppressWarnings("rawtypes")
     protected WebClient.RequestHeadersUriSpec requestHeadersUriSpec;
@@ -65,7 +65,7 @@ class ACMResponseEngineTest {
         );
 
         ACMResponse acmResponse = new ACMResponse();
-        when(responseSpec.bodyToMono(eq(ACMResponse.class))).thenReturn(Mono.just(acmResponse));
+        when(responseSpec.bodyToMono(ACMResponse.class)).thenReturn(Mono.just(acmResponse));
 
         List<Article> mapped = List.of(
                 new Article("AI Research Paper", "2024", "Journal of AI", "journal-article",
@@ -83,7 +83,7 @@ class ACMResponseEngineTest {
                 .verifyComplete();
 
         verify(resultMapper, times(1)).map(acmResponse);
-        verify(responseSpec, times(1)).bodyToMono(eq(ACMResponse.class));
+        verify(responseSpec, times(1)).bodyToMono(ACMResponse.class);
     }
 
     @Test
@@ -95,7 +95,7 @@ class ACMResponseEngineTest {
                 "rows", "5"
         );
 
-        when(responseSpec.bodyToMono(eq(ACMResponse.class))).thenReturn(Mono.just(new ACMResponse()));
+        when(responseSpec.bodyToMono(ACMResponse.class)).thenReturn(Mono.just(new ACMResponse()));
         when(resultMapper.map(any(ACMResponse.class))).thenReturn(List.of());
 
         // Act
@@ -133,7 +133,7 @@ class ACMResponseEngineTest {
     void testPropagatesErrorFromHttp() {
         // Arrange
         RuntimeException boom = new RuntimeException("API Error");
-        when(responseSpec.bodyToMono(eq(ACMResponse.class))).thenReturn(Mono.error(boom));
+        when(responseSpec.bodyToMono(ACMResponse.class)).thenReturn(Mono.error(boom));
 
         // Act
         Mono<List<Article>> result = acmEngine.search(Map.of("q", "test", "start", "0", "rows", "1"));

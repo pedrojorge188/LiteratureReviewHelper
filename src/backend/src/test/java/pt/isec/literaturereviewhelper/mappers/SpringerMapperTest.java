@@ -32,7 +32,7 @@ class SpringerMapperTest {
             rec.setCreators(
                     creators.stream().map(s -> {
                         SpringerResponse.Creator c = new SpringerResponse.Creator();
-                        c.setCreator(s);
+                        c.setName(s);
                         return c;
                     }).toList()
             );
@@ -140,12 +140,12 @@ class SpringerMapperTest {
         SpringerResponse.Record rec = new SpringerResponse.Record();
         rec.setTitle("T");
         var c1 = new SpringerResponse.Creator();
-        c1.setCreator(null);
+        c1.setName(null);
         SpringerResponse.Creator c2 = null;
         var c3 = new SpringerResponse.Creator();
-        c3.setCreator("   ");
+        c3.setName("   ");
         var c4 = new SpringerResponse.Creator();
-        c4.setCreator("Alice Doe");
+        c4.setName("Alice Doe");
 
         rec.setCreators(java.util.Arrays.asList(c1, c2, c3, c4));
 

@@ -68,7 +68,7 @@ public class ACMMapper implements IResultMapper<ACMResponse> {
 
                     return new Article(title, year, venue, type, authors, link, Engines.ACM);
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private String extractYear(List<List<Integer>> dateParts) {

@@ -19,34 +19,34 @@ public class SpringerMapper implements IResultMapper<SpringerResponse> {
         if (response == null || response.getRecords() == null)
             return Collections.emptyList();
 
-        return response.getRecords().stream().map(record -> {
+        return response.getRecords().stream().map(rec -> {
             // Title
-            String title = Optional.ofNullable(record.getTitle())
+            String title = Optional.ofNullable(rec.getTitle())
                     .map(s -> s.replace("\n", " ").trim())
                     .orElse("");
 
             // Year
-            String pubDate = Optional.ofNullable(record.getPublicationDate()).orElse("");
+            String pubDate = Optional.ofNullable(rec.getPublicationDate()).orElse("");
             String year = pubDate.contains("-") ? pubDate.split("-")[0] : pubDate;
 
             // Venue and type
-            String venue = Optional.ofNullable(record.getPublicationName()).orElse("");
-            String venueType = Optional.ofNullable(record.getContentType()).orElse("");
+            String venue = Optional.ofNullable(rec.getPublicationName()).orElse("");
+            String venueType = Optional.ofNullable(rec.getContentType()).orElse("");
 
             // Authors
             String authors = "";
-            if (record.getCreators() != null) {
-                authors = record.getCreators().stream()
+            if (rec.getCreators() != null) {
+                authors = rec.getCreators().stream()
                         .filter(Objects::nonNull)
-                        .map(SpringerResponse.Creator::getCreator)
+                        .map(SpringerResponse.Creator::getName)
                         .filter(s -> s != null && !s.isBlank())
                         .collect(Collectors.joining(", "));
             }
 
             // Link
             String link = "";
-            if (record.getUrl() != null && !record.getUrl().isEmpty()) {
-                link = Optional.ofNullable(record.getUrl().get(0).getValue()).orElse("");
+            if (rec.getUrl() != null && !rec.getUrl().isEmpty()) {
+                link = Optional.ofNullable(rec.getUrl().get(0).getValue()).orElse("");
             }
 
             return new Article(
@@ -58,6 +58,6 @@ public class SpringerMapper implements IResultMapper<SpringerResponse> {
                     link,
                     Engines.SPRINGER
             );
-        }).collect(Collectors.toList());
+        }).toList();
     }
 }

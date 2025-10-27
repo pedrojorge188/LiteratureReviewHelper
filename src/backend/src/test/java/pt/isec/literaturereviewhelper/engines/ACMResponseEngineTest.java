@@ -33,7 +33,6 @@ class ACMResponseEngineTest {
     private IResultMapper<ACMResponse> resultMapper;
     private ACMEngine acmEngine;
 
-    @SuppressWarnings("unchecked")
     @BeforeEach
     void setUp() {
         webClient = mock(WebClient.class);

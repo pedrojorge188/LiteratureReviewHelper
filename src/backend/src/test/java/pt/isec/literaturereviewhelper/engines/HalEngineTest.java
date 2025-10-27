@@ -28,7 +28,6 @@ class HalEngineTest {
     private IResultMapper<String> mapper;
     private HalEngine halEngine;
 
-    @SuppressWarnings("unchecked")
     @BeforeEach
     void setUp() {
         WebClient webClient = mock(WebClient.class);

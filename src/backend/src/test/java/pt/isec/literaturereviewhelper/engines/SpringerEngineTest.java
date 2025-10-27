@@ -29,7 +29,6 @@ class SpringerEngineTest {
     private IResultMapper<SpringerResponse> resultMapper;
     private SpringerEngine springerEngine;
 
-    @SuppressWarnings("unchecked")
     @BeforeEach
     void setUp() {
         WebClient webClient = mock(WebClient.class);

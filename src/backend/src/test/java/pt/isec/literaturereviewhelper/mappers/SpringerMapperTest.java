@@ -18,7 +18,7 @@ class SpringerMapperTest {
         return r;
     }
 
-    private static SpringerResponse.Record record(
+    private static SpringerResponse.Record rec(
             String title, String publicationDate, String publicationName,
             String contentType, List<String> creators, String url
     ) {
@@ -50,7 +50,7 @@ class SpringerMapperTest {
     @Test
     void testMapsFullRecord() {
         SpringerResponse response = makeResponse(
-                record(
+                rec(
                         "AI Research Paper",
                         "2024-01-15",
                         "Journal of AI",
@@ -85,7 +85,7 @@ class SpringerMapperTest {
     @Test
     void testHandlesPartialRecordGracefully() {
         SpringerResponse response = makeResponse(
-                record(
+                rec(
                         "Incomplete Article",
                         null,
                         null,
@@ -111,7 +111,7 @@ class SpringerMapperTest {
     @Test
     void testNormalizesTitleNewlines() {
         SpringerResponse response = makeResponse(
-                record("Title with\nnewlines\nand  spaces", null, null, null, null, null)
+                rec("Title with\nnewlines\nand  spaces", null, null, null, null, null)
         );
 
         List<Article> out = mapper.map(response);
@@ -123,9 +123,9 @@ class SpringerMapperTest {
     @Test
     void testMapsMultipleRecords() {
         SpringerResponse response = makeResponse(
-                record("Article 1", "2023-01-01", null, null, null, null),
-                record("Article 2", "2023-02-01", null, null, null, null),
-                record("Article 3", "2023-03-01", null, null, null, null)
+                rec("Article 1", "2023-01-01", null, null, null, null),
+                rec("Article 2", "2023-02-01", null, null, null, null),
+                rec("Article 3", "2023-03-01", null, null, null, null)
         );
 
         List<Article> out = mapper.map(response);

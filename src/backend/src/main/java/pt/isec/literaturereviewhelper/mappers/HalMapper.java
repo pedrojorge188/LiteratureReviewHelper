@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 @Component("halResultMapper")
 public class HalMapper implements IResultMapper<String> {
-    private static final Pattern AND_SPLIT = Pattern.compile("\\s++and\\s++");
+    private static final String AND_SPLIT = " and ";
 
     @Override
     public List<Article> map(String bibtexData) {
@@ -66,7 +66,7 @@ public class HalMapper implements IResultMapper<String> {
                 String rawAuthors = getField(entry, "AUTHOR");
                 if (!rawAuthors.isBlank()) {
                     // BibTeX joins authors
-                    String[] arr = AND_SPLIT.split(rawAuthors);
+                    String[] arr = rawAuthors.split(Pattern.quote(AND_SPLIT));
                     for (String a : arr) {
                         String cleaned = a.trim();
                         if (!cleaned.isBlank()) e.getAuthors().add(cleaned);

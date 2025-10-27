@@ -22,11 +22,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class SpringerEngineTest {
-    private WebClient webClient;
     @SuppressWarnings("rawtypes")
     private WebClient.RequestHeadersUriSpec requestHeadersUriSpec;
-    @SuppressWarnings("rawtypes")
-    private WebClient.RequestHeadersSpec requestHeadersSpec;
     private WebClient.ResponseSpec responseSpec;
 
     private IResultMapper<SpringerResponse> resultMapper;
@@ -35,9 +32,9 @@ class SpringerEngineTest {
     @SuppressWarnings("unchecked")
     @BeforeEach
     void setUp() {
-        webClient = mock(WebClient.class);
+        WebClient webClient = mock(WebClient.class);
         requestHeadersUriSpec = mock(WebClient.RequestHeadersUriSpec.class);
-        requestHeadersSpec = mock(WebClient.RequestHeadersSpec.class);
+        WebClient.RequestHeadersSpec requestHeadersSpec = mock(WebClient.RequestHeadersSpec.class);
         responseSpec = mock(WebClient.ResponseSpec.class);
 
         when(webClient.get()).thenReturn(requestHeadersUriSpec);
@@ -61,7 +58,7 @@ class SpringerEngineTest {
                 "q", "artificial intelligence",
                 "start", "0",
                 "rows", "10",
-                "api_key", "test-key" //TODO: Validar isto
+                "api_key", "test-key"
         );
 
         SpringerResponse resp = new SpringerResponse();
@@ -95,7 +92,7 @@ class SpringerEngineTest {
                 "q", "machine learning",
                 "start", "0",
                 "rows", "5",
-                "api_key", "abc123" //TODO: Validar isto
+                "api_key", "abc123"
         );
 
         when(responseSpec.bodyToMono(SpringerResponse.class))

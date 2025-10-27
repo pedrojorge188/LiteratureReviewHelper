@@ -21,11 +21,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class HalEngineTest {
-    private WebClient webClient;
     @SuppressWarnings("rawtypes")
     private WebClient.RequestHeadersUriSpec requestHeadersUriSpec;
-    @SuppressWarnings("rawtypes")
-    private WebClient.RequestHeadersSpec requestHeadersSpec;
     private WebClient.ResponseSpec responseSpec;
 
     private IResultMapper<String> mapper;
@@ -34,9 +31,9 @@ class HalEngineTest {
     @SuppressWarnings("unchecked")
     @BeforeEach
     void setUp() {
-        webClient = mock(WebClient.class);
+        WebClient webClient = mock(WebClient.class);
         requestHeadersUriSpec = mock(WebClient.RequestHeadersUriSpec.class);
-        requestHeadersSpec = mock(WebClient.RequestHeadersSpec.class);
+        WebClient.RequestHeadersSpec requestHeadersSpec = mock(WebClient.RequestHeadersSpec.class);
         responseSpec = mock(WebClient.ResponseSpec.class);
         mapper = mock(IResultMapper.class);
 

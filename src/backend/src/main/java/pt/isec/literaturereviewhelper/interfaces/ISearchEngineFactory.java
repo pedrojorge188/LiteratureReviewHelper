@@ -1,7 +1,7 @@
-
 package pt.isec.literaturereviewhelper.interfaces;
 
-public interface ISearchEngineFactory {
+import pt.isec.literaturereviewhelper.models.Engines;
 
-    ISearchEngine getSearchEngine(String engineName);
+public interface ISearchEngineFactory {
+    ISearchEngine createSearchEngine(Engines type);
 }

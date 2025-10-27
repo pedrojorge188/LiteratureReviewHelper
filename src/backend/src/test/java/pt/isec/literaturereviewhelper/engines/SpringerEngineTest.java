@@ -5,7 +5,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import pt.isec.literaturereviewhelper.interfaces.IResultMapper;
 import pt.isec.literaturereviewhelper.models.Article;
+import pt.isec.literaturereviewhelper.models.SpringerResponse;
+
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -18,21 +22,18 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class SpringerEngineTest {
-
-    private WebClient webClient;
     @SuppressWarnings("rawtypes")
     private WebClient.RequestHeadersUriSpec requestHeadersUriSpec;
-    @SuppressWarnings("rawtypes")
-    private WebClient.RequestHeadersSpec requestHeadersSpec;
     private WebClient.ResponseSpec responseSpec;
+
+    private IResultMapper<SpringerResponse> resultMapper;
     private SpringerEngine springerEngine;
 
-    @SuppressWarnings("unchecked")
     @BeforeEach
     void setUp() {
-        webClient = mock(WebClient.class);
+        WebClient webClient = mock(WebClient.class);
         requestHeadersUriSpec = mock(WebClient.RequestHeadersUriSpec.class);
-        requestHeadersSpec = mock(WebClient.RequestHeadersSpec.class);
+        WebClient.RequestHeadersSpec requestHeadersSpec = mock(WebClient.RequestHeadersSpec.class);
         responseSpec = mock(WebClient.ResponseSpec.class);
 
         when(webClient.get()).thenReturn(requestHeadersUriSpec);
@@ -40,7 +41,8 @@ class SpringerEngineTest {
         when(requestHeadersSpec.accept(MediaType.APPLICATION_JSON)).thenReturn(requestHeadersSpec);
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
 
-        springerEngine = new SpringerEngine(webClient);
+        resultMapper = mock(IResultMapper.class);
+        springerEngine = new SpringerEngine(webClient, resultMapper);
     }
 
     @Test
@@ -49,211 +51,99 @@ class SpringerEngineTest {
     }
 
     @Test
-    void testSearchSuccess() {
-        // Arrange
-        Map<String, Object> params = Map.of(
+    void testSearchSuccessMapsResponse() {
+        // Assert
+        Map<String, String> raw = Map.of(
                 "q", "artificial intelligence",
-                "s", 0,
-                "p", 10,
+                "start", "0",
+                "rows", "10",
                 "api_key", "test-key"
         );
 
-        Map<String, Object> mockResponse = Map.of(
-                "records", List.of(
-                        Map.of(
-                                "title", "AI Research Paper",
-                                "publicationDate", "2024-01-15",
-                                "publicationName", "Journal of AI",
-                                "contentType", "Article",
-                                "creators", List.of(
-                                        Map.of("creator", "John Doe"),
-                                        Map.of("creator", "Jane Smith")
-                                ),
-                                "url", List.of(
-                                        Map.of("value", "https://example.com/article")
-                                )
-                        )
-                )
-        );
+        SpringerResponse resp = new SpringerResponse();
+        SpringerResponse.Record rec = new SpringerResponse.Record();
+        rec.setTitle("AI Research Paper");
+        rec.setPublicationDate("2024-01-15");
+        resp.setRecords(List.of(rec));
 
-        when(responseSpec.bodyToMono(Map.class)).thenReturn(Mono.just(mockResponse));
+        List<Article> mapped = List.of(new Article(
+                "AI Research Paper", "2024", "", "",
+                "", "", pt.isec.literaturereviewhelper.models.Engines.SPRINGER
+        ));
 
-        // Act
-        Mono<List<Article>> result = springerEngine.search(params);
+        when(responseSpec.bodyToMono(SpringerResponse.class)).thenReturn(Mono.just(resp));
+        when(resultMapper.map(resp)).thenReturn(mapped);
 
-        // Assert
-        StepVerifier.create(result)
-                .assertNext(articles -> {
-                    assertEquals(1, articles.size());
-                    Article article = articles.get(0);
-                    assertEquals("AI Research Paper", article.getTitle());
-                    assertEquals("2024", article.getPublicationYear());
-                    assertEquals("Journal of AI", article.getVenue());
-                    assertEquals("Article", article.getVenueType());
-                    assertEquals("John Doe, Jane Smith", article.getAuthors());
-                    assertEquals("https://example.com/article", article.getLink());
-                    assertEquals("SpringerNature", article.getSource());
+        Mono<List<Article>> out = springerEngine.search(raw);
+
+        StepVerifier.create(out)
+                .assertNext(list -> {
+                    assertEquals(1, list.size());
+                    assertEquals("AI Research Paper", list.get(0).title());
+                    assertEquals("2024", list.get(0).publicationYear());
                 })
                 .verifyComplete();
     }
 
     @Test
-    void testSearchWithEmptyRecords() {
-        // Arrange
-        Map<String, Object> params = Map.of("q", "test");
-        Map<String, Object> mockResponse = Map.of("records", List.of());
-
-        when(responseSpec.bodyToMono(Map.class)).thenReturn(Mono.just(mockResponse));
-
-        // Act
-        Mono<List<Article>> result = springerEngine.search(params);
-
-        // Assert
-        StepVerifier.create(result)
-                .assertNext(articles -> assertEquals(0, articles.size()))
-                .verifyComplete();
-    }
-
-    @Test
-    void testSearchWithMissingRecordsField() {
-        // Arrange
-        Map<String, Object> params = Map.of("q", "test");
-        Map<String, Object> mockResponse = Map.of("message", "No records");
-
-        when(responseSpec.bodyToMono(Map.class)).thenReturn(Mono.just(mockResponse));
-
-        // Act
-        Mono<List<Article>> result = springerEngine.search(params);
-
-        // Assert
-        StepVerifier.create(result)
-                .assertNext(articles -> assertEquals(0, articles.size()))
-                .verifyComplete();
-    }
-
-    @Test
-    void testSearchWithPartialData() {
-        // Arrange
-        Map<String, Object> params = Map.of("q", "test");
-        Map<String, Object> mockResponse = Map.of(
-                "records", List.of(
-                        Map.of(
-                                "title", "Incomplete Article"
-                                // Missing other fields
-                        )
-                )
-        );
-
-        when(responseSpec.bodyToMono(Map.class)).thenReturn(Mono.just(mockResponse));
-
-        // Act
-        Mono<List<Article>> result = springerEngine.search(params);
-
-        // Assert
-        StepVerifier.create(result)
-                .assertNext(articles -> {
-                    assertEquals(1, articles.size());
-                    Article article = articles.get(0);
-                    assertEquals("Incomplete Article", article.getTitle());
-                    assertEquals("", article.getPublicationYear());
-                    assertEquals("", article.getVenue());
-                    assertEquals("", article.getVenueType());
-                    assertEquals("", article.getAuthors());
-                    assertNull(article.getLink());
-                })
-                .verifyComplete();
-    }
-
-    @Test
-    void testSearchBuildsCorrectUrl() {
-        // Arrange
-        Map<String, Object> params = Map.of(
+    void testBuildsCorrectUrlAndUsesMappedParams() {
+        Map<String, String> raw = Map.of(
                 "q", "machine learning",
-                "s", 0,
-                "p", 5
+                "start", "0",
+                "rows", "5",
+                "api_key", "abc123"
         );
 
-        when(responseSpec.bodyToMono(Map.class)).thenReturn(Mono.just(Map.of("records", List.of())));
+        when(responseSpec.bodyToMono(SpringerResponse.class))
+                .thenReturn(Mono.just(new SpringerResponse()));
+        when(resultMapper.map(any())).thenReturn(List.of());
 
-        // Act
-        springerEngine.search(params).subscribe();
+        springerEngine.search(raw).block();
 
-        // Assert
-        ArgumentCaptor<URI> uriCaptor = ArgumentCaptor.forClass(URI.class);
-        verify(requestHeadersUriSpec).uri(uriCaptor.capture());
+        ArgumentCaptor<URI> captor = ArgumentCaptor.forClass(URI.class);
+        verify(requestHeadersUriSpec).uri(captor.capture());
+        String uri = captor.getValue().toString();
 
-        URI capturedUri = uriCaptor.getValue();
-        assertTrue(capturedUri.toString().contains("api.springernature.com"));
-        assertTrue(capturedUri.toString().contains("/meta/v2/json"));
-        assertTrue(capturedUri.toString().contains("q=machine+learning"));
+        assertTrue(uri.contains("api.springernature.com"));
+        assertTrue(uri.contains("/meta/v2/json"));
+
+        assertTrue(uri.contains("q=machine+learning"));
+        assertTrue(uri.contains("s=0"));
+        assertTrue(uri.contains("p=5"));
+        assertTrue(uri.contains("api_key=abc123"));
     }
 
     @Test
-    void testSearchHandlesError() {
-        // Arrange
-        Map<String, Object> params = Map.of("q", "test");
-        RuntimeException error = new RuntimeException("API Error");
+    void testMissingRequiredParamThrows() {
+        Map<String, String> raw = Map.of(
+                "q", "ai",
+                "start", "0",
+                // rows missing
+                "api_key", "k"
+        );
 
-        when(responseSpec.bodyToMono(Map.class)).thenReturn(Mono.error(error));
+        // .search() will throw because we have validateParams() on the engine itself
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> springerEngine.search(raw)
+        );
+        assertTrue(ex.getMessage().contains("Missing or empty required parameter 'rows' for Springer"));
+    }
 
-        // Act
-        Mono<List<Article>> result = springerEngine.search(params);
+    @Test
+    void testPropagatesClientError() {
+        Map<String, String> raw = Map.of(
+                "q", "ai",
+                "start", "0",
+                "rows", "5",
+                "api_key", "k"
+        );
 
-        // Assert
-        StepVerifier.create(result)
-                .expectError(RuntimeException.class)
+        when(responseSpec.bodyToMono(SpringerResponse.class))
+                .thenReturn(Mono.error(new RuntimeException("API Error")));
+
+        StepVerifier.create(springerEngine.search(raw))
+                .expectErrorMatches(e -> e instanceof RuntimeException && e.getMessage().contains("API Error"))
                 .verify();
-    }
-
-    @Test
-    void testSearchWithMultipleArticles() {
-        // Arrange
-        Map<String, Object> params = Map.of("q", "test");
-        Map<String, Object> mockResponse = Map.of(
-                "records", List.of(
-                        Map.of("title", "Article 1", "publicationDate", "2023-01-01"),
-                        Map.of("title", "Article 2", "publicationDate", "2023-02-01"),
-                        Map.of("title", "Article 3", "publicationDate", "2023-03-01")
-                )
-        );
-
-        when(responseSpec.bodyToMono(Map.class)).thenReturn(Mono.just(mockResponse));
-
-        // Act
-        Mono<List<Article>> result = springerEngine.search(params);
-
-        // Assert
-        StepVerifier.create(result)
-                .assertNext(articles -> {
-                    assertEquals(3, articles.size());
-                    assertEquals("Article 1", articles.get(0).getTitle());
-                    assertEquals("Article 2", articles.get(1).getTitle());
-                    assertEquals("Article 3", articles.get(2).getTitle());
-                })
-                .verifyComplete();
-    }
-
-    @Test
-    void testSearchHandlesTitleWithNewlines() {
-        // Arrange
-        Map<String, Object> params = Map.of("q", "test");
-        Map<String, Object> mockResponse = Map.of(
-                "records", List.of(
-                        Map.of("title", "Title with\nnewlines\nand spaces")
-                )
-        );
-
-        when(responseSpec.bodyToMono(Map.class)).thenReturn(Mono.just(mockResponse));
-
-        // Act
-        Mono<List<Article>> result = springerEngine.search(params);
-
-        // Assert
-        StepVerifier.create(result)
-                .assertNext(articles -> {
-                    assertEquals(1, articles.size());
-                    assertEquals("Title with newlines and spaces", articles.get(0).getTitle());
-                })
-                .verifyComplete();
     }
 }

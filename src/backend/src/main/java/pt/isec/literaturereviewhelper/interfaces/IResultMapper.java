@@ -1,8 +1,9 @@
-
-
 package pt.isec.literaturereviewhelper.interfaces;
 
-interface IResultMapper {
+import pt.isec.literaturereviewhelper.models.Article;
 
-    
+import java.util.List;
+
+public interface IResultMapper<R> {
+    List<Article> map(R response);
 }

@@ -1,7 +1,5 @@
 package pt.isec.literaturereviewhelper.services;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import pt.isec.literaturereviewhelper.interfaces.ISearchEngine;
@@ -16,7 +14,6 @@ import java.util.Map;
 
 @Service
 public class ApiService {
-    private static final Logger log = LoggerFactory.getLogger(ApiService.class);
     private final ISearchEngineFactory factory;
 
     public ApiService(ISearchEngineFactory factory) {

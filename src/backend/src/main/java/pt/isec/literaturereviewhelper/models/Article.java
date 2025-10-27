@@ -1,10 +1,12 @@
 package pt.isec.literaturereviewhelper.models;
 
+import jakarta.validation.constraints.NotNull;
+
 public record Article(String title, String publicationYear, String venue, String venueType, String authors, String link,
                       Engines source) {
 
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         return "\nArticle" + "\n{" +
                 "\ttitle='" + title + "',\n" +
                 "\tpublicationYear='" + publicationYear + "',\n" +

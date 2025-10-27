@@ -65,10 +65,8 @@ public class ACMResponse {
         }
 
         public String getGiven() { return given; }
-        public void setGiven(String given) { this.given = given; }
 
         public String getFamily() { return family; }
-        public void setFamily(String family) { this.family = family; }
     }
 
     public static class PublishedDate {
@@ -78,6 +76,5 @@ public class ACMResponse {
         public PublishedDate(List<List<Integer>> dateParts) { this.dateParts = dateParts; }
 
         public List<List<Integer>> getDateParts() { return dateParts; }
-        public void setDateParts(List<List<Integer>> dateParts) { this.dateParts = dateParts; }
     }
 }

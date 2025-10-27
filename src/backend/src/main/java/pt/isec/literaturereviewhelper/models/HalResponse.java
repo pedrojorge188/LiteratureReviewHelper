@@ -37,10 +37,6 @@ public class HalResponse {
             return authors;
         }
 
-        public void setAuthors(List<String> authors) {
-            this.authors = authors;
-        }
-
         public String getYear() {
             return year;
         }
@@ -49,24 +45,12 @@ public class HalResponse {
             this.year = year;
         }
 
-        public String getJournal() {
-            return journal;
-        }
-
         public void setJournal(String journal) {
             this.journal = journal;
         }
 
-        public String getBooktitle() {
-            return booktitle;
-        }
-
         public void setBooktitle(String booktitle) {
             this.booktitle = booktitle;
-        }
-
-        public String getSchool() {
-            return school;
         }
 
         public void setSchool(String school) {

@@ -6,7 +6,6 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ServletInitializerTest {
-
     @Test
     void testConfigureReturnsBuilder() {
         ServletInitializer initializer = new ServletInitializer();
@@ -15,4 +14,3 @@ class ServletInitializerTest {
         assertNotNull(builder, "SpringApplicationBuilder should not be null");
     }
 }
-

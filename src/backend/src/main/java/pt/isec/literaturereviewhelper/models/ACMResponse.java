@@ -55,19 +55,7 @@ public class ACMResponse {
         public void setLink(List<Map<String, String>> link) { this.link = link; }
     }
 
-    public static class Author {
-        private String given;
-        private String family;
-
-        public Author(String given, String family) {
-            this.given = given;
-            this.family = family;
-        }
-
-        public String getGiven() { return given; }
-
-        public String getFamily() { return family; }
-    }
+    public record Author(String given, String family) {}
 
     public static class PublishedDate {
         @JsonProperty("date-parts")

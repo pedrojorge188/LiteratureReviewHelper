@@ -16,7 +16,7 @@ public class HalResponse {
 
     public static class Entry {
         private String title = "";
-        private List<String> authors = new ArrayList<>();
+        private final List<String> authors = new ArrayList<>();
         private String year = "";
         private String journal = "";
         private String booktitle = "";

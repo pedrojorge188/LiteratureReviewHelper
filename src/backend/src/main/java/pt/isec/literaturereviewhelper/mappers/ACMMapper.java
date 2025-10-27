@@ -46,8 +46,8 @@ public class ACMMapper implements IResultMapper<ACMResponse> {
                             .filter(a -> !a.isEmpty())
                             .map(list -> list.stream()
                                     .map(a -> String.format("%s %s",
-                                            Optional.ofNullable(a.getGiven()).orElse(""),
-                                            Optional.ofNullable(a.getFamily()).orElse("")).trim())
+                                            Optional.ofNullable(a.given()).orElse(""),
+                                            Optional.ofNullable(a.family()).orElse("")).trim())
                                     .collect(Collectors.joining(", ")))
                             .orElse("");
 

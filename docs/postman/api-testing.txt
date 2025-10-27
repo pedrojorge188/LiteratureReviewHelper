@@ -1,0 +1,21 @@
+Postman: https://.postman.co/workspace/My-Workspace~0681ea76-2b94-413b-8859-2fe672a50d07/collection/40690805-25629265-20d2-4f1f-b2e5-3d91be170e32?action=share&creator=40690805
+
+
+Possible Parameters:
+Parameters    Type     Required    Description
+q           - string - Yes       - Search query (ex: "AI AND Machine Learning")
+start       - string - Yes       - Index of the first result to return (pagination). Must be >= 0.
+rows        - string - Yes       - Number of results to return per engine. Must be > 0.
+source      - string - No        - Comma separated list of engines to search in. (ACM, HAL, Springer). If empty or omitted, searches all 3 engines.
+api_key     - string - Depends   - Required only for Springer. (Beto Api Key: 0c2c20ce9ca00510e69e0bd7ffba864e)
+wt          - string - Depends   - Output format. Currently only supports bibtex. Required only for HAL.
+
+
+CURL Examples
+No Engines Specified: curl --location 'http://localhost:8080/api/search?q=AI&start=0&rows=2&wt=bibtex&api_key=0c2c20ce9ca00510e69e0bd7ffba864e'
+2 Engines:            curl --location 'http://localhost:8080/api/search?source=HAL%2CACM&q=AI&start=0&rows=2&wt=bibtex'
+ACM:                  curl --location 'http://localhost:8080/api/search?source=ACM&q=AI&start=0&rows=2&wt=bibtex'
+HAL:                  curl --location 'http://localhost:8080/api/search?source=hal&q=AI&start=0&rows=2&wt=bibtex'
+Springer:             curl --location 'http://localhost:8080/api/search?source=springer&q=AI&start=0&rows=2&api_key=0c2c20ce9ca00510e69e0bd7ffba864e'
+
+

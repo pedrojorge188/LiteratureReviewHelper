@@ -69,7 +69,7 @@ class SpringerEngineTest {
 
         List<Article> mapped = List.of(new Article(
                 "AI Research Paper", "2024", "", "",
-                "", "", pt.isec.literaturereviewhelper.models.Engines.SPRINGER
+                List.of(), "", pt.isec.literaturereviewhelper.models.Engines.SPRINGER
         ));
 
         when(responseSpec.bodyToMono(SpringerResponse.class)).thenReturn(Mono.just(resp));

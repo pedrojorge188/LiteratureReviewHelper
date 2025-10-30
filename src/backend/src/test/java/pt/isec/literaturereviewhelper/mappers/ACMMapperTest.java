@@ -35,7 +35,7 @@ class ACMMapperTest {
         assertEquals("2024", a.publicationYear());
         assertEquals("Journal of AI", a.venue());
         assertEquals("journal-article", a.venueType());
-        assertEquals("John Doe, Jane Smith", a.authors());
+        assertEquals(List.of("John Doe", "Jane Smith"), a.authors());
         assertEquals("https://example.com/article", a.link());
         assertEquals(Engines.ACM, a.source());
     }
@@ -44,7 +44,7 @@ class ACMMapperTest {
     void testHandlesMissingGivenNameGracefully() {
         ACMResponse.Item item = new ACMResponse.Item();
         item.setTitle(List.of("Article"));
-        item.setAuthor(List.of(
+        item.setAuthors(List.of(
                 new ACMResponse.Author(null, "Doe"),
                 new ACMResponse.Author("Jane", "Smith")
         ));
@@ -53,7 +53,7 @@ class ACMMapperTest {
         List<Article> articles = mapper.map(response);
 
         assertEquals(1, articles.size());
-        assertEquals("Doe, Jane Smith", articles.get(0).authors());
+        assertEquals(List.of("Doe", "Jane Smith"), articles.get(0).authors());
     }
 
     @Test
@@ -147,7 +147,7 @@ class ACMMapperTest {
         assertEquals("", a.publicationYear());
         assertEquals("", a.venue());
         assertEquals("", a.venueType());
-        assertEquals("", a.authors());
+        assertEquals(List.of(), a.authors());
         assertEquals("", a.link());
     }
 
@@ -178,7 +178,7 @@ class ACMMapperTest {
         item.setTitle(List.of("AI Research Paper"));
         item.setType("journal-article");
         item.setContainerTitle(List.of("Journal of AI"));
-        item.setAuthor(List.of(
+        item.setAuthors(List.of(
                 new ACMResponse.Author("John", "Doe"),
                 new ACMResponse.Author("Jane", "Smith")
         ));

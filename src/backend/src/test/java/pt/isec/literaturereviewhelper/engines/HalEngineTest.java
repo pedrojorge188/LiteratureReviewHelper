@@ -75,7 +75,7 @@ class HalEngineTest {
                 "2024",
                 "Medical Informatics Journal",
                 "Journal Article",
-                "Doe, John, Smith, Jane",
+                List.of("Doe, John", "Smith, Jane"),
                 "https://hal.science/hal-12345",
                 pt.isec.literaturereviewhelper.models.Engines.HAL
         );

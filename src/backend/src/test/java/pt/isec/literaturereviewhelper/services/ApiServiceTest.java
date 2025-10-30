@@ -33,7 +33,7 @@ class ApiServiceTest {
         Map<String, String> params = Map.of("q", "AI", "p", "10", "s", "0", "api_key", "KEY");
         Article expected = new Article(
                 "Test Article", "2023", "Springer Journal",
-                "Article", "John Doe", "http://example.com", Engines.SPRINGER
+                "Article", List.of("John Doe"), "http://example.com", Engines.SPRINGER
         );
 
         when(factory.createSearchEngine(Engines.SPRINGER)).thenReturn(engineMock);
@@ -55,7 +55,7 @@ class ApiServiceTest {
         Map<String, String> params = Map.of("q", "ML", "start", "0", "rows", "10", "wt", "bibtex");
         Article expected = new Article(
                 "HAL Paper", "2022", "HAL Conference",
-                "Conference", "Jane Doe", "http://hal.link", Engines.HAL
+                "Conference", List.of("Jane Doe"), "http://hal.link", Engines.HAL
         );
 
         when(factory.createSearchEngine(Engines.HAL)).thenReturn(engineMock);
@@ -81,7 +81,7 @@ class ApiServiceTest {
         );
         Article expected = new Article(
                 "ACM Paper", "2021", "ACM Journal",
-                "Journal", "Alice Smith", "http://acm.link", Engines.ACM
+                "Journal", List.of("Alice Smith"), "http://acm.link", Engines.ACM
         );
 
         when(factory.createSearchEngine(Engines.ACM)).thenReturn(engineMock);

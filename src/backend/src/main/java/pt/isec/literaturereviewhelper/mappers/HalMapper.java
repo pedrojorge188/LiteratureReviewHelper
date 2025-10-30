@@ -25,7 +25,7 @@ public class HalMapper implements IResultMapper<String> {
         List<Article> out = new ArrayList<>();
         for (HalResponse.Entry e : model.getEntries()) {
             String title = safe(e.getTitle()).replace("{", "").replace("}", "");
-            String authors = String.join(", ", e.getAuthors());
+            List<String> authors = e.getAuthors();
             String year = safe(e.getYear());
             String venue = e.computeVenue();
             String venueType = e.computeVenueType();

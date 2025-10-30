@@ -38,7 +38,7 @@ class LiteratureReviewServiceTest {
 
     @Test
     void testPerformSearch_WithValidSources_AndApiKeys() {
-        
+
         Map<String, String> params = new HashMap<>();
         params.put("q", "AI");
         params.put("source", "HAL,ACM");
@@ -49,12 +49,12 @@ class LiteratureReviewServiceTest {
         );
 
         List<Article> googleArticles = List.of(
-                new Article("Google AI", "Author G1", "http://g1", "Google", "", "", Engines.ACM),
-                new Article("DeepMind", "Author G2", "http://g2", "Google", "", "", Engines.HAL)
+                new Article("Google AI", "Author G1", "http://g1", "Google", List.of(), "", Engines.ACM),
+                new Article("DeepMind", "Author G2", "http://g2", "Google", List.of(), "", Engines.HAL)
         );
 
         List<Article> redditArticles = List.of(
-                new Article("Reddit AI Discussion", "Author R1", "http://r1", "Reddit", "", "",Engines.HAL)
+                new Article("Reddit AI Discussion", "Author R1", "http://r1", "Reddit", List.of(), "",Engines.HAL)
         );
 
         when(apiService.search(eq(Engines.HAL), any()))
@@ -62,10 +62,10 @@ class LiteratureReviewServiceTest {
         when(apiService.search(eq(Engines.ACM), any()))
                 .thenReturn(Mono.just(redditArticles));
 
-        
+
         Mono<SearchResponseDto> result = service.performLiteratureSearch(params, apiKeys);
 
-        
+
         StepVerifier.create(result)
                 .assertNext(resp -> {
                     assertEquals("AI", resp.getQuery());
@@ -83,7 +83,7 @@ class LiteratureReviewServiceTest {
 
     @Test
     void testPerformSearch_WithNullSource_UsesAllEngines() {
-        
+
         Map<String, String> params = new HashMap<>();
         params.put("q", "test");
 
@@ -93,10 +93,10 @@ class LiteratureReviewServiceTest {
             when(apiService.search(eq(e), any())).thenReturn(Mono.just(List.of()));
         }
 
-        
+
         Mono<SearchResponseDto> result = service.performLiteratureSearch(params, apiKeys);
 
-        
+
         StepVerifier.create(result)
                 .assertNext(resp -> {
                     assertEquals("test", resp.getQuery());
@@ -128,23 +128,23 @@ class LiteratureReviewServiceTest {
 
     @Test
     void testPerformSearch_WithMissingApiKey_DoesNotBreak() {
-        
+
         Map<String, String> params = new HashMap<>();
         params.put("q", "AI");
         params.put("source", "HAL");
 
         Map<Engines, String> apiKeys = new EnumMap<>(Engines.class);
         List<Article> googleArticles = List.of(
-                new Article("A1", "Auth1", "http://a1", "Google", "", "", Engines.HAL)
+                new Article("A1", "Auth1", "http://a1", "Google", List.of(), "", Engines.HAL)
         );
 
         when(apiService.search(eq(Engines.HAL), any()))
                 .thenReturn(Mono.just(googleArticles));
 
-        
+
         Mono<SearchResponseDto> result = service.performLiteratureSearch(params, apiKeys);
 
-        
+
         StepVerifier.create(result)
                 .assertNext(resp -> {
                     assertEquals("AI", resp.getQuery());

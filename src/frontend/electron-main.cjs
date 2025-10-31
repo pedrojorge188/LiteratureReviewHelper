@@ -22,7 +22,7 @@ const isDev = !app.isPackaged;
 
 if (isDev) {
   // If we use electron during development the log file should be in this folder /src/frontend/logs
-  log.transports.file.resolvePathFn = () => path.join(__dirname, '..', 'logs', 'main.log');
+  log.transports.file.resolvePathFn = () => path.join(__dirname, 'logs', 'main.log');
 }
 log.transports.file.level = 'info';
 log.transports.console.level = isDev ? 'debug' : 'info';
@@ -184,15 +184,26 @@ function stopBackend() {
     log.info('[Backend] Stopping...');
     isQuitting = true;
 
+  
+    if (process.platform === 'win32') {
+      const pid = backendProcess.pid;
+      log.info(`[Backend] Killing process tree for PID ${pid}...`);
+      
+      // Use taskkill with /T flag to kill the process tree
+      spawn('taskkill', ['/pid', pid.toString(), '/T', '/F'], {
+        shell: true
+      });
+    } else {
+      // On Unix-like systems, use SIGTERM
+      backendProcess.kill('SIGTERM');
 
-    backendProcess.kill('SIGTERM');
-
-    setTimeout(() => {
-      if (backendProcess && !backendProcess.killed) {
-        log.warn('[Backend] Force killing...');
-        backendProcess.kill('SIGKILL');
-      }
-    }, 5000);
+      setTimeout(() => {
+        if (backendProcess && !backendProcess.killed) {
+          log.warn('[Backend] Force killing...');
+          backendProcess.kill('SIGKILL');
+        }
+      }, 5000);
+    }
   }
 }
 
@@ -206,7 +217,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      preload: path.join(__dirname, 'electron-preload.js')
+      preload: path.join(__dirname, 'electron-preload.cjs')
     },
     show: false 
   });

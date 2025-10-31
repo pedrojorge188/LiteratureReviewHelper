@@ -13,4 +13,14 @@ export default defineConfig({
             include: "**/*.svg", // força aplicar a todos os .svg
         }),
     ],
+    base: './',
+    build: {
+        outDir: 'dist',
+        assetsDir: 'assets',
+        emptyOutDir: true,
+    },
+    server: {
+        port: 5173,
+        strictPort: true,
+    },
 });

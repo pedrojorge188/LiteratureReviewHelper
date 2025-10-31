@@ -2,14 +2,15 @@
   "appId": "com.isec.literaturereviewhelper",
   "productName": "Literature Review Helper",
   "copyright": "Copyright © 2025 ISEC",
+  "npmRebuild": false,
   "directories": {
     "output": "dist-electron",
     "buildResources": "resources"
   },
   "files": [
     "dist/**/*",
-    "electron-main.js",
-    "electron-preload.js",
+    "electron-main.cjs",
+    "electron-preload.cjs",
     "package.json"
   ],
   "extraResources": [
@@ -24,6 +25,10 @@
       "filter": ["**/*"]
     }
   ],
+  "asar": true,
+  "asarUnpack": [
+    "resources/**/*"
+  ],
   "win": {
     "target": [
       {
@@ -35,7 +40,7 @@
         "arch": ["x64"]
       }
     ],
-    "icon": "resources/icon.ico",
+    "signAndEditExecutable": false,
     "artifactName": "${productName}-${version}-Windows-${arch}.${ext}"
   },
   "nsis": {

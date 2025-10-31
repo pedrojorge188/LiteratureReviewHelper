@@ -1,11 +1,15 @@
 {
-  "name": "Literature Review Helper",
+  "name": "literature-review-helper",
   "private": true,
   "version": "0.0.0",
   "description": "Literature Review Helper",
   "author": "ISEC",
   "type": "module",
   "main": "electron-main.cjs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pedrojorge188/LiteratureReviewHelper.git"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

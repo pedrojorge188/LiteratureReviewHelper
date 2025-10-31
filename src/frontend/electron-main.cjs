@@ -144,7 +144,35 @@ function waitForBackend() {
             try {
               const health = JSON.parse(data);
               if (health.status === 'UP') {
-                resolve();
+                // Make warmup requests to initialize database and other components
+                log.info('[Backend] Health check passed, warming up database and components...');
+                
+                // Warmup with multiple endpoints to fully initialize all components
+                const warmupUrls = [
+                  `http://${BACKEND_HOST}:${BACKEND_PORT}/api/articles`,
+                  // Add other main endpoints here if needed
+                ];
+                
+                let completed = 0;
+                const total = warmupUrls.length;
+                
+                warmupUrls.forEach(url => {
+                  http.get(url, (warmupRes) => {
+                    warmupRes.resume(); // Consume response data
+                    completed++;
+                    if (completed === total) {
+                      log.info('[Backend] Warmed up and ready!');
+                      resolve();
+                    }
+                  }).on('error', (err) => {
+                    log.warn(`[Backend] Warmup request to ${url} failed:`, err.message);
+                    completed++;
+                    if (completed === total) {
+                      log.info('[Backend] Warmup complete (some failed)');
+                      resolve();
+                    }
+                  });
+                });
               } else {
                 scheduleNextCheck();
               }
@@ -221,11 +249,14 @@ function createWindow() {
   });
 
   if (isDev) {
-
     mainWindow.loadURL('http://localhost:5173');
     mainWindow.webContents.openDevTools(); 
   } else {
-    mainWindow.loadFile(path.join(__dirname, 'dist', 'index.html'));
+    const indexPath = path.join(__dirname, 'dist', 'index.html');
+    log.info(`[Window] Loading file: ${indexPath}`);
+    log.info(`[Window] __dirname: ${__dirname}`);
+    log.info(`[Window] File exists: ${fs.existsSync(indexPath)}`);
+    mainWindow.loadFile(indexPath);
   }
 
 

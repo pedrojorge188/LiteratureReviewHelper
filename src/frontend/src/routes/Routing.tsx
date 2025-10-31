@@ -18,7 +18,10 @@ export const Routing = () => {
   const location = useLocation();
 
   useEffect(() => {
+    console.log('[Routing] Current pathname:', location.pathname);
     const langSelected = readLangPathname(location.pathname);
+    console.log('[Routing] Language selected:', langSelected);
+    console.log('[Routing] Current lang:', lang);
     if (langSelected && langSelected !== lang) dispatch(setLang(langSelected));
     if (!langSelected && !lang) dispatch(setLang(langDefault));
   }, [lang, langLoaded, location.pathname]);

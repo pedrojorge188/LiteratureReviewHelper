@@ -188,13 +188,11 @@ function stopBackend() {
     if (process.platform === 'win32') {
       const pid = backendProcess.pid;
       log.info(`[Backend] Killing process tree for PID ${pid}...`);
-      
-      // Use taskkill with /T flag to kill the process tree
+
       spawn('taskkill', ['/pid', pid.toString(), '/T', '/F'], {
         shell: true
       });
     } else {
-      // On Unix-like systems, use SIGTERM
       backendProcess.kill('SIGTERM');
 
       setTimeout(() => {

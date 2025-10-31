@@ -47,14 +47,14 @@ async function downloadFile(url, destPath) {
           response.pipe(file);
           file.on('finish', () => {
             file.close();
-            console.log(`\n✅ Downloaded: ${path.basename(destPath)}`);
+            console.log(`\nDownloaded: ${path.basename(destPath)}`);
             resolve();
           });
         } else {
           reject(new Error(`Failed to download: HTTP ${response.statusCode}`));
         }
       }).on('error', (err) => {
-        fs.unlink(destPath, () => {}); // Delete file on error
+        fs.unlink(destPath, () => {});
         reject(err);
       });
     };
@@ -93,44 +93,39 @@ async function prepareJRE(platform, arch) {
   const url = JRE_URLS[platformKey];
   
   if (!url) {
-    console.warn(`⚠️  No JRE URL configured for ${platformKey}, skipping...`);
+    console.warn(`No JRE URL configured for ${platformKey}, skipping...`);
     return;
   }
 
   const jreDir = path.join(RESOURCES_DIR, `jre-${platform}-${arch}`);
   const downloadDir = path.join(__dirname, '..', 'temp-downloads');
-  const fileName = path.basename(url.split('?')[0]); // Remove query params
+  const fileName = path.basename(url.split('?')[0]);
   const downloadPath = path.join(downloadDir, fileName);
 
-  // Check if JRE already exists
   if (fs.existsSync(jreDir)) {
-    console.log(`✅ JRE for ${platformKey} already exists, skipping download`);
+    console.log(`JRE for ${platformKey} already exists, skipping download`);
     return;
   }
 
-  console.log(`\n🔧 Preparing JRE for ${platformKey}...`);
+  console.log(`\nPreparing JRE for ${platformKey}...`);
 
-  // Create directories
   await fs.ensureDir(downloadDir);
   await fs.ensureDir(jreDir);
 
   try {
-    // Download JRE if not already downloaded
+
     if (!fs.existsSync(downloadPath)) {
       await downloadFile(url, downloadPath);
     } else {
-      console.log(`✅ Using cached download: ${fileName}`);
+      console.log(`Using cached download: ${fileName}`);
     }
 
-    // Extract based on file type
     if (fileName.endsWith('.zip')) {
       await extractZip(downloadPath, jreDir);
     } else if (fileName.endsWith('.tar.gz')) {
       await extractTarGz(downloadPath, jreDir);
     }
 
-    // Move extracted folder contents up one level if needed
-    // (JREs usually extract to a subfolder like "jdk-17.0.13+11-jre")
     const extractedContents = await fs.readdir(jreDir);
     if (extractedContents.length === 1) {
       const extractedFolder = path.join(jreDir, extractedContents[0]);
@@ -154,7 +149,7 @@ async function prepareJRE(platform, arch) {
       throw new Error(`Java executable not found at expected location: ${javaExecutable}`);
     }
 
-    console.log(`✅ JRE for ${platformKey} prepared successfully`);
+    console.log(`JRE for ${platformKey} prepared successfully`);
     console.log(`   Location: ${jreDir}`);
     console.log(`   Executable: ${javaExecutable}`);
   } catch (error) {
@@ -189,8 +184,8 @@ async function prepareBackend() {
   
   const stats = await fs.stat(BACKEND_JAR_DEST);
   const sizeInMB = (stats.size / 1024 / 1024).toFixed(2);
-  
-  console.log(`✅ Backend JAR copied successfully`);
+
+  console.log(`Backend JAR copied successfully`);
   console.log(`   Size: ${sizeInMB} MB`);
   console.log(`   Destination: ${BACKEND_JAR_DEST}`);
 }
@@ -203,7 +198,7 @@ async function cleanupTempDownloads() {
   if (fs.existsSync(downloadDir)) {
     console.log('\n🧹 Cleaning up temporary downloads...');
     await fs.remove(downloadDir);
-    console.log('✅ Cleanup complete');
+    console.log('Cleanup complete');
   }
 }
 
@@ -214,7 +209,7 @@ async function main() {
   const startTime = Date.now();
   
   console.log('═══════════════════════════════════════════════════════');
-  console.log('🚀 Electron Build Resources Preparation');
+  console.log(' Electron Build Resources Preparation');
   console.log('═══════════════════════════════════════════════════════\n');
 
   try {

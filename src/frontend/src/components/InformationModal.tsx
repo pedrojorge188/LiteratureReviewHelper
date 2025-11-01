@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 
 import { SelectionModalProps } from "./types";
-import InfoIcon from "../assets/iconInfo.svg";
+import { ReactComponent as InfoIcon } from "./../assets/images/svg/iconInfo.svg";
 export const InformationModal = (props: SelectionModalProps) => {
 	const {
 		setShow,

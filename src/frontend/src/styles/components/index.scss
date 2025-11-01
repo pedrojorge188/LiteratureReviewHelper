@@ -1,1 +1,2 @@
-//@import "file";
+@use "./topmenu" as *;
+@use "./sidemenu.scss" as *;

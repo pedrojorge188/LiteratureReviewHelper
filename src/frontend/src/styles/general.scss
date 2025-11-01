@@ -5,13 +5,57 @@
   width: 100vw;
   width: 100svw;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   height: 100%;
+  background-color: vars.$background-color;
+  &__top {
+    display: flex;
+    max-width: 1920px;
+    width: 100%;
+    padding-inline: 20px;
+    margin-inline: auto;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    background-color: vars.$color-white;
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background-color: vars.$color-black;
+      opacity: 30%;
+    }
+  }
+  &__bottom {
+    display: flex;
+    gap: 20px;
+    max-width: 1920px;
+    width: 100%;
+    margin-inline: auto;
+    height: 100%;
+    &__menu-content {
+      width: 100%;
+      height: 100%;
+      padding-top: 20px;
+    }
+    &__menu-left {
+      background-color: vars.$color-white;
+      padding-top: 10px;
+      min-width: 200px;
+    }
+  }
 }
 
 .container {
   max-width: 1920px;
   margin: auto;
+}
+
+a {
+  color: inherit !important; /* herda a cor do elemento pai */
+  text-decoration: none !important; /* remove o sublinhado */
 }
 
 #root {

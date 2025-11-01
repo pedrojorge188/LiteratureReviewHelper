@@ -1,15 +1,27 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface Artigo {
-  titulo: string;
-  autores: string;
-  ano: number;
+  title: string;
+  authors: string;
+  publicationYear: number;
   venue: string;
-  tipo: string;
-  fonte: string;
+  link: string;
+  source: string;
 }
 
+//     {
+//         "title": "REVIEWING THE RISKS OF AI TECHNICAL DEBT (TD) IN THE FINANCIAL SERVICES INDUSTRIES (FSIS)",
+//         "publicationYear": "2024",
+//         "venue": "",
+//         "venueType": "Unpublished",
+//         "authors": "Sankarapu, Vinay Kumar",
+//         "link": "https://hal.science/hal-04691168",
+//         "source": "HAL"
+//     }
+
 export const ArticlesList = () => {
+  const { t } = useTranslation();
   const [artigos, setArtigos] = useState<Artigo[]>([]);
   const [paginaAtual, setPaginaAtual] = useState<number>(1);
   const artigosPorPagina = 10;
@@ -17,17 +29,17 @@ export const ArticlesList = () => {
   // Gerar um JSON dummy com 50 artigos
   useEffect(() => {
     const dummy: Artigo[] = Array.from({ length: 50 }, (_, i) => ({
-      titulo: `(Texto Abreviado ${i + 1})`,
-      autores: `(Texto Abreviado ${i + 1})`,
-      ano: 2025,
+      title: `${t("articles:dummy_titulo")} ${i + 1}`,
+      authors: `${t("articles:dummy_autores")} ${i + 1}`,
+      publicationYear: 2025,
       venue: "Journal",
-      tipo: "Information Systems",
-      fonte: i % 2 === 0 ? "ScienceDirect" : "ACM",
+      link: `https://eusouumlink${i}.com`,
+      source: i % 2 === 0 ? "ScienceDirect" : "ACM",
     }));
     setArtigos(dummy);
-  }, []);
+  }, [t]);
 
-  // Calcular indices da paginação
+  // Calcular índices da paginação
   const indexInicial = (paginaAtual - 1) * artigosPorPagina;
   const indexFinal = indexInicial + artigosPorPagina;
   const artigosVisiveis = artigos.slice(indexInicial, indexFinal);
@@ -76,44 +88,39 @@ export const ArticlesList = () => {
 
   return (
     <div className="lista-artigos-page">
-      <div className="breadcrumb">
-        <a href="#">Início</a> &gt; <a href="#">Criar Estado de Arte</a> &gt;{" "}
-        <span>Lista de Artigos</span>
-      </div>
-
       <div className="lista-artigos-card">
         <div className="header">
-          <h2>Lista de Artigos</h2>
+          <h2>{t("articles:titulo_lista")}</h2>
           <a
             href="/api/download"
             className="download-btn"
             target="_blank"
             rel="noopener noreferrer"
           >
-            Download
+            {t("articles:botao_download")}
           </a>
         </div>
 
         <table>
           <thead>
             <tr>
-              <th>Título</th>
-              <th>Autores</th>
-              <th>Ano</th>
-              <th>Venue</th>
-              <th>Tipo</th>
-              <th>Fonte</th>
+              <th>{t("articles:coluna_titulo")}</th>
+              <th>{t("articles:coluna_autores")}</th>
+              <th>{t("articles:coluna_ano")}</th>
+              <th>{t("articles:coluna_venue")}</th>
+              <th>{t("articles:coluna_link")}</th>
+              <th>{t("articles:coluna_fonte")}</th>
             </tr>
           </thead>
           <tbody>
             {artigosVisiveis.map((artigo, index) => (
               <tr key={index}>
-                <td>{artigo.titulo}</td>
-                <td>{artigo.autores}</td>
-                <td>{artigo.ano}</td>
+                <td>{artigo.title}</td>
+                <td>{artigo.authors}</td>
+                <td>{artigo.publicationYear}</td>
                 <td>{artigo.venue}</td>
-                <td>{artigo.tipo}</td>
-                <td>{artigo.fonte}</td>
+                <td>{artigo.link}</td>
+                <td>{artigo.source}</td>
               </tr>
             ))}
           </tbody>
@@ -154,3 +161,26 @@ export const ArticlesList = () => {
     </div>
   );
 };
+
+//Lista que vai receber
+
+// [
+//     {
+//         "title": "AI-Family Integration Index (AFII): Benchmarking a New Global Readiness for AI as Family",
+//         "publicationYear": "2025",
+//         "venue": "",
+//         "venueType": "Unpublished",
+//         "authors": "Mahajan, Prashant",
+//         "link": "https://hal.science/hal-05020569",
+//         "source": "HAL"
+//     },
+//     {
+//         "title": "REVIEWING THE RISKS OF AI TECHNICAL DEBT (TD) IN THE FINANCIAL SERVICES INDUSTRIES (FSIS)",
+//         "publicationYear": "2024",
+//         "venue": "",
+//         "venueType": "Unpublished",
+//         "authors": "Sankarapu, Vinay Kumar",
+//         "link": "https://hal.science/hal-04691168",
+//         "source": "HAL"
+//     }
+// ]

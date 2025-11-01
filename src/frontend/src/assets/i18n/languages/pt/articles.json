@@ -1,0 +1,15 @@
+{
+  "breadcrumb_inicio": "Início",
+  "breadcrumb_criar_estado_arte": "Criar Estado de Arte",
+  "breadcrumb_lista_artigos": "Lista de Artigos",
+  "titulo_lista": "Lista de Artigos",
+  "botao_download": "Download",
+  "coluna_titulo": "Título",
+  "coluna_autores": "Autores",
+  "coluna_ano": "Ano",
+  "coluna_venue": "Venue",
+  "coluna_link": "Link",
+  "coluna_fonte": "Fonte",
+  "dummy_titulo": "Texto Abreviado",
+  "dummy_autores": "Texto Abreviado"
+}

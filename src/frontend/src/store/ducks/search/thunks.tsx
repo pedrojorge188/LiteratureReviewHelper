@@ -13,14 +13,4 @@ export const getNavbarData = createAsyncThunk("Navbar", async () => {
   return response.data;
 });
 
-export const getArticles = createAsyncThunk(
-  "Articles",
-  async (query: string) => {
-    const response = await axios.get(
-      `${API_URL}/search?q=${query}&start=0&rows=25&wt=bibtex&api_key=0c2c20ce9ca00510e69e0bd7ffba864e`
-    );
-    return response.data;
-  }
-);
-
 //http://localhost:8080/api/search?q=AI&start=0&rows=25&wt=bibtex&api_key=0c2c20ce9ca00510e69e0bd7ffba864e

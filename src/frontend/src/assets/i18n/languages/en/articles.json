@@ -1,0 +1,15 @@
+{
+  "breadcrumb_inicio": "Home",
+  "breadcrumb_criar_estado_arte": "Create State of the Art",
+  "breadcrumb_lista_artigos": "Article List",
+  "titulo_lista": "Article List",
+  "botao_download": "Download",
+  "coluna_titulo": "Title",
+  "coluna_autores": "Authors",
+  "coluna_ano": "Year",
+  "coluna_venue": "Venue",
+  "coluna_link": "Link",
+  "coluna_fonte": "Source",
+  "dummy_titulo": "Abbreviated Text",
+  "dummy_autores": "Abbreviated Text"
+}

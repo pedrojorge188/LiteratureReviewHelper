@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { getArticles } from "../store/ducks/home/thunks";
+import { useDispatch } from "react-redux";
 
 interface Query {
   valor: string;
@@ -6,6 +9,8 @@ interface Query {
 }
 
 export const MainPage = () => {
+  const { t } = useTranslation();
+  const dispatch = useDispatch<any>();
   const [queries, setQueries] = useState<Query[]>([{ valor: "" }]);
   const [anoDe, setAnoDe] = useState<string>("");
   const [anoAte, setAnoAte] = useState<string>("");
@@ -65,7 +70,7 @@ export const MainPage = () => {
   };
 
   const guardar = () => {
-    console.log("Dados guardados:", {
+    console.log(t("home:dados_guardados"), {
       queries,
       anoDe,
       anoAte,
@@ -75,12 +80,11 @@ export const MainPage = () => {
     });
   };
 
-  const pesquisar = () => {
-    // Exemplo de string resultante
+  const pesquisar = async () => {
     const queryString = queries
       .map((q, i) => (i === 0 ? q.valor : `${q.metadado} ${q.valor}`))
       .join(" ");
-    console.log("Pesquisar com:", {
+    console.log(t("home:pesquisar_com"), {
       queryString,
       queries,
       anoDe,
@@ -88,17 +92,26 @@ export const MainPage = () => {
       excluirVenues,
       bibliotecas,
     });
+    const resultAction = await dispatch(getArticles(queryString));
+
+    if (getArticles.fulfilled.match(resultAction)) {
+      // Aqui já tens os dados
+      console.log("Dados recebidos:", resultAction.payload);
+    } else {
+      console.error("Erro na pesquisa:", resultAction.error);
+    }
   };
 
   return (
     <div className="pesquisa-container">
-      <h2>Pesquisa</h2>
+      <h2>{t("home:titulo_pesquisa")}</h2>
+
       <div className="pesquisa-container__content">
+        {/* Query Section */}
         <div className="section">
-          <label>Query</label>
+          <label>{t("home:label_query")}</label>
           {queries.map((q, index) => (
             <div key={index} className="query-row">
-              {/* Só mostra o seletor de operador se não for a primeira */}
               {index > 0 && (
                 <select
                   value={q.metadado}
@@ -106,9 +119,9 @@ export const MainPage = () => {
                     atualizarQuery(index, "metadado", e.target.value)
                   }
                 >
-                  <option value="AND">AND</option>
-                  <option value="OR">OR</option>
-                  <option value="NOT">NOT</option>
+                  <option value="AND">{t("home:operador_and")}</option>
+                  <option value="OR">{t("home:operador_or")}</option>
+                  <option value="NOT">{t("home:operador_not")}</option>
                 </select>
               )}
 
@@ -116,6 +129,7 @@ export const MainPage = () => {
                 className="query-row__input-text"
                 type="text"
                 value={q.valor}
+                placeholder={t("home:placeholder_query") ?? ""}
                 onChange={(e) => atualizarQuery(index, "valor", e.target.value)}
               />
 
@@ -125,7 +139,7 @@ export const MainPage = () => {
                     type="button"
                     className="icon-btn"
                     onClick={adicionarQuery}
-                    title="Adicionar nova query"
+                    title={t("home:adicionar_query") ?? ""}
                   >
                     &#65291;
                   </button>
@@ -135,7 +149,7 @@ export const MainPage = () => {
                     type="button"
                     className="icon-btn"
                     onClick={() => moverQueryCima(index)}
-                    title="Mover para cima"
+                    title={t("home:mover_para_cima") ?? ""}
                   >
                     &#8593;
                   </button>
@@ -145,7 +159,7 @@ export const MainPage = () => {
                     type="button"
                     className="icon-btn"
                     onClick={() => removerQuery(index)}
-                    title="Remover"
+                    title={t("home:remover_query") ?? ""}
                   >
                     &#10005;
                   </button>
@@ -155,20 +169,21 @@ export const MainPage = () => {
           ))}
         </div>
 
-        {/* As outras seções permanecem iguais */}
+        {/* Ano de publicação */}
         <div className="section">
-          <label>Ano Publicação</label>
+          <label>{t("home:label_ano_publicacao")}</label>
           <div className="ano-row">
             <select value={anoDe} onChange={(e) => setAnoDe(e.target.value)}>
-              <option value="">De</option>
+              <option value="">{t("home:ano_de")}</option>
               {Array.from({ length: 30 }, (_, i) => 2025 - i).map((ano) => (
                 <option key={ano} value={ano}>
                   {ano}
                 </option>
               ))}
             </select>
+
             <select value={anoAte} onChange={(e) => setAnoAte(e.target.value)}>
-              <option value="">Até</option>
+              <option value="">{t("home:ano_ate")}</option>
               {Array.from({ length: 30 }, (_, i) => 2025 - i).map((ano) => (
                 <option key={ano} value={ano}>
                   {ano}
@@ -178,42 +193,47 @@ export const MainPage = () => {
           </div>
         </div>
 
+        {/* Excluir venues */}
         <div className="section">
-          <label>Excluir Venues</label>
+          <label>{t("home:label_excluir_venues")}</label>
           <textarea
             value={excluirVenues}
             onChange={(e) => setExcluirVenues(e.target.value)}
-            placeholder="Utilize ; para separar as tags de exclusão"
+            placeholder={t("home:placeholder_excluir_venues") ?? ""}
           ></textarea>
         </div>
 
+        {/* Excluir títulos */}
         <div className="section">
-          <label>Excluir Títulos</label>
+          <label>{t("home:label_excluir_titulos")}</label>
           <textarea
             value={excluirTitulos}
             onChange={(e) => setExcluirTitulos(e.target.value)}
-            placeholder="Utilize ; para separar as tags de exclusão"
+            placeholder={t("home:placeholder_excluir_titulos") ?? ""}
           ></textarea>
         </div>
 
+        {/* Bibliotecas */}
         <div className="section">
-          <label>Bibliotecas</label>
+          <label>{t("home:label_bibliotecas")}</label>
           <div className="biblioteca-row">
             <select
               value={bibliotecaSelecionada}
               onChange={(e) => setBibliotecaSelecionada(e.target.value)}
             >
-              <option value="">Selecionar Biblioteca</option>
+              <option value="">{t("home:selecionar_biblioteca")}</option>
               <option value="Scopus">Scopus</option>
               <option value="ACM">ACM</option>
               <option value="DBLP">DBLP</option>
             </select>
             <button type="button" onClick={adicionarBiblioteca}>
-              Adicionar
+              {t("home:botao_adicionar")}
             </button>
           </div>
 
-          <h3 className="bibliotecas-lista-titulo">Lista de Bibliotecas</h3>
+          <h3 className="bibliotecas-lista-titulo">
+            {t("home:lista_bibliotecas")}
+          </h3>
           <ul className="bibliotecas-lista">
             {bibliotecas.map((b, i) => (
               <li key={i}>
@@ -223,19 +243,20 @@ export const MainPage = () => {
                   className="remove-btn"
                   onClick={() => removerBiblioteca(b)}
                 >
-                  Remover
+                  {t("home:botao_remover")}
                 </button>
               </li>
             ))}
           </ul>
         </div>
 
+        {/* Botões principais */}
         <div className="actions">
           <button type="button" onClick={guardar}>
-            Guardar
+            {t("home:botao_guardar")}
           </button>
           <button type="button" onClick={pesquisar}>
-            Pesquisar
+            {t("home:botao_pesquisar")}
           </button>
         </div>
       </div>

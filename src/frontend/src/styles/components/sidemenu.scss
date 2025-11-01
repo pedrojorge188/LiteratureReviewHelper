@@ -1,0 +1,28 @@
+@use "./../variables" as vars;
+@use "./../utilities" as util;
+.side-menu {
+  &__container {
+    &__title-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 65px;
+      &__title-text {
+        @include util.font(24, 28, 0);
+      }
+    }
+    &__content-menu {
+      display: flex;
+      align-items: flex-start;
+      padding-left: 20px;
+      flex-direction: column;
+      gap: 16px;
+      &__link-container {
+        gap: 16px;
+        &__link {
+          @include util.font(14, 24, 0);
+        }
+      }
+    }
+  }
+}

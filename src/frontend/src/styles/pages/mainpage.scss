@@ -1,1 +1,151 @@
 @use "../utilities" as *;
+@use "../variables" as vars;
+
+.pesquisa-container {
+  width: 100%;
+  padding: 1.5rem;
+  color: vars.$color-gray-2;
+  &__content {
+    max-width: 800px;
+    margin-left: 130px;
+  }
+  h2 {
+    font-size: 1.6rem;
+    margin-bottom: 1rem;
+  }
+
+  .section {
+    margin-bottom: 1.5rem;
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 0.4rem;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+      font-size: 0.95rem;
+    }
+
+    input,
+    select {
+      padding: 0.4rem;
+      margin-right: 0.4rem;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 0.5rem;
+      resize: vertical;
+    }
+
+    .query-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.5rem;
+      &__input-text {
+        width: 100%;
+      }
+
+      .query-buttons {
+        display: flex;
+        gap: 0.2rem;
+        min-width: 127px;
+
+        .icon-btn {
+          background: rgba(vars.$color-white-3, 0.2);
+          border: none;
+          cursor: pointer;
+          font-size: 1rem;
+          padding: 0.3rem 0.5rem;
+          transition: 0.2s;
+          width: 40px;
+          height: 40px;
+
+          &:hover {
+            background: vars.$color-white-3;
+          }
+        }
+      }
+    }
+
+    .ano-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .biblioteca-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+
+      button {
+        background: vars.$color-gray-2;
+        color: vars.$color-white;
+        border: none;
+        padding: 0.4rem 0.8rem;
+        cursor: pointer;
+        border-radius: 3px;
+        transition: 0.2s;
+
+        &:hover {
+          color: vars.$color-gray-2;
+          background-color: vars.$color-white;
+        }
+      }
+    }
+
+    .bibliotecas-lista {
+      list-style: none;
+      padding: 0;
+      margin-top: 0.5rem;
+      &-titulo {
+        margin-top: 2rem;
+      }
+
+      li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid vars.$color-white-3;
+        padding: 0.3rem 0;
+
+        .remove-btn {
+          background: none;
+          border: none;
+          color: vars.$color-red-2;
+          cursor: pointer;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+
+    button {
+      background: vars.$color-gray-2;
+      color: vars.$color-white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: 0.2s;
+
+      &:hover {
+        color: vars.$color-gray-2;
+        background-color: vars.$color-white;
+      }
+    }
+  }
+}

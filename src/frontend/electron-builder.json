@@ -2,7 +2,6 @@
   "appId": "com.isec.literaturereviewhelper",
   "productName": "Literature Review Helper",
   "copyright": "Copyright © 2025 ISEC",
-  "maintainer": "Alberto Varandas,Jorge Martins,João Santos,José Cruz,Rodrigo Duarte,Francisco Simões,Pedro Jorge,Rafael Cardoso",
   "publish": null,
   "npmRebuild": false,
   "directories": {
@@ -71,6 +70,7 @@
     "artifactName": "${productName}-${version}-Linux-${arch}.${ext}"
   },
   "deb": {
-    "depends": []
+    "depends": [],
+    "maintainer": "ISEC Team"
   }
 }

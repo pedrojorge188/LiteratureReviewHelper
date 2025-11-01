@@ -1,26 +1,14 @@
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Artigo } from "./types";
+import ArrowIcon from "../assets/images/png/arrow.png";
 
-interface Artigo {
-  title: string;
-  authors: string;
-  publicationYear: number;
-  venue: string;
-  link: string;
-  source: string;
+interface Artigos {
+  lista: Artigo[];
+  setShow: Dispatch<SetStateAction<boolean>>;
 }
 
-//     {
-//         "title": "REVIEWING THE RISKS OF AI TECHNICAL DEBT (TD) IN THE FINANCIAL SERVICES INDUSTRIES (FSIS)",
-//         "publicationYear": "2024",
-//         "venue": "",
-//         "venueType": "Unpublished",
-//         "authors": "Sankarapu, Vinay Kumar",
-//         "link": "https://hal.science/hal-04691168",
-//         "source": "HAL"
-//     }
-
-export const ArticlesList = () => {
+export const ArticlesList = ({ lista, setShow }: Artigos) => {
   const { t } = useTranslation();
   const [artigos, setArtigos] = useState<Artigo[]>([]);
   const [paginaAtual, setPaginaAtual] = useState<number>(1);
@@ -28,16 +16,12 @@ export const ArticlesList = () => {
 
   // Gerar um JSON dummy com 50 artigos
   useEffect(() => {
-    const dummy: Artigo[] = Array.from({ length: 50 }, (_, i) => ({
-      title: `${t("articles:dummy_titulo")} ${i + 1}`,
-      authors: `${t("articles:dummy_autores")} ${i + 1}`,
-      publicationYear: 2025,
-      venue: "Journal",
-      link: `https://eusouumlink${i}.com`,
-      source: i % 2 === 0 ? "ScienceDirect" : "ACM",
-    }));
-    setArtigos(dummy);
-  }, [t]);
+    if (lista && Array.isArray(lista)) {
+      setArtigos(lista);
+    } else {
+      setArtigos([]);
+    }
+  }, [lista]);
 
   // Calcular índices da paginação
   const indexInicial = (paginaAtual - 1) * artigosPorPagina;
@@ -89,6 +73,16 @@ export const ArticlesList = () => {
   return (
     <div className="lista-artigos-page">
       <div className="lista-artigos-card">
+        <div className="lista-artigos-card__rollback">
+          <button
+            className="lista-artigos-card__rollback__btn"
+            onClick={() => {
+              setShow(false);
+            }}
+          >
+            <img src={ArrowIcon} alt="Voltar atrás" />
+          </button>
+        </div>
         <div className="header">
           <h2>{t("articles:titulo_lista")}</h2>
           <a
@@ -99,6 +93,11 @@ export const ArticlesList = () => {
           >
             {t("articles:botao_download")}
           </a>
+        </div>
+        <div className="results-container">
+          <div className="results-container__text">
+            {artigos.length} {t("home:results")}
+          </div>
         </div>
 
         <table>

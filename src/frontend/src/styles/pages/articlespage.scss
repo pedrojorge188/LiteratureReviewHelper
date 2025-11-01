@@ -33,12 +33,31 @@
     box-shadow: 0 2px 5px rgba(vars.$color-black, 0.05);
     padding: 1.5rem;
     position: relative;
+    &__rollback {
+      margin-bottom: 16px;
+
+      &__btn {
+        width: 40px;
+        height: 40px;
+        background-color: unset;
+        padding: 0;
+        border-radius: 50%;
+        img {
+          height: 20px;
+          width: 20px;
+        }
+        &:hover {
+          border-color: unset;
+          border: 0;
+          background-color: vars.$color-white-4;
+        }
+      }
+    }
 
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 1.5rem;
 
       h2 {
         font-size: 1.5rem;
@@ -47,8 +66,8 @@
       }
 
       .download-btn {
-        background-color: vars.$color-gray-4;
-        color: vars.$color-white;
+        background-color: vars.$color-gray-2;
+        color: vars.$color-white !important;
         border: none;
         border-radius: 6px;
         padding: 0.5rem 1.25rem;
@@ -57,7 +76,8 @@
         transition: vars.$trans-all-3;
 
         &:hover {
-          //   background-color: darken(vars.$color-gray-4, 5%);
+          background-color: vars.$color-white;
+          color: vars.$color-gray-2 !important;
         }
 
         &:disabled {
@@ -66,6 +86,14 @@
           cursor: not-allowed;
           opacity: 0.7;
         }
+      }
+    }
+
+    .results-container {
+      margin-bottom: 1.5rem;
+      margin-top: 1rem;
+      &__text {
+        font-size: 12px;
       }
     }
 

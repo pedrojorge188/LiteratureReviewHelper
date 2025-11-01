@@ -22,7 +22,7 @@ export const Paths = (): IRoute => ({
   savePage: { path: "favoritos", element: <FavoritesPage /> },
   libListPage: { path: "listabibliotecas", element: <LibrariesPage /> },
   credPage: { path: "credenciaisBiblioteca", element: <CredentialsLibPage /> },
-  articlePage: { path: "listaartigos", element: <ArticlesList /> },
+  // articlePage: { path: "listaartigos", element: <ArticlesList /> },
 });
 
 // Return the root path (ex: / or /en)

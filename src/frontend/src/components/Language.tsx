@@ -33,7 +33,14 @@ export const Language = () => {
             onClick={() => changeLanguage(language)}
             key={index}
           >
-            <span>{language}</span>
+            {index > 0 ? (
+              <>
+                <span> | </span>
+                <span>{language}</span>
+              </>
+            ) : (
+              <span>{language}</span>
+            )}
           </CommonLink>
         );
       })}

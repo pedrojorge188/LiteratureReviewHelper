@@ -2,6 +2,7 @@
   "appId": "com.isec.literaturereviewhelper",
   "productName": "Literature Review Helper",
   "copyright": "Copyright © 2025 ISEC",
+  "publish": null,
   "npmRebuild": false,
   "directories": {
     "output": "dist-electron",

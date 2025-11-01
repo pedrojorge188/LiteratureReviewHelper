@@ -45,19 +45,15 @@ jobs:
     needs: run-static-analysis-backend
     container:
       image: ghcr.io/${{ github.repository_owner }}/backend-builder:latest
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION }}
-        SONAR_PROJECT: ${{ vars.SONAR_PROJECT }}
     steps:
-      - name: Build backend
+      - name: Build backend JAR
         working-directory: /app
         run: mvn clean package -DskipTests -B
       - name: Upload backend JAR
         uses: actions/upload-artifact@v4
         with:
           name: backend-jar
-          path: /app/src/backend/target/literature-review-helper-0.0.1-SNAPSHOT.jar
+          path: /app/target/literature-review-helper-0.0.1-SNAPSHOT.jar
           retention-days: 1
 
   build-and-push-frontend-ci-image:

@@ -6,6 +6,10 @@
   "author": "ISEC",
   "type": "module",
   "main": "electron-main.cjs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pedrojorge188/LiteratureReviewHelper.git"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

@@ -3,12 +3,19 @@ package pt.isec.literaturereviewhelper.engines;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 
 import pt.isec.literaturereviewhelper.interfaces.IResultMapper;
 import pt.isec.literaturereviewhelper.interfaces.ISearchEngine;
@@ -24,6 +31,10 @@ import reactor.core.publisher.Mono;
 public abstract class EngineBase<R> implements ISearchEngine {
     protected final Logger log = LoggerFactory.getLogger(getClass());
     protected final WebClient webClient;
+    protected final Cache<String, List<Article>> upstreamCache = Caffeine.newBuilder()
+            .maximumSize(10L)
+            .expireAfterWrite(24L, TimeUnit.HOURS)
+            .build();
     private final IResultMapper<R> mapper;
 
     protected EngineBase(WebClient webClient, IResultMapper<R> mapper) {
@@ -126,7 +137,7 @@ public abstract class EngineBase<R> implements ISearchEngine {
     }
 
     /**
-     * Default implementation of search that handles common HTTP logic.
+     * Default implementation of search that handles common HTTP logic and request caching.
      * Subclasses can override if they need custom behavior.
      */
     @Override
@@ -154,13 +165,20 @@ public abstract class EngineBase<R> implements ISearchEngine {
 
                 String fullURL = buildURL(mapParams(pagedParams));
 
-                List<Article> pageArticles = webClient.get()
+                log.info("Fetching {} from cache...", fullURL);
+                List<Article> pageArticles = upstreamCache.getIfPresent(fullURL);
+                if (pageArticles == null) {
+                    log.info("Cache miss for {}, fetching from upstream...", fullURL);
+                    pageArticles = webClient.get()
                         .uri(URI.create(fullURL))
                         .accept(getMediaType())
                         .retrieve()
                         .bodyToMono(getResponseType())
                         .map(mapper::map)
                         .block();
+
+                    upstreamCache.put(fullURL, pageArticles);
+                }
 
                 if (pageArticles != null && !pageArticles.isEmpty()) {
                     accumulatedArticles.addAll(pageArticles);

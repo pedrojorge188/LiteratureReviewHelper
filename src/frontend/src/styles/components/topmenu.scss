@@ -13,8 +13,19 @@
         }
       }
     }
+
     &__right {
       &__language-container {
+        .languages {
+          .lang-item {
+            span {
+              text-transform: capitalize;
+            }
+            &.selected {
+              font-weight: 700;
+            }
+          }
+        }
       }
     }
   }

@@ -4,11 +4,13 @@ import { Paths } from "../routes/RouteConfig";
 import { useSelector } from "react-redux";
 import { ApplicationState } from "../store";
 import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 export const SideMenu = () => {
   const { t, i18n } = useTranslation();
   const routes = Paths();
   const { lang } = useSelector((state: ApplicationState) => state.HOME);
+  const location = useLocation();
 
   return (
     <>
@@ -22,7 +24,11 @@ export const SideMenu = () => {
           <div className="side-menu__container__content-menu">
             <div className="side-menu__container__content-menu__link-container">
               <CommonLink
-                linkClass="side-menu__container__content-menu__link-container__link"
+                linkClass={`side-menu__container__content-menu__link-container__link ${
+                  location.pathname === `/${routes.searchPage.path}`
+                    ? "selected"
+                    : ""
+                }`}
                 link={{ external: false, url: routes.searchPage.path }}
                 title={t("sideMenu:search")}
               >
@@ -31,7 +37,11 @@ export const SideMenu = () => {
             </div>
             <div className="side-menu__container__content-menu__link-container">
               <CommonLink
-                linkClass="side-menu__container__content-menu__link-container__link"
+                linkClass={`side-menu__container__content-menu__link-container__link ${
+                  location.pathname === `/${routes.savePage.path}`
+                    ? "selected"
+                    : ""
+                }`}
                 link={{ external: false, url: routes.savePage.path }}
                 title={t("sideMenu:favorites")}
               >
@@ -40,7 +50,11 @@ export const SideMenu = () => {
             </div>
             <div className="side-menu__container__content-menu__link-container">
               <CommonLink
-                linkClass="side-menu__container__content-menu__link-container__link"
+                linkClass={`side-menu__container__content-menu__link-container__link ${
+                  location.pathname === `/${routes.historyPage.path}`
+                    ? "selected"
+                    : ""
+                }`}
                 link={{ external: false, url: routes.historyPage.path }}
                 title={t("sideMenu:history")}
               >
@@ -50,7 +64,11 @@ export const SideMenu = () => {
 
             <div className="side-menu__container__content-menu__link-container">
               <CommonLink
-                linkClass="side-menu__container__content-menu__link-container__link"
+                linkClass={`side-menu__container__content-menu__link-container__link ${
+                  location.pathname === `/${routes.libListPage.path}`
+                    ? "selected"
+                    : ""
+                }`}
                 link={{ external: false, url: routes.libListPage.path }}
                 title={t("sideMenu:librayList")}
               >
@@ -63,3 +81,5 @@ export const SideMenu = () => {
     </>
   );
 };
+
+const selected = (url: string) => {};

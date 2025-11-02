@@ -1,4 +1,10 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { getArticles } from "../store/ducks/home/thunks";
+import { useDispatch } from "react-redux";
+import { Artigo } from "./types";
+import { ArticlesList } from "./ArticlesList";
+import { LoadingCircle } from "../components/shared";
 
 interface Query {
   valor: string;
@@ -6,6 +12,8 @@ interface Query {
 }
 
 export const MainPage = () => {
+  const { t } = useTranslation();
+  const dispatch = useDispatch<any>();
   const [queries, setQueries] = useState<Query[]>([{ valor: "" }]);
   const [anoDe, setAnoDe] = useState<string>("");
   const [anoAte, setAnoAte] = useState<string>("");
@@ -14,8 +22,10 @@ export const MainPage = () => {
   const [bibliotecaSelecionada, setBibliotecaSelecionada] =
     useState<string>("");
   const [bibliotecas, setBibliotecas] = useState<string[]>([]);
+  const [showList, setShowList] = useState(false);
+  const [article, setArticle] = useState<Artigo[] | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // 🧩 Função auxiliar que garante que apenas o primeiro não tem metadado
   const normalizarQueries = (lista: Query[]): Query[] => {
     return lista.map((q, i) => {
       if (i === 0) {
@@ -65,7 +75,7 @@ export const MainPage = () => {
   };
 
   const guardar = () => {
-    console.log("Dados guardados:", {
+    console.log(t("home:dados_guardados"), {
       queries,
       anoDe,
       anoAte,
@@ -75,170 +85,203 @@ export const MainPage = () => {
     });
   };
 
-  const pesquisar = () => {
-    // Exemplo de string resultante
+  const pesquisar = async () => {
+    setIsLoading(true); // começa o loading
     const queryString = queries
       .map((q, i) => (i === 0 ? q.valor : `${q.metadado} ${q.valor}`))
       .join(" ");
-    console.log("Pesquisar com:", {
-      queryString,
-      queries,
-      anoDe,
-      anoAte,
-      excluirVenues,
-      bibliotecas,
-    });
+
+    try {
+      const resultAction = await dispatch(getArticles(queryString));
+
+      if (getArticles.fulfilled.match(resultAction)) {
+        setArticle(resultAction.payload);
+        setShowList(true);
+      } else {
+        console.error("Erro na pesquisa:", resultAction.error);
+      }
+    } catch (error) {
+      console.error("Erro geral na pesquisa:", error);
+    } finally {
+      setIsLoading(false); // termina o loading sempre
+    }
   };
 
   return (
-    <div className="pesquisa-container">
-      <h2>Pesquisa</h2>
-      <div className="pesquisa-container__content">
-        <div className="section">
-          <label>Query</label>
-          {queries.map((q, index) => (
-            <div key={index} className="query-row">
-              {/* Só mostra o seletor de operador se não for a primeira */}
-              {index > 0 && (
+    <>
+      {isLoading && <LoadingCircle />}
+      {showList && article !== null ? (
+        <>
+          <ArticlesList lista={article} setShow={setShowList} />
+        </>
+      ) : (
+        <div className="pesquisa-container">
+          <h2>{t("home:titulo_pesquisa")}</h2>
+
+          <div className="pesquisa-container__content">
+            {/* Query Section */}
+            <div className="section">
+              <label>{t("home:label_query")}</label>
+              {queries.map((q, index) => (
+                <div key={index} className="query-row">
+                  {index > 0 && (
+                    <select
+                      value={q.metadado}
+                      onChange={(e) =>
+                        atualizarQuery(index, "metadado", e.target.value)
+                      }
+                    >
+                      <option value="AND">{t("home:operador_and")}</option>
+                      <option value="OR">{t("home:operador_or")}</option>
+                      <option value="NOT">{t("home:operador_not")}</option>
+                    </select>
+                  )}
+
+                  <input
+                    className="query-row__input-text"
+                    type="text"
+                    value={q.valor}
+                    placeholder={t("home:placeholder_query") ?? ""}
+                    onChange={(e) =>
+                      atualizarQuery(index, "valor", e.target.value)
+                    }
+                  />
+
+                  <div className="query-buttons">
+                    {index === queries.length - 1 && (
+                      <button
+                        type="button"
+                        className="icon-btn"
+                        onClick={adicionarQuery}
+                        title={t("home:adicionar_query") ?? ""}
+                      >
+                        &#65291;
+                      </button>
+                    )}
+                    {index > 0 && (
+                      <button
+                        type="button"
+                        className="icon-btn"
+                        onClick={() => moverQueryCima(index)}
+                        title={t("home:mover_para_cima") ?? ""}
+                      >
+                        &#8593;
+                      </button>
+                    )}
+                    {index > 0 && (
+                      <button
+                        type="button"
+                        className="icon-btn"
+                        onClick={() => removerQuery(index)}
+                        title={t("home:remover_query") ?? ""}
+                      >
+                        &#10005;
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Ano de publicação */}
+            <div className="section">
+              <label>{t("home:label_ano_publicacao")}</label>
+              <div className="ano-row">
                 <select
-                  value={q.metadado}
-                  onChange={(e) =>
-                    atualizarQuery(index, "metadado", e.target.value)
-                  }
+                  value={anoDe}
+                  onChange={(e) => setAnoDe(e.target.value)}
                 >
-                  <option value="AND">AND</option>
-                  <option value="OR">OR</option>
-                  <option value="NOT">NOT</option>
+                  <option value="">{t("home:ano_de")}</option>
+                  {Array.from({ length: 30 }, (_, i) => 2025 - i).map((ano) => (
+                    <option key={ano} value={ano}>
+                      {ano}
+                    </option>
+                  ))}
                 </select>
-              )}
 
-              <input
-                className="query-row__input-text"
-                type="text"
-                value={q.valor}
-                onChange={(e) => atualizarQuery(index, "valor", e.target.value)}
-              />
-
-              <div className="query-buttons">
-                {index === queries.length - 1 && (
-                  <button
-                    type="button"
-                    className="icon-btn"
-                    onClick={adicionarQuery}
-                    title="Adicionar nova query"
-                  >
-                    &#65291;
-                  </button>
-                )}
-                {index > 0 && (
-                  <button
-                    type="button"
-                    className="icon-btn"
-                    onClick={() => moverQueryCima(index)}
-                    title="Mover para cima"
-                  >
-                    &#8593;
-                  </button>
-                )}
-                {index > 0 && (
-                  <button
-                    type="button"
-                    className="icon-btn"
-                    onClick={() => removerQuery(index)}
-                    title="Remover"
-                  >
-                    &#10005;
-                  </button>
-                )}
+                <select
+                  value={anoAte}
+                  onChange={(e) => setAnoAte(e.target.value)}
+                >
+                  <option value="">{t("home:ano_ate")}</option>
+                  {Array.from({ length: 30 }, (_, i) => 2025 - i).map((ano) => (
+                    <option key={ano} value={ano}>
+                      {ano}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
-          ))}
-        </div>
 
-        {/* As outras seções permanecem iguais */}
-        <div className="section">
-          <label>Ano Publicação</label>
-          <div className="ano-row">
-            <select value={anoDe} onChange={(e) => setAnoDe(e.target.value)}>
-              <option value="">De</option>
-              {Array.from({ length: 30 }, (_, i) => 2025 - i).map((ano) => (
-                <option key={ano} value={ano}>
-                  {ano}
-                </option>
-              ))}
-            </select>
-            <select value={anoAte} onChange={(e) => setAnoAte(e.target.value)}>
-              <option value="">Até</option>
-              {Array.from({ length: 30 }, (_, i) => 2025 - i).map((ano) => (
-                <option key={ano} value={ano}>
-                  {ano}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+            {/* Excluir venues */}
+            <div className="section">
+              <label>{t("home:label_excluir_venues")}</label>
+              <textarea
+                value={excluirVenues}
+                onChange={(e) => setExcluirVenues(e.target.value)}
+                placeholder={t("home:placeholder_excluir_venues") ?? ""}
+              ></textarea>
+            </div>
 
-        <div className="section">
-          <label>Excluir Venues</label>
-          <textarea
-            value={excluirVenues}
-            onChange={(e) => setExcluirVenues(e.target.value)}
-            placeholder="Utilize ; para separar as tags de exclusão"
-          ></textarea>
-        </div>
+            {/* Excluir títulos */}
+            <div className="section">
+              <label>{t("home:label_excluir_titulos")}</label>
+              <textarea
+                value={excluirTitulos}
+                onChange={(e) => setExcluirTitulos(e.target.value)}
+                placeholder={t("home:placeholder_excluir_titulos") ?? ""}
+              ></textarea>
+            </div>
 
-        <div className="section">
-          <label>Excluir Títulos</label>
-          <textarea
-            value={excluirTitulos}
-            onChange={(e) => setExcluirTitulos(e.target.value)}
-            placeholder="Utilize ; para separar as tags de exclusão"
-          ></textarea>
-        </div>
-
-        <div className="section">
-          <label>Bibliotecas</label>
-          <div className="biblioteca-row">
-            <select
-              value={bibliotecaSelecionada}
-              onChange={(e) => setBibliotecaSelecionada(e.target.value)}
-            >
-              <option value="">Selecionar Biblioteca</option>
-              <option value="Scopus">Scopus</option>
-              <option value="ACM">ACM</option>
-              <option value="DBLP">DBLP</option>
-            </select>
-            <button type="button" onClick={adicionarBiblioteca}>
-              Adicionar
-            </button>
-          </div>
-
-          <h3 className="bibliotecas-lista-titulo">Lista de Bibliotecas</h3>
-          <ul className="bibliotecas-lista">
-            {bibliotecas.map((b, i) => (
-              <li key={i}>
-                <span>{b}</span>
-                <button
-                  type="button"
-                  className="remove-btn"
-                  onClick={() => removerBiblioteca(b)}
+            {/* Bibliotecas */}
+            <div className="section">
+              <label>{t("home:label_bibliotecas")}</label>
+              <div className="biblioteca-row">
+                <select
+                  value={bibliotecaSelecionada}
+                  onChange={(e) => setBibliotecaSelecionada(e.target.value)}
                 >
-                  Remover
+                  <option value="">{t("home:selecionar_biblioteca")}</option>
+                  <option value="Scopus">Scopus</option>
+                  <option value="ACM">ACM</option>
+                  <option value="DBLP">DBLP</option>
+                </select>
+                <button type="button" onClick={adicionarBiblioteca}>
+                  {t("home:botao_adicionar")}
                 </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+              </div>
 
-        <div className="actions">
-          <button type="button" onClick={guardar}>
-            Guardar
-          </button>
-          <button type="button" onClick={pesquisar}>
-            Pesquisar
-          </button>
+              <h3 className="bibliotecas-lista-titulo">
+                {t("home:lista_bibliotecas")}
+              </h3>
+              <ul className="bibliotecas-lista">
+                {bibliotecas.map((b, i) => (
+                  <li key={i}>
+                    <span>{b}</span>
+                    <button
+                      type="button"
+                      className="remove-btn"
+                      onClick={() => removerBiblioteca(b)}
+                    >
+                      {t("home:botao_remover")}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Botões principais */}
+            <div className="actions">
+              <button type="button" onClick={guardar}>
+                {t("home:botao_guardar")}
+              </button>
+              <button type="button" onClick={pesquisar}>
+                {t("home:botao_pesquisar")}
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 };

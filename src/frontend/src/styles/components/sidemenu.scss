@@ -21,6 +21,12 @@
         gap: 16px;
         &__link {
           @include util.font(14, 24, 0);
+          &.selected {
+            font-weight: 700;
+          }
+          &:hover {
+            font-weight: 700;
+          }
         }
       }
     }

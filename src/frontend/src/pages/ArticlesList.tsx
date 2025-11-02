@@ -1,33 +1,29 @@
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Artigo } from "./types";
+import ArrowIcon from "../assets/images/png/arrow.png";
 
-interface Artigo {
-  titulo: string;
-  autores: string;
-  ano: number;
-  venue: string;
-  tipo: string;
-  fonte: string;
+interface Artigos {
+  lista: Artigo[];
+  setShow: Dispatch<SetStateAction<boolean>>;
 }
 
-export const ArticlesList = () => {
+export const ArticlesList = ({ lista, setShow }: Artigos) => {
+  const { t } = useTranslation();
   const [artigos, setArtigos] = useState<Artigo[]>([]);
   const [paginaAtual, setPaginaAtual] = useState<number>(1);
   const artigosPorPagina = 10;
 
   // Gerar um JSON dummy com 50 artigos
   useEffect(() => {
-    const dummy: Artigo[] = Array.from({ length: 50 }, (_, i) => ({
-      titulo: `(Texto Abreviado ${i + 1})`,
-      autores: `(Texto Abreviado ${i + 1})`,
-      ano: 2025,
-      venue: "Journal",
-      tipo: "Information Systems",
-      fonte: i % 2 === 0 ? "ScienceDirect" : "ACM",
-    }));
-    setArtigos(dummy);
-  }, []);
+    if (lista && Array.isArray(lista)) {
+      setArtigos(lista);
+    } else {
+      setArtigos([]);
+    }
+  }, [lista]);
 
-  // Calcular indices da paginação
+  // Calcular índices da paginação
   const indexInicial = (paginaAtual - 1) * artigosPorPagina;
   const indexFinal = indexInicial + artigosPorPagina;
   const artigosVisiveis = artigos.slice(indexInicial, indexFinal);
@@ -76,44 +72,54 @@ export const ArticlesList = () => {
 
   return (
     <div className="lista-artigos-page">
-      <div className="breadcrumb">
-        <a href="#">Início</a> &gt; <a href="#">Criar Estado de Arte</a> &gt;{" "}
-        <span>Lista de Artigos</span>
-      </div>
-
       <div className="lista-artigos-card">
+        <div className="lista-artigos-card__rollback">
+          <button
+            className="lista-artigos-card__rollback__btn"
+            onClick={() => {
+              setShow(false);
+            }}
+          >
+            <img src={ArrowIcon} alt="Voltar atrás" />
+          </button>
+        </div>
         <div className="header">
-          <h2>Lista de Artigos</h2>
+          <h2>{t("articles:titulo_lista")}</h2>
           <a
             href="/api/download"
             className="download-btn"
             target="_blank"
             rel="noopener noreferrer"
           >
-            Download
+            {t("articles:botao_download")}
           </a>
+        </div>
+        <div className="results-container">
+          <div className="results-container__text">
+            {artigos.length} {t("home:results")}
+          </div>
         </div>
 
         <table>
           <thead>
             <tr>
-              <th>Título</th>
-              <th>Autores</th>
-              <th>Ano</th>
-              <th>Venue</th>
-              <th>Tipo</th>
-              <th>Fonte</th>
+              <th>{t("articles:coluna_titulo")}</th>
+              <th>{t("articles:coluna_autores")}</th>
+              <th>{t("articles:coluna_ano")}</th>
+              <th>{t("articles:coluna_venue")}</th>
+              <th>{t("articles:coluna_link")}</th>
+              <th>{t("articles:coluna_fonte")}</th>
             </tr>
           </thead>
           <tbody>
             {artigosVisiveis.map((artigo, index) => (
               <tr key={index}>
-                <td>{artigo.titulo}</td>
-                <td>{artigo.autores}</td>
-                <td>{artigo.ano}</td>
+                <td>{artigo.title}</td>
+                <td>{artigo.authors}</td>
+                <td>{artigo.publicationYear}</td>
                 <td>{artigo.venue}</td>
-                <td>{artigo.tipo}</td>
-                <td>{artigo.fonte}</td>
+                <td>{artigo.link}</td>
+                <td>{artigo.source}</td>
               </tr>
             ))}
           </tbody>
@@ -154,3 +160,26 @@ export const ArticlesList = () => {
     </div>
   );
 };
+
+//Lista que vai receber
+
+// [
+//     {
+//         "title": "AI-Family Integration Index (AFII): Benchmarking a New Global Readiness for AI as Family",
+//         "publicationYear": "2025",
+//         "venue": "",
+//         "venueType": "Unpublished",
+//         "authors": "Mahajan, Prashant",
+//         "link": "https://hal.science/hal-05020569",
+//         "source": "HAL"
+//     },
+//     {
+//         "title": "REVIEWING THE RISKS OF AI TECHNICAL DEBT (TD) IN THE FINANCIAL SERVICES INDUSTRIES (FSIS)",
+//         "publicationYear": "2024",
+//         "venue": "",
+//         "venueType": "Unpublished",
+//         "authors": "Sankarapu, Vinay Kumar",
+//         "link": "https://hal.science/hal-04691168",
+//         "source": "HAL"
+//     }
+// ]

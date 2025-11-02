@@ -35,6 +35,7 @@ public class LiteratureSearchController {
         String sourceStr = allParams.get("source");
 
         if (sourceStr == null || sourceStr.isBlank()) {
+
             return Flux.fromArray(Engines.values())
                     .flatMap(engine -> apiService.search(engine, allParams))
                     .flatMap(Flux::fromIterable)

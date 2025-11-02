@@ -10,7 +10,7 @@ const initialState: IHomeState = {
   lang: "",
   langLoaded: false,
 };
-
+//não apagar que o disparar da linguagem é neste redux. Poderá ser limpo depois.
 const homeSlice = createSlice({
   name: "Home",
   initialState,

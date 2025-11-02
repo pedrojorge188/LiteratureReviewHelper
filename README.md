@@ -63,6 +63,7 @@ The MVP will include:
 | Role              | Assignment |
 |------------------|------------|
 | **Product Owner** | Pedro Jorge |
+| **Frontend Tech Lead** | Jorge Martins |
 | **Architecture Owner** | Rafael Cardoso |
 | **Team Members** | Alberto Varandas<br>Jorge Martins<br>João Santos<br>José Cruz<br>Rodrigo Duarte<br>Francisco Simões<br>Pedro Jorge<br>Rafael Cardoso |
 

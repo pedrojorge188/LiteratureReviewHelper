@@ -6,6 +6,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static pt.isec.literaturereviewhelper.commons.Params.QUERY;
+import static pt.isec.literaturereviewhelper.commons.Params.ROWS;
+import static pt.isec.literaturereviewhelper.commons.Params.START;
 
 import java.net.URI;
 import java.util.List;
@@ -52,30 +55,51 @@ public class EngineBaseTest {
     @Test
     void testRepeatedQueryDoesNotRecallUpstream() {
         // Arrange
-        Map<String, String> params = Map.of(
-                "q", "data science",
-                "start", "0",
-                "rows", "10",
-                "deep_search_limit", "1" // only get 1st page of results
-        );
-
         TestEngineResponse testResponse = new TestEngineResponse();
         when(responseSpec.bodyToMono(TestEngineResponse.class)).thenReturn(Mono.just(testResponse));
 
         List<Article> mapped = List.of(
-                new Article("Data Science Paper", "2023", "Data Journal", "journal-article",
-                        List.of("Alice Johnson"), "https://example.com/ds-article", Engines.ACM)
+                new Article("Old Data Science Paper", "2010", "Old Journal", "journal-article",
+                        List.of("Jane Smith"), "https://example.com/old-ds-article", Engines.ACM),
+                new Article("Future Data Science Paper", "2050", "Future Journal", "journal-article",
+                        List.of("John Doe"), "https://example.com/future-ds-article", Engines.ACM),
+                new Article("Valid Data Science Paper", "2018", "Valid Journal", "journal-article",
+                        List.of("John Doe"), "https://example.com/valid-ds-article", Engines.ACM)
         );
 
         when(resultMapper.map(testResponse)).thenReturn(mapped);
 
         // Act
-        Mono<List<Article>> firstCall = testEngine.search(params);
-        Mono<List<Article>> secondCall = testEngine.search(params);
+        Mono<List<Article>> firstCall = testEngine.search(Map.of(
+                "q", "data science",
+                "start", "0",
+                "rows", "10",
+                "deep_search_limit", "1" // only get 1st page of results
+                // missing filter parameters
+        ));
+        Mono<List<Article>> secondCall = testEngine.search(Map.of(
+                "q", "data science",
+                "start", "0",
+                "rows", "10",
+                "deep_search_limit", "1", // only get 1st page of results
+                "year_start", "2015",
+                "year_end", "2020"
+        ));
 
         // Assert
         verify(webClient, times(1)).get();
-        assertEquals(firstCall.block(), secondCall.block());
+        assertEquals(firstCall.block(), List.of(
+                new Article("Old Data Science Paper", "2010", "Old Journal", "journal-article",
+                        List.of("Jane Smith"), "https://example.com/old-ds-article", Engines.ACM),
+                new Article("Future Data Science Paper", "2050", "Future Journal", "journal-article",
+                        List.of("John Doe"), "https://example.com/future-ds-article", Engines.ACM),
+                new Article("Valid Data Science Paper", "2018", "Valid Journal", "journal-article",
+                        List.of("John Doe"), "https://example.com/valid-ds-article", Engines.ACM)
+        ));
+        assertEquals(secondCall.block(), List.of(
+                new Article("Valid Data Science Paper", "2018", "Valid Journal", "journal-article",
+                        List.of("John Doe"), "https://example.com/valid-ds-article", Engines.ACM)
+        ));
     }
 
     private class TestEngine extends EngineBase<TestEngineResponse> {
@@ -104,7 +128,15 @@ public class EngineBaseTest {
         }
         @Override
         protected List<String> getRequiredParameters() {
-            return List.of();
+            return List.of(QUERY, START, ROWS);
+        }
+        @Override
+        public Map<String, Object> mapParams(Map<String, String> raw) {
+            return Map.of(
+                    "query", raw.get(QUERY),
+                    "start", raw.get(START),
+                    "rows", raw.get(ROWS)
+            );
         }
     }
 

@@ -17,6 +17,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
+import pt.isec.literaturereviewhelper.filters.ResultFilterChain;
 import pt.isec.literaturereviewhelper.interfaces.IResultMapper;
 import pt.isec.literaturereviewhelper.interfaces.ISearchEngine;
 import pt.isec.literaturereviewhelper.models.Article;
@@ -137,7 +138,7 @@ public abstract class EngineBase<R> implements ISearchEngine {
     }
 
     /**
-     * Default implementation of search that handles common HTTP logic and request caching.
+     * Default implementation of search that handles common HTTP logic, request caching and result filtering.
      * Subclasses can override if they need custom behavior.
      */
     @Override
@@ -188,6 +189,10 @@ public abstract class EngineBase<R> implements ISearchEngine {
             log.error("Exception occurred, returning accumulated articles: {}", e.getMessage());
         }
 
-        return Mono.just(accumulatedArticles);
+
+        ResultFilterChain filterChain = new ResultFilterChain.Builder().fromParams(params).build();
+        List<Article> filteredArticles = filterChain.filter(accumulatedArticles);
+
+        return Mono.just(filteredArticles);
     }
 }

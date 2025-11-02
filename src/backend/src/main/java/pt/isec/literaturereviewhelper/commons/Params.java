@@ -11,4 +11,5 @@ public final class Params {
     public static final String DEEP_SEARCH_LIMIT = "deep_search_limit";
     public static final String YEAR_START        = "year_start";
     public static final String YEAR_END          = "year_end";
+    public static final String AUTHOR            = "author";
 }

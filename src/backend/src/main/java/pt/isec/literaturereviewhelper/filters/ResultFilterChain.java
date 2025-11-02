@@ -3,8 +3,14 @@ package pt.isec.literaturereviewhelper.filters;
 import pt.isec.literaturereviewhelper.interfaces.IResultFilter;
 import pt.isec.literaturereviewhelper.models.Article;
 
+import static pt.isec.literaturereviewhelper.commons.Params.AUTHOR;
+import static pt.isec.literaturereviewhelper.commons.Params.YEAR_END;
+import static pt.isec.literaturereviewhelper.commons.Params.YEAR_START;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -25,5 +31,37 @@ public final class ResultFilterChain implements IResultFilter {
             filtered = f.filter(filtered);
         }
         return filtered;
+    }
+
+    public static class Builder {
+        private final List<IResultFilter> filters = new ArrayList<>();
+
+        public Builder fromParams(Map<String, String> params) {
+            if (params.containsKey(YEAR_START) && params.containsKey(YEAR_END)) {
+                int startYear = Integer.parseInt(params.get(YEAR_START));
+                int endYear = Integer.parseInt(params.get(YEAR_END));
+                filters.add(new YearResultFilter(startYear, endYear));
+            }
+            else if (params.containsKey(YEAR_END)) {
+                int startYear = Integer.MIN_VALUE;
+                int endYear = Integer.parseInt(params.get(YEAR_END));
+                filters.add(new YearResultFilter(startYear, endYear));
+            }
+            else if (params.containsKey(YEAR_START)) {
+                int startYear = Integer.parseInt(params.get(YEAR_START));
+                int endYear = LocalDate.now().getYear();
+                filters.add(new YearResultFilter(startYear, endYear));
+            }
+
+            if (params.containsKey(AUTHOR)) {
+                filters.add(new AuthorResultFilter(params.get(AUTHOR)));
+            }
+
+            return this;
+        }
+
+        public ResultFilterChain build() {
+            return new ResultFilterChain(filters);
+        }
     }
 }

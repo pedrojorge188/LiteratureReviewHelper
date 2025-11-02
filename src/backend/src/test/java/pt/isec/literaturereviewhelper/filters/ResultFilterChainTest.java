@@ -8,6 +8,7 @@ import pt.isec.literaturereviewhelper.models.Engines;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -51,5 +52,31 @@ class ResultFilterChainTest {
                 new Article("", "", "", "", List.of(), "", Engines.HAL)
         );
         assertEquals(List.of(new Article("", "", "", "", List.of(), "", Engines.ACM)), chain.filter(articles));
+    }
+
+    @Test
+    void testBuilder_fromParams_createsCorrectFilterChain() {
+        // Arrange
+        var params = Map.of(
+                "year_start", "2015",
+                "year_end", "2020",
+                "author", "Doe, John"
+        );
+        ResultFilterChain chain = new ResultFilterChain.Builder().fromParams(params).build();
+
+        List<Article> articles = Arrays.asList(
+                new Article("", "2010", "", "", List.of("Doe, John"), "", Engines.ACM),
+                new Article("", "2015", "", "", List.of("Smith, Jane"), "", Engines.ACM),
+                new Article("", "2015", "", "", List.of("Doe, John"), "", Engines.ACM)
+        );
+
+        // Act
+        List<Article> filtered = chain.filter(articles);
+
+        // Assert
+        assertEquals(
+                List.of(new Article("", "2015", "", "", List.of("Doe, John"), "", Engines.ACM)),
+                filtered
+        );
     }
 }

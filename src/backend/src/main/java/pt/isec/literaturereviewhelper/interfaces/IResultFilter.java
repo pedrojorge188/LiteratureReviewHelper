@@ -1,13 +1,15 @@
 package pt.isec.literaturereviewhelper.interfaces;
 
+import java.util.List;
+
 import pt.isec.literaturereviewhelper.models.Article;
 
 public interface IResultFilter {
     /**
-     * Determines whether the provided Article matches the criteria defined by the filter.
+     * Filters the provided list of articles according to the filter's criteria.
      *
-     * @param article the Article to evaluate
-     * @return true if the article satisfies the filter and should be included, false otherwise
+     * @param articles the list of articles to filter
+     * @return a list containing only the articles that satisfy the filter
      */
-    boolean filter(Article article);
+    List<Article> filter(List<Article> articles);
 }

@@ -19,12 +19,11 @@ public final class ResultFilterChain implements IResultFilter {
     }
 
     @Override
-    public boolean filter(Article article) {
+    public List<Article> filter(List<Article> articles) {
+        List<Article> filtered = articles;
         for (IResultFilter f : filters) {
-            if (!f.filter(article)) {
-                return false;
-            }
+            filtered = f.filter(filtered);
         }
-        return true;
+        return filtered;
     }
 }

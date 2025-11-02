@@ -1,9 +1,7 @@
 package pt.isec.literaturereviewhelper.filters;
 
-import pt.isec.literaturereviewhelper.interfaces.IResultFilter;
 import pt.isec.literaturereviewhelper.models.Article;
-
-public class AuthorResultFilter implements IResultFilter {
+    public class AuthorResultFilter extends ResultFilterBase {
     private final String author;
 
     public AuthorResultFilter(String author) {
@@ -11,7 +9,7 @@ public class AuthorResultFilter implements IResultFilter {
     }
 
     @Override
-    public boolean filter(Article article) {
+    boolean filter(Article article) {
         if (article.authors() == null) {
             return false;
         }

@@ -19,26 +19,37 @@ class ResultFilterChainTest {
     }
 
     @Test
-    void testEmptyFilterList_returnsTrue() {
+    void testEmptyFilterList_returnsUnmodifiedList() {
         ResultFilterChain chain = new ResultFilterChain(Collections.emptyList());
-        assertTrue(chain.filter(new Article("", "", "", "", List.of(), "", Engines.ACM)));
+        List<Article> articles = Arrays.asList(
+                new Article("", "", "", "", List.of(), "", Engines.ACM)
+        );
+        assertEquals(articles, chain.filter(articles));
     }
 
     @Test
-    void testAllFiltersPass_returnsTrue() {
-        IResultFilter filter1 = article -> true;
-        IResultFilter filter2 = article -> true;
+    void testAllFiltersPass_returnsUnmodifiedList() {
+        IResultFilter filter1 = articles -> List.copyOf(articles);
+        IResultFilter filter2 = articles -> List.copyOf(articles);
         ResultFilterChain chain = new ResultFilterChain(Arrays.asList(filter1, filter2));
-
-        assertTrue(chain.filter(new Article("", "", "", "", List.of(), "", Engines.ACM)));
+        List<Article> articles = Arrays.asList(
+                new Article("", "", "", "", List.of(), "", Engines.ACM)
+        );
+        assertEquals(articles, chain.filter(articles));
     }
 
     @Test
-    void testOneFilterFails_returnsFalse() {
-        IResultFilter filter1 = article -> true;
-        IResultFilter filter2 = article -> false;
+    void testOneFilterFails_returnsListWithoutInfringingElement() {
+        IResultFilter filter1 = articles -> List.copyOf(articles);
+        IResultFilter filter2 = articles -> articles
+                .stream()
+                .filter(article -> article.source() == Engines.ACM)
+                .toList();
         ResultFilterChain chain = new ResultFilterChain(Arrays.asList(filter1, filter2));
-
-        assertFalse(chain.filter(new Article("", "", "", "", List.of(), "", Engines.ACM)));
+        List<Article> articles = Arrays.asList(
+                new Article("", "", "", "", List.of(), "", Engines.ACM),
+                new Article("", "", "", "", List.of(), "", Engines.HAL)
+        );
+        assertEquals(List.of(new Article("", "", "", "", List.of(), "", Engines.ACM)), chain.filter(articles));
     }
 }

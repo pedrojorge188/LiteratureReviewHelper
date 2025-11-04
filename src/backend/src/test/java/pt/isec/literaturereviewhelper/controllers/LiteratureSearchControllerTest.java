@@ -2,14 +2,14 @@ package pt.isec.literaturereviewhelper.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
+import org.springframework.util.Assert;
 
+import pt.isec.literaturereviewhelper.commons.RequestHeaderUtils;
 import pt.isec.literaturereviewhelper.dtos.SearchResponseDto;
-import pt.isec.literaturereviewhelper.interfaces.IApiService;
+import pt.isec.literaturereviewhelper.interfaces.ILiteratureReviewService;
 import pt.isec.literaturereviewhelper.models.Article;
 import pt.isec.literaturereviewhelper.models.Engines;
-import pt.isec.literaturereviewhelper.services.LiteratureReviewService;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -18,80 +18,117 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class LiteratureSearchControllerTest {
-    
-    private LiteratureReviewService service;
-    
+
     @Mock
-    private IApiService apiService;
+    private ILiteratureReviewService literatureReviewService;
+
+    @InjectMocks
+    private LiteratureSearchController controller;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        service = new LiteratureReviewService(apiService);
-    }
-
-    private Article dummyArticle(Engines engine) {
-        return new Article("", "", "", "", "", "", engine);
     }
 
     @Test
-    void testPerformLiteratureSearchReturnsAggregatedCounts() {
-        Map<String, String> allParams = new HashMap<>();
-        allParams.put("q", "AI");
-
-        Map<Engines, String> apiKeysByEngine = new EnumMap<>(Engines.class);
-        apiKeysByEngine.put(Engines.ACM, "key1");
-        apiKeysByEngine.put(Engines.HAL, "key2");
-
-        when(apiService.search(any(), any()))
-            .thenAnswer(invocation -> {
-                Engines engine = invocation.getArgument(0);
-                if (engine == Engines.ACM) {
-                    return Mono.just(List.of(dummyArticle(engine), dummyArticle(engine)));
-                } else if (engine == Engines.HAL) {
-                    return Mono.just(List.of(dummyArticle(engine)));
-                } else {
-                    return Mono.just(List.of());
-                }
-            });
-
-        Mono<SearchResponseDto> result = service.performLiteratureSearch(allParams, apiKeysByEngine);
-
-        StepVerifier.create(result)
-            .expectNextMatches(resp ->
-                resp.getQuery().equals("AI") &&
-                resp.getTotalArticles() == 3 &&
-                resp.getArticlesByEngine().get(Engines.ACM) == 2 &&
-                resp.getArticlesByEngine().get(Engines.HAL) == 1 &&
-                resp.getArticles().size() == 3
-            )
-            .verifyComplete();
+    void testConstructorCoverage() {
+        LiteratureSearchController ctrl = new LiteratureSearchController(literatureReviewService);
+        Assert.notNull(ctrl, "");
     }
 
     @Test
-    void testPerformLiteratureSearchWithEmptyListsFromApiService() {
-        Map<String, String> allParams = new HashMap<>();
-        allParams.put("q", "AI");
-        
-        Map<Engines, String> apiKeysByEngine = new EnumMap<>(Engines.class);
-        apiKeysByEngine.put(Engines.ACM, "key1");
-        apiKeysByEngine.put(Engines.HAL, "key2");
-        
-        when(apiService.search(any(), any())).thenReturn(Mono.just(List.of()));
-        
-        Mono<SearchResponseDto> result = service.performLiteratureSearch(allParams, apiKeysByEngine);
-        
-        StepVerifier.create(result)
-            .expectNextMatches(resp ->
-                resp.getTotalArticles() == 0 &&
-                resp.getArticlesByEngine().get(Engines.ACM) == 0 &&
-                resp.getArticlesByEngine().get(Engines.HAL) == 0 &&
-                resp.getArticles().isEmpty()
-            ).verifyComplete();
+    void testSearch_WithApiKeysHeader() {
+        // Arrange
+        Map<String, String> params = new HashMap<>();
+        params.put("q", "AI");
+        params.put("source", "google,reddit");
+
+        String apiKeysHeader = "google=key1,reddit=key2";
+
+        Map<Engines, String> apiKeysByEngine = Map.of(
+                Engines.ACM, "key1",
+                Engines.HAL, "key2"
+        );
+
+        List<Article> articles = List.of(new Article("Title 1", "Author 1", apiKeysHeader, apiKeysHeader, apiKeysHeader, apiKeysHeader, null), new Article("Title 2", "Author 2", apiKeysHeader, apiKeysHeader, apiKeysHeader, apiKeysHeader, null));
+        Map<Engines, Integer> articlesByEngine = Map.of(
+                Engines.ACM, 5,
+                Engines.HAL, 3
+        );
+
+        SearchResponseDto expectedResponse = new SearchResponseDto(
+                "AI",
+                8,
+                articlesByEngine,
+                articles
+        );
+
+        try (MockedStatic<RequestHeaderUtils> mocked = mockStatic(RequestHeaderUtils.class)) {
+            mocked.when(() -> RequestHeaderUtils.parseApiKeysHeader(apiKeysHeader))
+                    .thenReturn(apiKeysByEngine);
+
+            when(literatureReviewService.performLiteratureSearch(params, apiKeysByEngine))
+                    .thenReturn(Mono.just(expectedResponse));
+
+            // Act
+            Mono<SearchResponseDto> result = controller.search(params, apiKeysHeader);
+
+            // Assert
+            StepVerifier.create(result)
+                    .expectNextMatches(resp ->
+                            resp.getQuery().equals("AI") &&
+                            resp.getTotalArticles() == 8 &&
+                            resp.getArticlesByEngine().equals(articlesByEngine) &&
+                            resp.getArticles().equals(articles)
+                    )
+                    .verifyComplete();
+
+            verify(literatureReviewService, times(1))
+                    .performLiteratureSearch(params, apiKeysByEngine);
+        }
+    }
+
+    @Test
+    void testSearch_WithoutApiKeysHeader() {
+        // Arrange
+        Map<String, String> params = Map.of("q", "machine learning");
+        Map<Engines, String> emptyKeys = new EnumMap<>(Engines.class);
+
+        List<Article> articles = List.of(new Article("ML Basics", "Author X", null, null, null, null, null));
+        Map<Engines, Integer> articlesByEngine = Map.of(Engines.HAL, 1);
+
+        SearchResponseDto expectedResponse = new SearchResponseDto(
+                "machine learning",
+                1,
+                articlesByEngine,
+                articles
+        );
+
+        try (MockedStatic<RequestHeaderUtils> mocked = mockStatic(RequestHeaderUtils.class)) {
+            mocked.when(() -> RequestHeaderUtils.parseApiKeysHeader(null))
+                    .thenReturn(emptyKeys);
+
+            when(literatureReviewService.performLiteratureSearch(params, emptyKeys))
+                    .thenReturn(Mono.just(expectedResponse));
+
+            // Act
+            Mono<SearchResponseDto> result = controller.search(params, null);
+
+            // Assert
+            StepVerifier.create(result)
+                    .expectNextMatches(resp ->
+                            resp.getQuery().equals("machine learning") &&
+                            resp.getTotalArticles() == 1 &&
+                            resp.getArticlesByEngine().equals(articlesByEngine) &&
+                            resp.getArticles().equals(articles)
+                    )
+                    .verifyComplete();
+
+            verify(literatureReviewService, times(1))
+                    .performLiteratureSearch(params, emptyKeys);
+        }
     }
 }

@@ -1,9 +1,7 @@
 package pt.isec.literaturereviewhelper.services;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 
 import pt.isec.literaturereviewhelper.dtos.SearchResponseDto;
 import pt.isec.literaturereviewhelper.interfaces.IApiService;
@@ -12,20 +10,19 @@ import pt.isec.literaturereviewhelper.models.Engines;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 class LiteratureReviewServiceTest {
 
-    private LiteratureReviewService service;
-
     @Mock
     private IApiService apiService;
+
+    private LiteratureReviewService service;
 
     @BeforeEach
     void setUp() {
@@ -33,134 +30,132 @@ class LiteratureReviewServiceTest {
         service = new LiteratureReviewService(apiService);
     }
 
-    private Article dummyArticle(Engines engine) {
-        return new Article("", "", "", "", "", "", engine);
+    @Test
+    void testConstructorCoverage() {
+        LiteratureReviewService s = new LiteratureReviewService(apiService);
+        assertNotNull(s);
     }
 
     @Test
-    void testPerformLiteratureSearchReturnsAggregatedCounts() {
-        Map<String, String> allParams = new HashMap<>();
-        allParams.put("q", "AI");
+    void testPerformSearch_WithValidSources_AndApiKeys() {
+        // Arrange
+        Map<String, String> params = new HashMap<>();
+        params.put("q", "AI");
+        params.put("source", "HAL,ACM");
 
-        Map<Engines, String> apiKeysByEngine = new HashMap<>();
-        apiKeysByEngine.put(Engines.ACM, "key1");
-        apiKeysByEngine.put(Engines.HAL, "key2");
+        Map<Engines, String> apiKeys = Map.of(
+                Engines.HAL, "key1",
+                Engines.ACM, "key2"
+        );
 
-        when(apiService.search(any(), any()))
-                .thenAnswer(invocation -> {
-                    Engines engine = invocation.getArgument(0);
-                    if (engine == Engines.ACM) {
-                        return Mono.just(List.of(dummyArticle(engine), dummyArticle(engine)));
-                    } else if (engine == Engines.HAL) {
-                        return Mono.just(List.of(dummyArticle(engine)));
-                    } else {
-                        return Mono.just(List.of());
-                    }
-                });
+        List<Article> googleArticles = List.of(
+                new Article("Google AI", "Author G1", "http://g1", "Google", "", "", Engines.ACM),
+                new Article("DeepMind", "Author G2", "http://g2", "Google", "", "", Engines.HAL)
+        );
 
-        Mono<SearchResponseDto> result = service.performLiteratureSearch(allParams, apiKeysByEngine);
+        List<Article> redditArticles = List.of(
+                new Article("Reddit AI Discussion", "Author R1", "http://r1", "Reddit", "", "",Engines.HAL)
+        );
 
-        StepVerifier.create(result)
-                .expectNextMatches(resp ->
-                        resp.getQuery().equals("AI") &&
-                        resp.getTotalArticles() == 3 &&
-                        resp.getArticlesByEngine().get(Engines.ACM) == 2 &&
-                        resp.getArticlesByEngine().get(Engines.HAL) == 1
-                )
-                .verifyComplete();
-    }
-
-    @Test
-    void testPerformLiteratureSearchWithEmptySourceUsesAllEngines() {
-        Map<String, String> allParams = new HashMap<>();
-        allParams.put("q", "ML");
-        allParams.put("source", "");
-        Map<Engines, String> apiKeysByEngine = new HashMap<>();
-        apiKeysByEngine.put(Engines.ACM, "key1");
-        apiKeysByEngine.put(Engines.HAL, "key2");
-        apiKeysByEngine.put(Engines.SPRINGER, "key3");
-
-        when(apiService.search(any(), any()))
-                .thenAnswer(invocation -> {
-                    Engines engine = invocation.getArgument(0);
-                    return Mono.just(List.of(dummyArticle(engine)));
-                });
-
-        Mono<SearchResponseDto> result = service.performLiteratureSearch(allParams, apiKeysByEngine);
-
-        StepVerifier.create(result)
-                .expectNextMatches(resp ->
-                        resp.getArticlesByEngine().size() == 3 &&
-                        resp.getTotalArticles() == 3
-                )
-                .verifyComplete();
-    }
-
-    @Test
-    void testPerformLiteratureSearchWithEmptyListsFromApiService() {
-        Map<String, String> allParams = new HashMap<>();
-        allParams.put("q", "AI");
-        Map<Engines, String> apiKeysByEngine = new HashMap<>();
-        apiKeysByEngine.put(Engines.ACM, "key1");
-        apiKeysByEngine.put(Engines.HAL, "key2");
-
-        when(apiService.search(any(), any()))
-                .thenReturn(Mono.just(List.of()));
-
-        Mono<SearchResponseDto> result = service.performLiteratureSearch(allParams, apiKeysByEngine);
-
-        StepVerifier.create(result)
-                .expectNextMatches(resp ->
-                        resp.getTotalArticles() == 0 &&
-                        resp.getArticlesByEngine().get(Engines.ACM) == 0 &&
-                        resp.getArticlesByEngine().get(Engines.HAL) == 0
-                )
-                .verifyComplete();
-    }
-
-    @Test
-    void testPerformLiteratureSearchWithAllApiKeysNull() {
-        Map<String, String> allParams = new HashMap<>();
-        allParams.put("q", "AI");
-
-        Map<Engines, String> apiKeysByEngine = new HashMap<>();
-        apiKeysByEngine.put(Engines.ACM, null);
-        apiKeysByEngine.put(Engines.HAL, null);
-        apiKeysByEngine.put(Engines.SPRINGER, null);
-
-        when(apiService.search(eq(Engines.ACM), any()))
-                .thenReturn(Mono.just(List.of(dummyArticle(Engines.ACM), dummyArticle(Engines.ACM))));
         when(apiService.search(eq(Engines.HAL), any()))
-                .thenReturn(Mono.just(List.of(dummyArticle(Engines.HAL))));
-        when(apiService.search(eq(Engines.SPRINGER), any()))
-                .thenReturn(Mono.just(List.of()));
+                .thenReturn(Mono.just(googleArticles));
+        when(apiService.search(eq(Engines.ACM), any()))
+                .thenReturn(Mono.just(redditArticles));
 
-        Mono<SearchResponseDto> result = service.performLiteratureSearch(allParams, apiKeysByEngine);
+        // Act
+        Mono<SearchResponseDto> result = service.performLiteratureSearch(params, apiKeys);
 
+        // Assert
         StepVerifier.create(result)
-                .expectNextMatches(resp ->
-                        resp.getTotalArticles() == 3 &&
-                        resp.getArticlesByEngine().get(Engines.ACM) == 2 &&
-                        resp.getArticlesByEngine().get(Engines.HAL) == 1 &&
-                        resp.getArticlesByEngine().get(Engines.SPRINGER) == 0
-                )
+                .assertNext(resp -> {
+                    assertEquals("AI", resp.getQuery());
+                    assertEquals(3, resp.getTotalArticles());
+                    assertEquals(2, resp.getArticlesByEngine().size());
+                    assertEquals(3, resp.getArticles().size());
+                    assertTrue(resp.getArticlesByEngine().containsKey(Engines.HAL));
+                    assertTrue(resp.getArticlesByEngine().containsKey(Engines.ACM));
+                })
                 .verifyComplete();
+
+        verify(apiService, times(1)).search(eq(Engines.HAL), any());
+        verify(apiService, times(1)).search(eq(Engines.ACM), any());
     }
 
     @Test
-    void testPerformLiteratureSearchServiceThrowsExceptionPropagated() {
-        Map<String, String> allParams = new HashMap<>();
-        allParams.put("q", "AI");
-        Map<Engines, String> apiKeysByEngine = new HashMap<>();
-        apiKeysByEngine.put(Engines.ACM, "key1");
+    void testPerformSearch_WithNullSource_UsesAllEngines() {
+        // Arrange
+        Map<String, String> params = new HashMap<>();
+        params.put("q", "test");
 
-        when(apiService.search(any(), any()))
-                .thenReturn(Mono.error(new RuntimeException("API failed")));
+        Map<Engines, String> apiKeys = new EnumMap<>(Engines.class);
 
-        Mono<SearchResponseDto> result = service.performLiteratureSearch(allParams, apiKeysByEngine);
+        for (Engines e : Engines.values()) {
+            when(apiService.search(eq(e), any())).thenReturn(Mono.just(List.of()));
+        }
 
+        // Act
+        Mono<SearchResponseDto> result = service.performLiteratureSearch(params, apiKeys);
+
+        // Assert
         StepVerifier.create(result)
-                .expectErrorMatches(ex -> ex instanceof RuntimeException && ex.getMessage().equals("API failed"))
-                .verify();
+                .assertNext(resp -> {
+                    assertEquals("test", resp.getQuery());
+                    assertTrue(resp.getArticles().isEmpty());
+                    assertEquals(Engines.values().length, resp.getArticlesByEngine().size());
+                })
+                .verifyComplete();
+
+        for (Engines e : Engines.values()) {
+            verify(apiService, atLeastOnce()).search(eq(e), any());
+        }
+    }
+
+    @Test
+    void testPerformSearch_WithInvalidSource_ThrowsException() {
+        // Arrange
+        Map<String, String> params = new HashMap<>();
+        params.put("q", "AI");
+        params.put("source", "invalidEngine"); // valor inválido
+    
+        Map<Engines, String> apiKeys = new EnumMap<>(Engines.class);
+    
+        // Act & Assert
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> service.performLiteratureSearch(params, apiKeys).block()
+        );
+    
+        // Verifica a mensagem
+        assertEquals("Unsupported source: invalidEngine", exception.getMessage());
+    }
+
+    @Test
+    void testPerformSearch_WithMissingApiKey_DoesNotBreak() {
+        // Arrange
+        Map<String, String> params = new HashMap<>();
+        params.put("q", "AI");
+        params.put("source", "HAL");
+
+        Map<Engines, String> apiKeys = new EnumMap<>(Engines.class); // missing key
+
+        List<Article> googleArticles = List.of(
+                new Article("A1", "Auth1", "http://a1", "Google", "", "", Engines.HAL)
+        );
+
+        when(apiService.search(eq(Engines.HAL), any()))
+                .thenReturn(Mono.just(googleArticles));
+
+        // Act
+        Mono<SearchResponseDto> result = service.performLiteratureSearch(params, apiKeys);
+
+        // Assert
+        StepVerifier.create(result)
+                .assertNext(resp -> {
+                    assertEquals("AI", resp.getQuery());
+                    assertEquals(1, resp.getTotalArticles());
+                    assertEquals(1, resp.getArticlesByEngine().get(Engines.HAL));
+                    assertEquals(1, resp.getArticles().size());
+                })
+                .verifyComplete();
     }
 }

@@ -41,7 +41,7 @@ class LiteratureSearchControllerTest {
 
     @Test
     void testSearch_WithApiKeysHeader() {
-        // Arrange
+        
         Map<String, String> params = new HashMap<>();
         params.put("q", "AI");
         params.put("source", "google,reddit");
@@ -73,10 +73,10 @@ class LiteratureSearchControllerTest {
             when(literatureReviewService.performLiteratureSearch(params, apiKeysByEngine))
                     .thenReturn(Mono.just(expectedResponse));
 
-            // Act
+            
             Mono<SearchResponseDto> result = controller.search(params, apiKeysHeader);
 
-            // Assert
+            
             StepVerifier.create(result)
                     .expectNextMatches(resp ->
                             resp.getQuery().equals("AI") &&
@@ -93,7 +93,7 @@ class LiteratureSearchControllerTest {
 
     @Test
     void testSearch_WithoutApiKeysHeader() {
-        // Arrange
+        
         Map<String, String> params = Map.of("q", "machine learning");
         Map<Engines, String> emptyKeys = new EnumMap<>(Engines.class);
 
@@ -114,10 +114,10 @@ class LiteratureSearchControllerTest {
             when(literatureReviewService.performLiteratureSearch(params, emptyKeys))
                     .thenReturn(Mono.just(expectedResponse));
 
-            // Act
+            
             Mono<SearchResponseDto> result = controller.search(params, null);
 
-            // Assert
+            
             StepVerifier.create(result)
                     .expectNextMatches(resp ->
                             resp.getQuery().equals("machine learning") &&

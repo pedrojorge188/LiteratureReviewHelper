@@ -38,7 +38,7 @@ class LiteratureReviewServiceTest {
 
     @Test
     void testPerformSearch_WithValidSources_AndApiKeys() {
-        // Arrange
+        
         Map<String, String> params = new HashMap<>();
         params.put("q", "AI");
         params.put("source", "HAL,ACM");
@@ -62,10 +62,10 @@ class LiteratureReviewServiceTest {
         when(apiService.search(eq(Engines.ACM), any()))
                 .thenReturn(Mono.just(redditArticles));
 
-        // Act
+        
         Mono<SearchResponseDto> result = service.performLiteratureSearch(params, apiKeys);
 
-        // Assert
+        
         StepVerifier.create(result)
                 .assertNext(resp -> {
                     assertEquals("AI", resp.getQuery());
@@ -83,7 +83,7 @@ class LiteratureReviewServiceTest {
 
     @Test
     void testPerformSearch_WithNullSource_UsesAllEngines() {
-        // Arrange
+        
         Map<String, String> params = new HashMap<>();
         params.put("q", "test");
 
@@ -93,10 +93,10 @@ class LiteratureReviewServiceTest {
             when(apiService.search(eq(e), any())).thenReturn(Mono.just(List.of()));
         }
 
-        // Act
+        
         Mono<SearchResponseDto> result = service.performLiteratureSearch(params, apiKeys);
 
-        // Assert
+        
         StepVerifier.create(result)
                 .assertNext(resp -> {
                     assertEquals("test", resp.getQuery());
@@ -110,34 +110,30 @@ class LiteratureReviewServiceTest {
         }
     }
 
-    @Test
-    void testPerformSearch_WithInvalidSource_ThrowsException() {
-        // Arrange
+   @Test
+   void testPerformSearch_WithInvalidSource_ThrowsException() {
         Map<String, String> params = new HashMap<>();
         params.put("q", "AI");
-        params.put("source", "invalidEngine"); // valor inválido
-    
+        params.put("source", "invalidEngine");
+
         Map<Engines, String> apiKeys = new EnumMap<>(Engines.class);
-    
-        // Act & Assert
+
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> service.performLiteratureSearch(params, apiKeys).block()
+            () -> service.performLiteratureSearch(params, apiKeys)
         );
-    
-        // Verifica a mensagem
+
         assertEquals("Unsupported source: invalidEngine", exception.getMessage());
     }
 
     @Test
     void testPerformSearch_WithMissingApiKey_DoesNotBreak() {
-        // Arrange
+        
         Map<String, String> params = new HashMap<>();
         params.put("q", "AI");
         params.put("source", "HAL");
 
-        Map<Engines, String> apiKeys = new EnumMap<>(Engines.class); // missing key
-
+        Map<Engines, String> apiKeys = new EnumMap<>(Engines.class);
         List<Article> googleArticles = List.of(
                 new Article("A1", "Auth1", "http://a1", "Google", "", "", Engines.HAL)
         );
@@ -145,10 +141,10 @@ class LiteratureReviewServiceTest {
         when(apiService.search(eq(Engines.HAL), any()))
                 .thenReturn(Mono.just(googleArticles));
 
-        // Act
+        
         Mono<SearchResponseDto> result = service.performLiteratureSearch(params, apiKeys);
 
-        // Assert
+        
         StepVerifier.create(result)
                 .assertNext(resp -> {
                     assertEquals("AI", resp.getQuery());

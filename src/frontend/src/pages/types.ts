@@ -6,3 +6,17 @@ export interface Artigo {
   link: string;
   source: string;
 }
+
+export enum Engines {
+  ACM = 'ACM',
+  HAL = 'HAL',
+  SPRINGER = 'SPRINGER'
+}
+
+export interface SearchResponseDto {
+  query: string;
+  totalArticles: number;
+  articlesByEngine: Record<Engines, number>;
+  articles: Artigo[];
+}
+

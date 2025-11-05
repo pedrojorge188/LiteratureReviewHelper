@@ -15,9 +15,14 @@ export const getNavbarData = createAsyncThunk("Navbar", async () => {
 //usado
 export const getArticles = createAsyncThunk(
   "Articles",
-  async (query: string) => {
+  async ({ query, apiList }: { query: string; apiList: string }) => {
     const response = await axios.get(
-      `${API_URL}/search?q=${query}&start=0&rows=10&wt=bibtex&api_key=0c2c20ce9ca00510e69e0bd7ffba864e`
+      `${API_URL}/search?q=${query}&start=0&rows=10&wt=bibtex`,
+      {
+        headers: {
+          'X-API-KEYS': apiList
+        }
+      }
     );
     return response.data;
   }

@@ -1,35 +1,32 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Artigo } from "./types";
+import { Artigo, SearchResponseDto } from "./types";
 import ArrowIcon from "../assets/images/png/arrow.png";
 
-interface Artigos {
-  lista: Artigo[];
+interface ArtigosProps {
+  response: SearchResponseDto;
   setShow: Dispatch<SetStateAction<boolean>>;
 }
 
-export const ArticlesList = ({ lista, setShow }: Artigos) => {
+export const ArticlesList = ({ response, setShow }: ArtigosProps) => {
   const { t } = useTranslation();
   const [artigos, setArtigos] = useState<Artigo[]>([]);
   const [paginaAtual, setPaginaAtual] = useState<number>(1);
   const artigosPorPagina = 10;
 
-  // Gerar um JSON dummy com 50 artigos
   useEffect(() => {
-    if (lista && Array.isArray(lista)) {
-      setArtigos(lista);
+    if (response && Array.isArray(response.articles)) {
+      setArtigos(response.articles);
     } else {
       setArtigos([]);
     }
-  }, [lista]);
+  }, [response]);
 
-  // Calcular índices da paginação
   const indexInicial = (paginaAtual - 1) * artigosPorPagina;
   const indexFinal = indexInicial + artigosPorPagina;
   const artigosVisiveis = artigos.slice(indexInicial, indexFinal);
   const totalPaginas = Math.ceil(artigos.length / artigosPorPagina);
 
-  // Renderização de paginação com elipses (... 1 2 ... 10 11)
   const gerarBotoesPaginacao = () => {
     const botoes: (number | string)[] = [];
 
@@ -76,13 +73,12 @@ export const ArticlesList = ({ lista, setShow }: Artigos) => {
         <div className="lista-artigos-card__rollback">
           <button
             className="lista-artigos-card__rollback__btn"
-            onClick={() => {
-              setShow(false);
-            }}
+            onClick={() => setShow(false)}
           >
             <img src={ArrowIcon} alt="Voltar atrás" />
           </button>
         </div>
+
         <div className="header">
           <h2>{t("articles:titulo_lista")}</h2>
           <a
@@ -94,9 +90,10 @@ export const ArticlesList = ({ lista, setShow }: Artigos) => {
             {t("articles:botao_download")}
           </a>
         </div>
+
         <div className="results-container">
           <div className="results-container__text">
-            {artigos.length} {t("home:results")}
+            {response?.totalArticles ?? artigos.length} {t("home:results")}
           </div>
         </div>
 
@@ -118,7 +115,15 @@ export const ArticlesList = ({ lista, setShow }: Artigos) => {
                 <td>{artigo.authors}</td>
                 <td>{artigo.publicationYear}</td>
                 <td>{artigo.venue}</td>
-                <td>{artigo.link}</td>
+                <td>
+                  <a
+                    href={artigo.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {artigo.link}
+                  </a>
+                </td>
                 <td>{artigo.source}</td>
               </tr>
             ))}

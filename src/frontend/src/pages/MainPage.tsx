@@ -2,13 +2,13 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getArticles } from "../store/ducks/home/thunks";
 import { useDispatch } from "react-redux";
-import { Artigo } from "./types";
+import { SearchResponseDto } from "./types";
 import { ArticlesList } from "./ArticlesList";
 import { LoadingCircle } from "../components/shared";
 
 interface Query {
   valor: string;
-  metadado?: string; // opcional no primeiro
+  metadado?: string;
 }
 
 export const MainPage = () => {
@@ -23,16 +23,15 @@ export const MainPage = () => {
     useState<string>("");
   const [bibliotecas, setBibliotecas] = useState<string[]>([]);
   const [showList, setShowList] = useState(false);
-  const [article, setArticle] = useState<Artigo[] | null>(null);
+  const [response, setResponse] = useState<SearchResponseDto | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const normalizarQueries = (lista: Query[]): Query[] => {
     return lista.map((q, i) => {
       if (i === 0) {
         const { valor } = q;
-        return { valor }; // remove metadado
+        return { valor };
       }
-      // se não tiver metadado, define um por defeito (ex: AND)
       return { valor: q.valor, metadado: q.metadado || "AND" };
     });
   };
@@ -86,16 +85,16 @@ export const MainPage = () => {
   };
 
   const pesquisar = async () => {
-    setIsLoading(true); // começa o loading
+    setIsLoading(true);
     const queryString = queries
       .map((q, i) => (i === 0 ? q.valor : `${q.metadado} ${q.valor}`))
       .join(" ");
 
     try {
-      const resultAction = await dispatch(getArticles(queryString));
+      const resultAction = await dispatch(getArticles({query: queryString, apiList: "SPRINGER=0c2c20ce9ca00510e69e0bd7ffba864e"}));
 
       if (getArticles.fulfilled.match(resultAction)) {
-        setArticle(resultAction.payload);
+        setResponse(resultAction.payload as SearchResponseDto);
         setShowList(true);
       } else {
         console.error("Erro na pesquisa:", resultAction.error);
@@ -103,17 +102,16 @@ export const MainPage = () => {
     } catch (error) {
       console.error("Erro geral na pesquisa:", error);
     } finally {
-      setIsLoading(false); // termina o loading sempre
+      setIsLoading(false);
     }
   };
 
   return (
     <>
       {isLoading && <LoadingCircle />}
-      {showList && article !== null ? (
-        <>
-          <ArticlesList lista={article} setShow={setShowList} />
-        </>
+
+      {showList && response !== null ? (
+        <ArticlesList response={response} setShow={setShowList} />
       ) : (
         <div className="pesquisa-container">
           <h2>{t("home:titulo_pesquisa")}</h2>
@@ -187,10 +185,7 @@ export const MainPage = () => {
             <div className="section">
               <label>{t("home:label_ano_publicacao")}</label>
               <div className="ano-row">
-                <select
-                  value={anoDe}
-                  onChange={(e) => setAnoDe(e.target.value)}
-                >
+                <select value={anoDe} onChange={(e) => setAnoDe(e.target.value)}>
                   <option value="">{t("home:ano_de")}</option>
                   {Array.from({ length: 30 }, (_, i) => 2025 - i).map((ano) => (
                     <option key={ano} value={ano}>

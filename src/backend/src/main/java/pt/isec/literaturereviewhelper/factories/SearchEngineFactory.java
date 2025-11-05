@@ -22,7 +22,7 @@ public class SearchEngineFactory implements ISearchEngineFactory {
     private final IResultMapper<SpringerResponse> springerMapper;
 
     public SearchEngineFactory(WebClient webClient, IResultMapper<ACMResponse> acmMapper,
-                               @Qualifier("halResultMapper") IResultMapper<String> halMapper, IResultMapper<SpringerResponse> springer) {
+                            @Qualifier("halResultMapper") IResultMapper<String> halMapper, IResultMapper<SpringerResponse> springer) {
         this.webClient = webClient;
         this.acmMapper = acmMapper;
         this.halMapper = halMapper;

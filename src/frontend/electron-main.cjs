@@ -144,34 +144,13 @@ function waitForBackend() {
             try {
               const health = JSON.parse(data);
               if (health.status === 'UP') {
-                // Make warmup requests to initialize database and other components
-                log.info('[Backend] Health check passed, warming up database and components...');
-                
-                // Warmup with multiple endpoints to fully initialize all components
-                const warmupUrls = [
-                  `http://${BACKEND_HOST}:${BACKEND_PORT}/api/articles`,
-                  // Add other main endpoints here if needed
-                ];
-                
-                let completed = 0;
-                const total = warmupUrls.length;
-                
-                warmupUrls.forEach(url => {
-                  http.get(url, (warmupRes) => {
-                    warmupRes.resume(); // Consume response data
-                    completed++;
-                    if (completed === total) {
-                      log.info('[Backend] Warmed up and ready!');
-                      resolve();
-                    }
-                  }).on('error', (err) => {
-                    log.warn(`[Backend] Warmup request to ${url} failed:`, err.message);
-                    completed++;
-                    if (completed === total) {
-                      log.info('[Backend] Warmup complete (some failed)');
-                      resolve();
-                    }
-                  });
+                // Make one more warmup request before resolving
+                log.info('[Backend] Health check passed, warming up...');
+                http.get(BACKEND_HEALTH_URL, () => {
+                  log.info('[Backend] Warmed up and ready!');
+                  resolve();
+                }).on('error', () => {
+                  resolve(); // Continue even if warmup fails
                 });
               } else {
                 scheduleNextCheck();

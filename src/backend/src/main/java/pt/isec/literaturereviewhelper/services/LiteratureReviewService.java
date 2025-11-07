@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap; // Import ConcurrentHashMap
 
 import org.springframework.stereotype.Service;
 
@@ -47,30 +48,38 @@ public class LiteratureReviewService implements ILiteratureReviewService {
             .collectList()
             .map(listOfEntries -> {
                 Map<Engines, Integer> articlesByEngine = new EnumMap<>(Engines.class);
-                List<Article> allArticles = new ArrayList<>();
+                Map<String, Article> uniqueArticlesMap = new ConcurrentHashMap<>();
+                int articlesDuplicatedRemoved = 0;
 
                 for (Map.Entry<Engines, List<Article>> entry : listOfEntries) {
                     articlesByEngine.put(entry.getKey(), entry.getValue().size());
-                    allArticles.addAll(entry.getValue());
+                    for (Article article : entry.getValue()) {
+                        String originalTitle = article.title();
+                        String processedTitle = getProcessedTitle(originalTitle);
+                        if (uniqueArticlesMap.putIfAbsent(processedTitle, article) != null) {
+                            articlesDuplicatedRemoved++;
+                        }
+                    }
                 }
 
+                List<Article> allArticles = new ArrayList<>(uniqueArticlesMap.values());
                 int totalArticles = allArticles.size();
 
-                return new SearchResponseDto(query, totalArticles, articlesByEngine, allArticles);
+                return new SearchResponseDto(query, totalArticles, articlesByEngine, allArticles, articlesDuplicatedRemoved); // Pass messages to constructor
             });
     }
 
     /**
-    * Parses the "source" parameter and converts it into a list of Engines enums.
-    *
-    * If the sourceStr is null or blank, this method returns all available engines.
-    * Otherwise, it splits the input string by commas, trims whitespace, converts each
-    * engine name to uppercase, and maps it to the corresponding Engines enum.
-    *
-    * @param sourceStr the comma-separated string of engine names (e.g., "springer,hal,acm")
-    * @return a List of Engines to be used for the search
-    * @throws IllegalArgumentException if any engine name is invalid or not supported
-    */
+     * Parses the "source" parameter and converts it into a list of Engines enums.
+     *
+     * If the sourceStr is null or blank, this method returns all available engines.
+     * Otherwise, it splits the input string by commas, trims whitespace, converts each
+     * engine name to uppercase, and maps it to the corresponding Engines enum.
+     *
+     * @param sourceStr the comma-separated string of engine names (e.g., "springer,hal,acm")
+     * @return a List of Engines to be used for the search
+     * @throws IllegalArgumentException if any engine name is invalid or not supported
+     */
     private List<Engines> parseSources(String sourceStr) {
         if (sourceStr == null || sourceStr.isBlank()) {
             return Arrays.asList(Engines.values());
@@ -85,5 +94,19 @@ public class LiteratureReviewService implements ILiteratureReviewService {
                         throw new IllegalArgumentException("Unsupported source: " + s);
                     }
                 }).toList();
+    }
+
+    /**
+     * Processes an article title by converting it to lowercase and removing special characters.
+     * This is used for removing duplication purposes.
+     *
+     * @param title The original article title.
+     * @return The processed title.
+     */
+    private String getProcessedTitle(String title) {
+        if (title == null) {
+            return "";
+        }
+        return title.toLowerCase().replaceAll("[!@#$%^&*()_+\\-=\\[\\]{};:'\",.<>?/~`|\\\\]+", "");
     }
 }

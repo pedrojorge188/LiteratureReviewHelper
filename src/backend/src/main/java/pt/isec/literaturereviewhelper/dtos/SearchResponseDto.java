@@ -13,13 +13,18 @@ public class SearchResponseDto {
 
     private Map<Engines, Integer> articlesByEngine;
 
+    private int articlesDuplicatedRemoved;
+
     private List<Article> articles;
 
-    public SearchResponseDto(String query, int totalArticles, Map<Engines, Integer> articlesByEngine, List<Article> articles) {
+
+    public SearchResponseDto(String query, int totalArticles, Map<Engines, Integer> articlesByEngine, List<Article> articles, int articlesDuplicatedRemoved) {
         this.query = query;
         this.totalArticles = totalArticles;
         this.articlesByEngine = articlesByEngine;
+        this.articlesDuplicatedRemoved = articlesDuplicatedRemoved;
         this.articles = articles;
+
     }
 
     public String getQuery() { return query; }
@@ -37,4 +42,10 @@ public class SearchResponseDto {
     public List<Article> getArticles() { return articles; }
 
     public void setArticles(List<Article> articles) { this.articles = articles; }
+
+    public int getArticlesDuplicatedRemoved() {
+        return articlesDuplicatedRemoved;
+    }
+
+    public void setArticlesDuplicatedRemoved(int articlesDuplicatedRemoved) { this.articlesDuplicatedRemoved = articlesDuplicatedRemoved; }
 }

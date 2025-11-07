@@ -13,6 +13,7 @@ import pt.isec.literaturereviewhelper.models.Engines;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.util.ArrayList; // Import ArrayList
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -63,8 +64,8 @@ class LiteratureSearchControllerTest {
                 "AI",
                 8,
                 articlesByEngine,
-                articles
-        );
+                articles,
+                0);
 
         try (MockedStatic<RequestHeaderUtils> mocked = mockStatic(RequestHeaderUtils.class)) {
             mocked.when(() -> RequestHeaderUtils.parseApiKeysHeader(apiKeysHeader))
@@ -104,7 +105,8 @@ class LiteratureSearchControllerTest {
                 "machine learning",
                 1,
                 articlesByEngine,
-                articles
+                articles,
+                0
         );
 
         try (MockedStatic<RequestHeaderUtils> mocked = mockStatic(RequestHeaderUtils.class)) {

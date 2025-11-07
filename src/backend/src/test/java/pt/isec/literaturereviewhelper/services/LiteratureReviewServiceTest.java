@@ -154,4 +154,59 @@ class LiteratureReviewServiceTest {
                 })
                 .verifyComplete();
     }
+
+    @Test
+    void testPerformSearch_RemoveDuplicatedArticles() {
+        // Arrange
+        Map<String, String> params = new HashMap<>();
+        params.put("q", "Distributed Systems");
+        params.put("source", "HAL,ACM");
+
+        Map<Engines, String> apiKeys = Map.of(
+                Engines.HAL, "key1",
+                Engines.ACM, "key2"
+        );
+
+        // Articles that should be considered duplicated articles after processing
+        Article commonArticleHal = new Article("Distributed Systems Overview!", "2023", "Journal of DS", "Journal", "John Doe", "http://example.com/ds-overview-hal", Engines.HAL);
+        Article commonArticleAcm = new Article("distributed systems overview", "2023", "Journal of DS", "Journal", "John Doe", "http://example.com/ds-overview-acm", Engines.ACM);
+
+        Article uniqueHalArticle = new Article("HAL Specific Article", "2022", "HAL Journal", "Conference", "Jane Smith", "http://example.com/hal-specific", Engines.HAL);
+        Article uniqueAcmArticle = new Article("ACM Specific Article", "2021", "ACM Transactions", "Journal", "Peter Jones", "http://example.com/acm-specific", Engines.ACM);
+
+        List<Article> halArticles = List.of(commonArticleHal, uniqueHalArticle);
+        List<Article> acmArticles = List.of(commonArticleAcm, uniqueAcmArticle);
+
+        when(apiService.search(eq(Engines.HAL), any()))
+                .thenReturn(Mono.just(halArticles));
+        when(apiService.search(eq(Engines.ACM), any()))
+                .thenReturn(Mono.just(acmArticles));
+
+        // Act
+        Mono<SearchResponseDto> result = service.performLiteratureSearch(params, apiKeys);
+
+        // Assert
+        StepVerifier.create(result)
+                .assertNext(resp -> {
+                    assertEquals("Distributed Systems", resp.getQuery());
+                    assertEquals(3, resp.getTotalArticles()); // Expect 3 unique articles after deduplication
+                    assertEquals(3, resp.getArticles().size()); // Expect 3 unique articles in the list
+
+                    // Verify that the unique articles are present
+                    assertTrue(resp.getArticles().contains(uniqueHalArticle));
+                    assertTrue(resp.getArticles().contains(uniqueAcmArticle));
+
+                    // Verify that one of the common articles is present (either HAL or ACM version)
+                    // Since putIfAbsent is used, the first one encountered will be kept.
+                    // We can't guarantee which one, so we check if either is present.
+                    assertTrue(resp.getArticles().contains(commonArticleHal) || resp.getArticles().contains(commonArticleAcm));
+
+                    // Verify removed articles duplicated count
+                    assertEquals(1, resp.getArticlesDuplicatedRemoved());
+                })
+                .verifyComplete();
+
+        verify(apiService, times(1)).search(eq(Engines.HAL), any());
+        verify(apiService, times(1)).search(eq(Engines.ACM), any());
+    }
 }

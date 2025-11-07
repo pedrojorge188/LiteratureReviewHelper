@@ -13,7 +13,6 @@ import pt.isec.literaturereviewhelper.models.Engines;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.util.ArrayList; // Import ArrayList
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;

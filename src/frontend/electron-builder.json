@@ -1,0 +1,76 @@
+{
+  "appId": "com.isec.literaturereviewhelper",
+  "productName": "Literature Review Helper",
+  "copyright": "Copyright © 2025 ISEC",
+  "publish": null,
+  "npmRebuild": false,
+  "directories": {
+    "output": "dist-electron",
+    "buildResources": "resources"
+  },
+  "files": [
+    "dist/**/*",
+    "electron-main.cjs",
+    "electron-preload.cjs",
+    "package.json"
+  ],
+  "extraResources": [
+    {
+      "from": "resources/backend/backend.jar",
+      "to": "backend/backend.jar",
+      "filter": ["**/*"]
+    },
+    {
+      "from": "resources/jre-${os}-${arch}",
+      "to": "jre",
+      "filter": ["**/*"]
+    }
+  ],
+  "asar": true,
+  "asarUnpack": [
+    "resources/**/*"
+  ],
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64"]
+      },
+      {
+        "target": "portable",
+        "arch": ["x64"]
+      }
+    ],
+    "signAndEditExecutable": false,
+    "artifactName": "${productName}-${version}-Windows-${arch}.${ext}"
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "Literature Review Helper"
+  },
+  "portable": {
+    "artifactName": "${productName}-${version}-Windows-${arch}-Portable.${ext}"
+  },
+  "linux": {
+    "target": [
+      {
+        "target": "AppImage",
+        "arch": ["x64"]
+      },
+      {
+        "target": "deb",
+        "arch": ["x64"]
+      }
+    ],
+    "icon": "resources/icon.png",
+    "category": "Education",
+    "artifactName": "${productName}-${version}-Linux-${arch}.${ext}"
+  },
+  "deb": {
+    "depends": [],
+    "maintainer": "ISEC Team"
+  }
+}

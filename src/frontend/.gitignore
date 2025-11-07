@@ -22,3 +22,14 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Electron build output
+dist-electron
+
+# Electron build resources (too large for git)
+resources/jre-*
+temp-downloads/
+
+# Keep backend JAR location in git but not the actual file
+!resources/backend/.gitkeep
+resources/backend/*.jar

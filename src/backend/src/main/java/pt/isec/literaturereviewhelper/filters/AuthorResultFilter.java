@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pt.isec.literaturereviewhelper.models.Article;
-public class AuthorResultFilter extends ResultFilterBase {
+public final class AuthorResultFilter extends ResultFilterBase {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final boolean reversed;
     private final String author;

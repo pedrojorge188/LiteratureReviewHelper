@@ -8,6 +8,7 @@ import static pt.isec.literaturereviewhelper.commons.Params.EXCLUDE_AUTHOR;
 import static pt.isec.literaturereviewhelper.commons.Params.EXCLUDE_TITLE;
 import static pt.isec.literaturereviewhelper.commons.Params.EXCLUDE_VENUE;
 import static pt.isec.literaturereviewhelper.commons.Params.TITLE;
+import static pt.isec.literaturereviewhelper.commons.Params.VALUE_DELIMITER;
 import static pt.isec.literaturereviewhelper.commons.Params.VENUE;
 import static pt.isec.literaturereviewhelper.commons.Params.YEAR_END;
 import static pt.isec.literaturereviewhelper.commons.Params.YEAR_START;
@@ -80,27 +81,33 @@ public final class ResultFilterChain implements IResultFilter {
             }
 
             if (params.containsKey(AUTHOR)) {
-                filters.add(new AuthorResultFilter(params.get(AUTHOR)));
+                List<String> authors = List.of(params.get(AUTHOR).split(VALUE_DELIMITER));
+                filters.add(new AuthorResultFilter(authors));
             }
 
             if (params.containsKey(EXCLUDE_AUTHOR)) {
-                filters.add(new AuthorResultFilter(params.get(EXCLUDE_AUTHOR), true));
+                List<String> authors = List.of(params.get(EXCLUDE_AUTHOR).split(VALUE_DELIMITER));
+                filters.add(new AuthorResultFilter(authors, true));
             }
 
             if (params.containsKey(VENUE)) {
-                filters.add(new VenueResultFilter(params.get(VENUE)));
+                List<String> venues = List.of(params.get(VENUE).split(VALUE_DELIMITER));
+                filters.add(new VenueResultFilter(venues));
             }
 
             if (params.containsKey(EXCLUDE_VENUE)) {
-                filters.add(new VenueResultFilter(params.get(EXCLUDE_VENUE), true));
+                List<String> venues = List.of(params.get(EXCLUDE_VENUE).split(VALUE_DELIMITER));
+                filters.add(new VenueResultFilter(venues, true));
             }
 
             if (params.containsKey(TITLE)) {
-                filters.add(new TitleResultFilter(params.get(TITLE)));
+                List<String> titles = List.of(params.get(TITLE).split(VALUE_DELIMITER));
+                filters.add(new TitleResultFilter(titles));
             }
 
             if (params.containsKey(EXCLUDE_TITLE)) {
-                filters.add(new TitleResultFilter(params.get(EXCLUDE_TITLE), true));
+                List<String> titles = List.of(params.get(EXCLUDE_TITLE).split(VALUE_DELIMITER));
+                filters.add(new TitleResultFilter(titles, true));
             }
 
             return this;

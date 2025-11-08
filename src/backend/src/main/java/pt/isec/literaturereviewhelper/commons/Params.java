@@ -17,4 +17,12 @@ public final class Params {
     public static final String EXCLUDE_VENUE     = "exclude_venue";
     public static final String TITLE             = "title";
     public static final String EXCLUDE_TITLE     = "exclude_title";
+
+    /**
+     * Delimiter used to separate multiple values in a single parameter.
+     *
+     * For example, to filter by multiple authors, the authors can be provided
+     * as a single string separated by this delimiter.
+     */
+    public static final String VALUE_DELIMITER = ";";
 }

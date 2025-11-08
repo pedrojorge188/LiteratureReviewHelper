@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 import pt.isec.literaturereviewhelper.models.Article;
@@ -17,10 +19,10 @@ class VenueResultFilterTest {
         Article article = mock(Article.class);
         when(article.venue()).thenReturn(null);
 
-        filter = new VenueResultFilter("IEEE International Conference on Software Architecture");
+        filter = new VenueResultFilter(List.of("IEEE International Conference on Software Architecture"));
         assertFalse(filter.filter(article));
 
-        filter = new VenueResultFilter("IEEE International Conference on Software Architecture", false);
+        filter = new VenueResultFilter(List.of("IEEE International Conference on Software Architecture"), false);
         assertFalse(filter.filter(article));
     }
 
@@ -29,11 +31,20 @@ class VenueResultFilterTest {
         Article article = mock(Article.class);
         when(article.venue()).thenReturn("2017 IEEE International Conference on Software Architecture");
 
-        filter = new VenueResultFilter("ieee international conference on software architecture");
+        filter = new VenueResultFilter(List.of("ieee international conference on software architecture"));
         assertTrue(filter.filter(article));
 
-        filter = new VenueResultFilter("IEEE INTERNATIONAL CONFERENCE ON SOFTWARE ARCHITECTURE");
+        filter = new VenueResultFilter(List.of("IEEE INTERNATIONAL CONFERENCE ON SOFTWARE ARCHITECTURE"));
         assertTrue(filter.filter(article));
+    }
+
+    @Test
+    void testExclusionWhenMatchingVenue() {
+        Article article = mock(Article.class);
+        when(article.venue()).thenReturn("2017 IEEE International Conference on Software Architecture");
+
+        filter = new VenueResultFilter(List.of("IEEE International Conference on Software Architecture"), true);
+        assertFalse(filter.filter(article));
     }
 
     @Test
@@ -41,10 +52,10 @@ class VenueResultFilterTest {
         Article article = mock(Article.class);
         when(article.venue()).thenReturn("IEEE/ACM International Conference on Software and System Processes");
 
-        filter = new VenueResultFilter("IEEE International Conference on Software Architecture");
+        filter = new VenueResultFilter(List.of("IEEE International Conference on Software Architecture"));
         assertFalse(filter.filter(article));
 
-        filter = new VenueResultFilter("IEEE International Conference on Software Architecture", true);
+        filter = new VenueResultFilter(List.of("IEEE International Conference on Software Architecture"), true);
         assertTrue(filter.filter(article));
     }
 }

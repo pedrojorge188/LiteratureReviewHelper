@@ -13,7 +13,7 @@ class AuthorResultFilterTest {
         Article article = mock(Article.class);
         when(article.authors()).thenReturn(null);
 
-        AuthorResultFilter filter = new AuthorResultFilter("Smith");
+        AuthorResultFilter filter = new AuthorResultFilter(List.of("Smith"));
         assertFalse(filter.filter(article));
     }
 
@@ -22,29 +22,31 @@ class AuthorResultFilterTest {
         Article article = mock(Article.class);
         when(article.authors()).thenReturn(List.of("John Smith", "Alice Johnson"));
 
-        AuthorResultFilter filterLower = new AuthorResultFilter("john smith");
+        AuthorResultFilter filterLower = new AuthorResultFilter(List.of("john smith"));
         assertTrue(filterLower.filter(article));
 
-        AuthorResultFilter filterUpper = new AuthorResultFilter("JOHN SMITH");
+        AuthorResultFilter filterUpper = new AuthorResultFilter(List.of("JOHN SMITH"));
         assertTrue(filterUpper.filter(article));
     }
 
-
     @Test
-    void testNoMatch_ReturnsFalse() {
+    void testExclusionWhenMatchingAuthor() {
         Article article = mock(Article.class);
-        when(article.authors()).thenReturn(List.of("Alice", "Bob"));
+        when(article.authors()).thenReturn(List.of("John Smith", "Alice Johnson"));
 
-        AuthorResultFilter filter = new AuthorResultFilter("Charlie");
+        AuthorResultFilter filter = new AuthorResultFilter(List.of("John Smith"), true);
         assertFalse(filter.filter(article));
     }
 
     @Test
-    void testReversedFilter() {
-        AuthorResultFilter filter = new AuthorResultFilter("john smith", true);
+    void testNoMatch() {
         Article article = mock(Article.class);
-        when(article.authors()).thenReturn(List.of("John Smith", "Alice Johnson"));
+        when(article.authors()).thenReturn(List.of("Alice", "Bob"));
 
+        AuthorResultFilter filter = new AuthorResultFilter(List.of("Charlie"));
         assertFalse(filter.filter(article));
+
+        filter = new AuthorResultFilter(List.of("Charlie"), true);
+        assertTrue(filter.filter(article));
     }
 }

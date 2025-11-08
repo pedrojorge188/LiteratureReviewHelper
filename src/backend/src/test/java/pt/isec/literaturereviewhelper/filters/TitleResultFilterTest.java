@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 import pt.isec.literaturereviewhelper.models.Article;
@@ -17,11 +19,20 @@ class TitleResultFilterTest {
         Article article = mock(Article.class);
         when(article.title()).thenReturn("Continuous Integration Applied to Software-Intensive Embedded Systems");
 
-        filter = new TitleResultFilter("continuous integration applied to software-intensive embedded systems");
+        filter = new TitleResultFilter(List.of("continuous integration applied to software-intensive embedded systems"));
         assertTrue(filter.filter(article));
 
-        filter = new TitleResultFilter("CONTINUOUS INTEGRATION APPLIED TO SOFTWARE-INTENSIVE EMBEDDED SYSTEMS");
+        filter = new TitleResultFilter(List.of("CONTINUOUS INTEGRATION APPLIED TO SOFTWARE-INTENSIVE EMBEDDED SYSTEMS"));
         assertTrue(filter.filter(article));
+    }
+
+    @Test
+    void testExclusionWhenMatchingTitle() {
+        Article article = mock(Article.class);
+        when(article.title()).thenReturn("Continuous Integration Applied to Software-Intensive Embedded Systems");
+
+        filter = new TitleResultFilter(List.of("Continuous Integration Applied to Software-Intensive Embedded Systems"), true);
+        assertFalse(filter.filter(article));
     }
 
     @Test
@@ -29,10 +40,10 @@ class TitleResultFilterTest {
         Article article = mock(Article.class);
         when(article.title()).thenReturn("Continuous Integration Applied to Software-Intensive Embedded Systems");
 
-        filter = new TitleResultFilter("continuous integration applied to software-intensive embedded systems");
+        filter = new TitleResultFilter(List.of("continuous integration applied to software-intensive embedded systems"));
         assertTrue(filter.filter(article));
 
-        filter = new TitleResultFilter("continuous integration applied to software-intensive embedded systems", true);
+        filter = new TitleResultFilter(List.of("continuous integration applied to software-intensive embedded systems"), true);
         assertFalse(filter.filter(article));
     }
 }

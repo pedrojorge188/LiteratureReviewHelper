@@ -1,39 +1,41 @@
 package pt.isec.literaturereviewhelper.filters;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pt.isec.literaturereviewhelper.models.Article;
 
 /**
- * A filter that accepts or rejects articles based on their venue.
+ * A filter that accepts or rejects articles based on their venues.
  */
 public class VenueResultFilter extends ResultFilterBase {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final boolean reversed;
-    private final String venue;
+    private final List<String> venues;
 
     /**
-     * Constructs a case insensitive VenueResultFilter for the given venue.
+     * Constructs a case insensitive VenueResultFilter for the given venues.
      *
-     * This is equivalent to calling {@link #VenueResultFilter(String, boolean)} with reversed set to false.
+     * This is equivalent to calling {@link #VenueResultFilter(List<String>, boolean)} with reversed set to false.
      *
-     * @param venue the name of the venue to filter by
-     * @see #VenueResultFilter(String, boolean)
+     * @param venues the names of the venues to filter by
+     * @see #VenueResultFilter(List<String>, boolean)
      */
-    public VenueResultFilter(String venue) {
-        this(venue, false);
+    public VenueResultFilter(List<String> venues) {
+        this(venues, false);
     }
 
     /**
      * Constructs a case insensitive VenueResultFilter for the given venue.
      *
-     * @param venue    the name of the venue to filter by
+     * @param venues   the names of the venues to filter by
      * @param reversed whether included articles should not be from the specified venue
      */
-    public VenueResultFilter(String venue, boolean reversed) {
+    public VenueResultFilter(List<String> venues, boolean reversed) {
         this.reversed = reversed;
-        this.venue = venue.toLowerCase().strip();
+        this.venues = venues.stream().map(String::toLowerCase).map(String::strip).toList();
     }
 
     @Override
@@ -48,9 +50,9 @@ public class VenueResultFilter extends ResultFilterBase {
          * matches "2017 IEEE International Conference on Software Architecture").
          */
         if (reversed) {
-            return !article.venue().toLowerCase().contains(venue);
+            return venues.stream().noneMatch(venue -> article.venue().toLowerCase().contains(venue));
         } else {
-            return article.venue().toLowerCase().contains(venue);
+            return venues.stream().anyMatch(venue -> article.venue().toLowerCase().contains(venue));
         }
     }
 }

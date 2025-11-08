@@ -60,14 +60,18 @@ class ResultFilterChainTest {
         var params = Map.of(
                 "year_start", "2015",
                 "year_end", "2020",
-                "author", "Doe, John"
+                "author", "Doe, John",
+                "venue", "IEEE International Conference on Software Architecture",
+                "title", "Continuous Integration Applied to Software-Intensive Embedded Systems"
         );
         ResultFilterChain chain = new ResultFilterChain.Builder().fromParams(params).build();
 
         List<Article> articles = Arrays.asList(
                 new Article("", "2010", "", "", List.of("Doe, John"), "", Engines.ACM),
                 new Article("", "2015", "", "", List.of("Smith, Jane"), "", Engines.ACM),
-                new Article("", "2015", "", "", List.of("Doe, John"), "", Engines.ACM)
+                new Article("Continuous Integration Applied to Software-Intensive Embedded Systems", "2015", "", "", List.of("Doe, John"), "", Engines.ACM),
+                new Article("", "2015", "IEEE International Conference on Software Architecture", "", List.of("Doe, John"), "", Engines.ACM),
+                new Article("Continuous Integration Applied to Software-Intensive Embedded Systems", "2015", "IEEE International Conference on Software Architecture", "", List.of("Doe, John"), "", Engines.ACM)
         );
 
         // Act
@@ -75,7 +79,7 @@ class ResultFilterChainTest {
 
         // Assert
         assertEquals(
-                List.of(new Article("", "2015", "", "", List.of("Doe, John"), "", Engines.ACM)),
+                List.of(new Article("Continuous Integration Applied to Software-Intensive Embedded Systems", "2015", "IEEE International Conference on Software Architecture", "", List.of("Doe, John"), "", Engines.ACM)),
                 filtered
         );
     }

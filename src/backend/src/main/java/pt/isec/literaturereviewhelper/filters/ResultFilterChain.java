@@ -4,6 +4,8 @@ import pt.isec.literaturereviewhelper.interfaces.IResultFilter;
 import pt.isec.literaturereviewhelper.models.Article;
 
 import static pt.isec.literaturereviewhelper.commons.Params.AUTHOR;
+import static pt.isec.literaturereviewhelper.commons.Params.TITLE;
+import static pt.isec.literaturereviewhelper.commons.Params.VENUE;
 import static pt.isec.literaturereviewhelper.commons.Params.YEAR_END;
 import static pt.isec.literaturereviewhelper.commons.Params.YEAR_START;
 
@@ -55,6 +57,14 @@ public final class ResultFilterChain implements IResultFilter {
 
             if (params.containsKey(AUTHOR)) {
                 filters.add(new AuthorResultFilter(params.get(AUTHOR)));
+            }
+
+            if (params.containsKey(VENUE)) {
+                filters.add(new VenueResultFilter(params.get(VENUE)));
+            }
+
+            if (params.containsKey(TITLE)) {
+                filters.add(new TitleResultFilter(params.get(TITLE)));
             }
 
             return this;

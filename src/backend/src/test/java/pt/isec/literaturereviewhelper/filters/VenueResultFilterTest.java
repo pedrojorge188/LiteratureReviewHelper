@@ -30,10 +30,10 @@ public class VenueResultFilterTest {
         when(article.venue()).thenReturn("2017 IEEE International Conference on Software Architecture");
 
         filter = new VenueResultFilter("ieee international conference on software architecture");
-        assert(filter.filter(article));
+        assertTrue(filter.filter(article));
 
         filter = new VenueResultFilter("IEEE INTERNATIONAL CONFERENCE ON SOFTWARE ARCHITECTURE");
-        assert(filter.filter(article));
+        assertTrue(filter.filter(article));
     }
 
     @Test

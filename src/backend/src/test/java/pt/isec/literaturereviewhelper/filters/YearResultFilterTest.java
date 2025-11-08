@@ -63,4 +63,19 @@ class YearResultFilterTest {
 
         assertTrue(filter.filter(article));
     }
+
+    @Test
+    void testReversedFilter() {
+        filter = new YearResultFilter(2000, 2020, true);
+        Article article = mock(Article.class);
+
+        when(article.publicationYear()).thenReturn("1995");
+        assertTrue(filter.filter(article));
+
+        when(article.publicationYear()).thenReturn("2000");
+        assertFalse(filter.filter(article));
+
+        when(article.publicationYear()).thenReturn("2010");
+        assertFalse(filter.filter(article));
+    }
 }

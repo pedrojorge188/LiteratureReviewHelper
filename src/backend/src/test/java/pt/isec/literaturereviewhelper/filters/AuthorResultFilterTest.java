@@ -38,4 +38,13 @@ public class AuthorResultFilterTest {
         AuthorResultFilter filter = new AuthorResultFilter("Charlie");
         assertFalse(filter.filter(article));
     }
+
+    @Test
+    void testReversedFilter() {
+        AuthorResultFilter filter = new AuthorResultFilter("john smith", true);
+        Article article = mock(Article.class);
+        when(article.authors()).thenReturn(List.of("John Smith", "Alice Johnson"));
+
+        assertFalse(filter.filter(article));
+    }
 }

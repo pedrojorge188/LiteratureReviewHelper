@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component("springerResultMapper")
 public class SpringerMapper implements IResultMapper<SpringerResponse> {
@@ -40,7 +39,7 @@ public class SpringerMapper implements IResultMapper<SpringerResponse> {
                         .filter(Objects::nonNull)
                         .map(SpringerResponse.Creator::getName)
                         .filter(s -> s != null && !s.isBlank())
-                        .collect(Collectors.toList());
+                        .toList();
             }
 
             // Link

@@ -4,6 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pt.isec.literaturereviewhelper.models.Article;
+/**
+ * A filter that accepts or rejects articles based on their authors.
+ */
 public final class AuthorResultFilter extends ResultFilterBase {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final boolean reversed;

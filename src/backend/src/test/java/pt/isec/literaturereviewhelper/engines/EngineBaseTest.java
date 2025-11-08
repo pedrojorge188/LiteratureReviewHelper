@@ -24,7 +24,7 @@ import pt.isec.literaturereviewhelper.models.Article;
 import pt.isec.literaturereviewhelper.models.Engines;
 import reactor.core.publisher.Mono;
 
-public class EngineBaseTest {
+class EngineBaseTest {
     protected WebClient webClient;
     @SuppressWarnings("rawtypes")
     protected WebClient.RequestHeadersUriSpec requestHeadersUriSpec;

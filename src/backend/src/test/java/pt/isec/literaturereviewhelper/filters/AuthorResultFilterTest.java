@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import pt.isec.literaturereviewhelper.models.Article;
 import java.util.List;
 
-public class AuthorResultFilterTest {
+class AuthorResultFilterTest {
 
     @Test
     void testNullAuthors_ReturnsFalse() {

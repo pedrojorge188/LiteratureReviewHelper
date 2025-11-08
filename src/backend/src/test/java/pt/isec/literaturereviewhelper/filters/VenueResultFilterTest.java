@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import pt.isec.literaturereviewhelper.models.Article;
 
-public class VenueResultFilterTest {
+class VenueResultFilterTest {
     private VenueResultFilter filter;
 
     @Test

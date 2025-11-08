@@ -30,8 +30,28 @@ class ResultFilterChainTest {
 
     @Test
     void testAllFiltersPass_returnsUnmodifiedList() {
-        IResultFilter filter1 = articles -> List.copyOf(articles);
-        IResultFilter filter2 = articles -> List.copyOf(articles);
+        IResultFilter filter1 = new IResultFilter() {
+                @Override
+                public List<Article> filter(List<Article> articles) {
+                        return List.copyOf(articles);
+                }
+
+                @Override
+                public Map<Statistic, Integer> getExecutionStatistics() {
+                        return Map.of();
+                }
+        };
+        IResultFilter filter2 = new IResultFilter() {
+                @Override
+                public List<Article> filter(List<Article> articles) {
+                        return List.copyOf(articles);
+                }
+
+                @Override
+                public Map<Statistic, Integer> getExecutionStatistics() {
+                        return Map.of();
+                }
+        };
         ResultFilterChain chain = new ResultFilterChain(Arrays.asList(filter1, filter2));
         List<Article> articles = Arrays.asList(
                 new Article("", "", "", "", List.of(), "", Engines.ACM)
@@ -41,11 +61,32 @@ class ResultFilterChainTest {
 
     @Test
     void testOneFilterFails_returnsListWithoutInfringingElement() {
-        IResultFilter filter1 = articles -> List.copyOf(articles);
-        IResultFilter filter2 = articles -> articles
-                .stream()
-                .filter(article -> article.source() == Engines.ACM)
-                .toList();
+        IResultFilter filter1 = new IResultFilter() {
+                @Override
+                public List<Article> filter(List<Article> articles) {
+                        return List.copyOf(articles);
+                }
+
+                @Override
+                public Map<Statistic, Integer> getExecutionStatistics() {
+                        return Map.of();
+                }
+        };
+        IResultFilter filter2 = new IResultFilter() {
+                @Override
+                public List<Article> filter(List<Article> articles) {
+                        return articles
+                                .stream()
+                                .filter(article -> article.source() == Engines.ACM)
+                                .toList();
+                }
+
+                @Override
+                public Map<Statistic, Integer> getExecutionStatistics() {
+                        return Map.of();
+                }
+        };
+
         ResultFilterChain chain = new ResultFilterChain(Arrays.asList(filter1, filter2));
         List<Article> articles = Arrays.asList(
                 new Article("", "", "", "", List.of(), "", Engines.ACM),
@@ -106,6 +147,43 @@ class ResultFilterChainTest {
         assertEquals(
                 List.of(new Article("", "2015", "", "", List.of("Smith, Jane"), "", Engines.ACM)),
                 filtered
+        );
+    }
+
+    @Test
+    void testResultFilterChain_getExecutionStatistics() {
+        // Arrange
+        Map<String, String> params = Map.of(
+                "year_start", "2015",
+                "year_end", "2020",
+                "author", "Doe, John",
+                "venue", "IEEE International Conference on Software Architecture",
+                "title", "Continuous Integration Applied to Software-Intensive Embedded Systems"
+        );
+        ResultFilterChain chain = new ResultFilterChain.Builder().fromParams(params).build();
+
+        List<Article> articles = Arrays.asList(
+                new Article("", "2010", "", "", List.of("Doe, John"), "", Engines.ACM),
+                new Article("", "2015", "", "", List.of("Smith, Jane"), "", Engines.ACM),
+                new Article("Continuous Integration Applied to Software-Intensive Embedded Systems", "2015", "", "", List.of("Doe, John"), "", Engines.ACM),
+                new Article("", "2015", "IEEE International Conference on Software Architecture", "", List.of("Doe, John"), "", Engines.ACM),
+                new Article("Continuous Integration Applied to Software-Intensive Embedded Systems", "2015", "IEEE International Conference on Software Architecture", "", List.of("Doe, John"), "", Engines.ACM)
+        );
+
+        // Assert
+        assertThrows(IllegalStateException.class, chain::getExecutionStatistics);
+
+        // Act
+        chain.filter(articles);
+
+        // Assert
+        assertEquals(
+                Map.of(
+                        IResultFilter.Statistic.INPUT, 5,
+                        IResultFilter.Statistic.OUTPUT, 1,
+                        IResultFilter.Statistic.DROPPED, 4
+                ),
+                chain.getExecutionStatistics()
         );
     }
 }

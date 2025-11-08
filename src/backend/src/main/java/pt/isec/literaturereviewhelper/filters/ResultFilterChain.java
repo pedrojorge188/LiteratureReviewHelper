@@ -24,6 +24,9 @@ import java.util.Objects;
  */
 public final class ResultFilterChain implements IResultFilter {
     private final List<IResultFilter> filters;
+    private int inputCount = Integer.MIN_VALUE;
+    private int outputCount = Integer.MIN_VALUE;
+    private int droppedCount = Integer.MIN_VALUE;
 
     public ResultFilterChain(List<IResultFilter> filters) {
         this.filters = new ArrayList<>(Objects.requireNonNull(filters));
@@ -35,7 +38,25 @@ public final class ResultFilterChain implements IResultFilter {
         for (IResultFilter f : filters) {
             filtered = f.filter(filtered);
         }
+
+        inputCount = articles.size();
+        outputCount = filtered.size();
+        droppedCount = inputCount - outputCount;
+
         return filtered;
+    }
+
+    @Override
+    public Map<Statistic, Integer> getExecutionStatistics() {
+        if (inputCount == Integer.MIN_VALUE) {
+            throw new IllegalStateException("Filter has not been executed yet.");
+        }
+
+        return Map.of(
+                Statistic.INPUT, inputCount,
+                Statistic.OUTPUT, outputCount,
+                Statistic.DROPPED, droppedCount
+        );
     }
 
     public static class Builder {

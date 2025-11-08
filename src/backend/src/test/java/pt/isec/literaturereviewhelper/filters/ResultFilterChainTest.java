@@ -57,7 +57,7 @@ class ResultFilterChainTest {
     @Test
     void testBuilder_fromParams_createsCorrectFilterChain() {
         // Arrange
-        var params = Map.of(
+        Map<String, String> params = Map.of(
                 "year_start", "2015",
                 "year_end", "2020",
                 "author", "Doe, John",
@@ -80,6 +80,31 @@ class ResultFilterChainTest {
         // Assert
         assertEquals(
                 List.of(new Article("Continuous Integration Applied to Software-Intensive Embedded Systems", "2015", "IEEE International Conference on Software Architecture", "", List.of("Doe, John"), "", Engines.ACM)),
+                filtered
+        );
+
+        // Arrange
+        params = Map.of(
+                "exclude_author", "Doe, John",
+                "exclude_venue", "IEEE International Conference on Software Architecture",
+                "exclude_title", "Continuous Integration Applied to Software-Intensive Embedded Systems"
+        );
+        chain = new ResultFilterChain.Builder().fromParams(params).build();
+
+        articles = Arrays.asList(
+                new Article("", "2010", "", "", List.of("Doe, John"), "", Engines.ACM),
+                new Article("", "2015", "", "", List.of("Smith, Jane"), "", Engines.ACM),
+                new Article("Continuous Integration Applied to Software-Intensive Embedded Systems", "2015", "", "", List.of("Doe, John"), "", Engines.ACM),
+                new Article("", "2015", "IEEE International Conference on Software Architecture", "", List.of("Doe, John"), "", Engines.ACM),
+                new Article("Continuous Integration Applied to Software-Intensive Embedded Systems", "2015", "IEEE International Conference on Software Architecture", "", List.of("Doe, John"), "", Engines.ACM)
+        );
+
+        // Act
+        filtered = chain.filter(articles);
+
+        // Assert
+        assertEquals(
+                List.of(new Article("", "2015", "", "", List.of("Smith, Jane"), "", Engines.ACM)),
                 filtered
         );
     }

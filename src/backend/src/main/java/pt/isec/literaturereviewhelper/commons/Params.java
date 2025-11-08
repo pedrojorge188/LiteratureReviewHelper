@@ -12,6 +12,9 @@ public final class Params {
     public static final String YEAR_START        = "year_start";
     public static final String YEAR_END          = "year_end";
     public static final String AUTHOR            = "author";
+    public static final String EXCLUDE_AUTHOR    = "exclude_author";
     public static final String VENUE             = "venue";
+    public static final String EXCLUDE_VENUE     = "exclude_venue";
     public static final String TITLE             = "title";
+    public static final String EXCLUDE_TITLE     = "exclude_title";
 }

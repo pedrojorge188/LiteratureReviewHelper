@@ -4,6 +4,9 @@ import pt.isec.literaturereviewhelper.interfaces.IResultFilter;
 import pt.isec.literaturereviewhelper.models.Article;
 
 import static pt.isec.literaturereviewhelper.commons.Params.AUTHOR;
+import static pt.isec.literaturereviewhelper.commons.Params.EXCLUDE_AUTHOR;
+import static pt.isec.literaturereviewhelper.commons.Params.EXCLUDE_TITLE;
+import static pt.isec.literaturereviewhelper.commons.Params.EXCLUDE_VENUE;
 import static pt.isec.literaturereviewhelper.commons.Params.TITLE;
 import static pt.isec.literaturereviewhelper.commons.Params.VENUE;
 import static pt.isec.literaturereviewhelper.commons.Params.YEAR_END;
@@ -59,12 +62,24 @@ public final class ResultFilterChain implements IResultFilter {
                 filters.add(new AuthorResultFilter(params.get(AUTHOR)));
             }
 
+            if (params.containsKey(EXCLUDE_AUTHOR)) {
+                filters.add(new AuthorResultFilter(params.get(EXCLUDE_AUTHOR), true));
+            }
+
             if (params.containsKey(VENUE)) {
                 filters.add(new VenueResultFilter(params.get(VENUE)));
             }
 
+            if (params.containsKey(EXCLUDE_VENUE)) {
+                filters.add(new VenueResultFilter(params.get(EXCLUDE_VENUE), true));
+            }
+
             if (params.containsKey(TITLE)) {
                 filters.add(new TitleResultFilter(params.get(TITLE)));
+            }
+
+            if (params.containsKey(EXCLUDE_TITLE)) {
+                filters.add(new TitleResultFilter(params.get(EXCLUDE_TITLE), true));
             }
 
             return this;

@@ -90,11 +90,15 @@ export const MainPage = () => {
       .map((q, i) => (i === 0 ? q.valor : `${q.metadado} ${q.valor}`))
       .join(" ");
 
+    // Build the source parameter from selected bibliotecas
+    const sourceParam = bibliotecas.length > 0 ? bibliotecas.join(",") : undefined;
+
     try {
       const resultAction = await dispatch(
         getArticles({
           query: queryString,
           apiList: "SPRINGER=0c2c20ce9ca00510e69e0bd7ffba864e",
+          source: sourceParam,
         })
       );
 
@@ -277,9 +281,9 @@ export const MainPage = () => {
                 onChange={(e) => setBibliotecaSelecionada(e.target.value)}
               >
                 <option value="">{t("home:selecionar_biblioteca")}</option>
-                <option value="Scopus">Scopus</option>
                 <option value="ACM">ACM</option>
-                <option value="DBLP">DBLP</option>
+                <option value="HAL">HAL</option>
+                <option value="SPRINGER">Springer</option>
               </select>
               <button type="button" onClick={adicionarBiblioteca}>
                 {t("home:botao_adicionar")}

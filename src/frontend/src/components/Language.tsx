@@ -24,14 +24,22 @@ export const Language = () => {
   return (
     <div className="languages">
       {links?.map((linkItem: ILanguageLink, index: number) => {
-        const { language, link } = linkItem;
+        const { language } = linkItem;
         return (
-          <CommonLink
+          <button
+            type="button"
             title={language === "pt" ? "Portugues" : "Ingles"}
-            link={{ external: false, url: link }}
-            linkClass={`lang-item ${language === lang ? "selected" : ""}`}
+            className={`lang-item ${language === lang ? "selected" : ""}`}
             onClick={() => changeLanguage(language)}
             key={index}
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              cursor: 'pointer', 
+              padding: 0,
+              color: 'inherit',
+              font: 'inherit'
+            }}
           >
             {index > 0 ? (
               <>
@@ -41,7 +49,7 @@ export const Language = () => {
             ) : (
               <span>{language}</span>
             )}
-          </CommonLink>
+          </button>
         );
       })}
     </div>

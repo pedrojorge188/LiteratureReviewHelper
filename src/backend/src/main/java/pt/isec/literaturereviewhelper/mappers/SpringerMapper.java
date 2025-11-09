@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component("springerResultMapper")
 public class SpringerMapper implements IResultMapper<SpringerResponse> {
@@ -34,13 +33,13 @@ public class SpringerMapper implements IResultMapper<SpringerResponse> {
             String venueType = Optional.ofNullable(rec.getContentType()).orElse("");
 
             // Authors
-            String authors = "";
+            List<String> authors = List.of();
             if (rec.getCreators() != null) {
                 authors = rec.getCreators().stream()
                         .filter(Objects::nonNull)
                         .map(SpringerResponse.Creator::getName)
                         .filter(s -> s != null && !s.isBlank())
-                        .collect(Collectors.joining(", "));
+                        .toList();
             }
 
             // Link

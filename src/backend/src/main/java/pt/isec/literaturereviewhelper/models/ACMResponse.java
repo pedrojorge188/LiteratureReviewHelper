@@ -30,7 +30,7 @@ public class ACMResponse {
         @JsonProperty("published-online")
         private PublishedDate publishedOnline;
 
-        private List<Author> author;
+        private List<Author> authors;
 
         @JsonProperty("container-title")
         private List<String> containerTitle;
@@ -39,7 +39,7 @@ public class ACMResponse {
         private List<Map<String, String>> link;
 
         public List<String> getTitle() { return title; }
-        public List<Author> getAuthor() { return author; }
+        public List<Author> getAuthors() { return authors; }
         public List<String> getContainerTitle() { return containerTitle; }
         public String getType() { return type; }
         public List<Map<String, String>> getLink() { return link; }
@@ -49,7 +49,7 @@ public class ACMResponse {
         public void setTitle(List<String> strings) { this.title = strings; }
         public void setType(String type) { this.type = type; }
         public void setContainerTitle(List<String> containerTitle) { this.containerTitle = containerTitle; }
-        public void setAuthor(List<Author> authors) { this.author = authors; }
+        public void setAuthors(List<Author> authors) { this.authors = authors; }
         public void setPublishedPrint(PublishedDate publishedPrint) { this.publishedPrint = publishedPrint; }
         public void setPublishedOnline(PublishedDate publishedOnline) { this.publishedOnline = publishedOnline; }
         public void setLink(List<Map<String, String>> link) { this.link = link; }

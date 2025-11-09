@@ -68,7 +68,7 @@ class SpringerMapperTest {
         assertEquals("2024", a.publicationYear()); // year extracted from yyyy-MM-dd
         assertEquals("Journal of AI", a.venue());
         assertEquals("Article", a.venueType());
-        assertEquals("John Doe, Jane Smith", a.authors());
+        assertEquals(List.of("John Doe", "Jane Smith"), a.authors());
         assertEquals("https://example.com/article", a.link());
         assertEquals(Engines.SPRINGER, a.source());
     }
@@ -103,7 +103,7 @@ class SpringerMapperTest {
         assertEquals("", a.publicationYear());
         assertEquals("", a.venue());
         assertEquals("", a.venueType());
-        assertEquals("", a.authors());
+        assertEquals(List.of(), a.authors());
         assertEquals("", a.link());
         assertEquals(Engines.SPRINGER, a.source());
     }
@@ -154,6 +154,6 @@ class SpringerMapperTest {
 
         List<Article> out = mapper.map(wrapper);
         assertEquals(1, out.size());
-        assertEquals("Alice Doe", out.get(0).authors());
+        assertEquals(List.of("Alice Doe"), out.get(0).authors());
     }
 }

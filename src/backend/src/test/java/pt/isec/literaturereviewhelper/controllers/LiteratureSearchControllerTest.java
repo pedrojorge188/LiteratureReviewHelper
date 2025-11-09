@@ -41,7 +41,7 @@ class LiteratureSearchControllerTest {
 
     @Test
     void testSearch_WithApiKeysHeader() {
-        
+
         Map<String, String> params = new HashMap<>();
         params.put("q", "AI");
         params.put("source", "google,reddit");
@@ -53,7 +53,7 @@ class LiteratureSearchControllerTest {
                 Engines.HAL, "key2"
         );
 
-        List<Article> articles = List.of(new Article("Title 1", "Author 1", apiKeysHeader, apiKeysHeader, apiKeysHeader, apiKeysHeader, null), new Article("Title 2", "Author 2", apiKeysHeader, apiKeysHeader, apiKeysHeader, apiKeysHeader, null));
+        List<Article> articles = List.of(new Article("Title 1", "Author 1", apiKeysHeader, apiKeysHeader, List.of(apiKeysHeader), apiKeysHeader, null), new Article("Title 2", "Author 2", apiKeysHeader, apiKeysHeader, List.of(apiKeysHeader), apiKeysHeader, null));
         Map<Engines, Integer> articlesByEngine = Map.of(
                 Engines.ACM, 5,
                 Engines.HAL, 3
@@ -73,10 +73,10 @@ class LiteratureSearchControllerTest {
             when(literatureReviewService.performLiteratureSearch(params, apiKeysByEngine))
                     .thenReturn(Mono.just(expectedResponse));
 
-            
+
             Mono<SearchResponseDto> result = controller.search(params, apiKeysHeader);
 
-            
+
             StepVerifier.create(result)
                     .expectNextMatches(resp ->
                             resp.getQuery().equals("AI") &&
@@ -93,7 +93,7 @@ class LiteratureSearchControllerTest {
 
     @Test
     void testSearch_WithoutApiKeysHeader() {
-        
+
         Map<String, String> params = Map.of("q", "machine learning");
         Map<Engines, String> emptyKeys = new EnumMap<>(Engines.class);
 
@@ -114,10 +114,10 @@ class LiteratureSearchControllerTest {
             when(literatureReviewService.performLiteratureSearch(params, emptyKeys))
                     .thenReturn(Mono.just(expectedResponse));
 
-            
+
             Mono<SearchResponseDto> result = controller.search(params, null);
 
-            
+
             StepVerifier.create(result)
                     .expectNextMatches(resp ->
                             resp.getQuery().equals("machine learning") &&

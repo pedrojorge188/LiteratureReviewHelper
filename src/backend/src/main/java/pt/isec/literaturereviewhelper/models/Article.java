@@ -1,8 +1,10 @@
 package pt.isec.literaturereviewhelper.models;
 
+import java.util.List;
+
 import jakarta.validation.constraints.NotNull;
 
-public record Article(String title, String publicationYear, String venue, String venueType, String authors, String link,
+public record Article(String title, String publicationYear, String venue, String venueType, List<String> authors, String link,
                       Engines source) {
 
     @Override
@@ -12,7 +14,7 @@ public record Article(String title, String publicationYear, String venue, String
                 "\tpublicationYear='" + publicationYear + "',\n" +
                 "\tvenue='" + venue + "',\n" +
                 "\tvenueType='" + venueType + "',\n" +
-                "\tauthors='" + authors + "',\n" +
+                "\tauthors='" + authors.stream().map(Object::toString).reduce((a, b) -> a + ", " + b).orElse("") + "',\n" +
                 "\tlink='" + link + "',\n" +
                 "\tsource='" + source + "'\n" +
                 "}\n";

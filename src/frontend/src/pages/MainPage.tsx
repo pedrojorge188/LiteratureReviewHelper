@@ -118,14 +118,16 @@ export const MainPage = () => {
       {isLoading && <LoadingCircle />}
 
       <div
-        className={`container-article ${showList && article ? "show" : "hide"}`}
+        className={`container-article ${
+          showList && response ? "show" : "hide"
+        }`}
       >
-        {article && <ArticlesList lista={article} setShow={setShowList} />}
+        {response && <ArticlesList response={response} setShow={setShowList} />}
       </div>
 
       <div
         className={`pesquisa-container ${
-          showList && article ? "hide-pesquisa" : ""
+          (showList && response) || isLoading ? "hide-pesquisa" : ""
         }`}
       >
         <h2>{t("home:titulo_pesquisa")}</h2>

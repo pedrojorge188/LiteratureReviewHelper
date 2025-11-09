@@ -178,7 +178,11 @@ public abstract class EngineBase<R> implements ISearchEngine {
                         .map(mapper::map)
                         .block();
 
-                    upstreamCache.put(fullURL, pageArticles);
+                    if (pageArticles == null) {
+                        log.warn("Received null response from upstream for URL: {}", fullURL);
+                    } else {
+                        upstreamCache.put(fullURL, pageArticles);
+                    }
                 }
 
                 if (pageArticles != null && !pageArticles.isEmpty()) {

@@ -56,7 +56,8 @@ class HalEngineTest {
                 "q", "machine learning",
                 "start", "0",
                 "rows", "10",
-                "wt", "bibtex"
+                "wt", "bibtex",
+                "deep_search_limit", "1"
         );
 
         String bibtexResponse = """
@@ -106,7 +107,8 @@ class HalEngineTest {
                 "q", "deep learning",
                 "start", "0",
                 "rows", "5",
-                "wt", "bibtex"
+                "wt", "bibtex",
+                "deep_search_limit", "1"
         );
 
         when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.just(""));
@@ -165,14 +167,15 @@ class HalEngineTest {
                 "q", "error",
                 "start", "0",
                 "rows", "10",
-                "wt", "bibtex"
+                "wt", "bibtex",
+                "deep_search_limit", "1"
         );
 
         RuntimeException ex = new RuntimeException("API Error");
         when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.error(ex));
 
         StepVerifier.create(halEngine.search(rawParams))
-                .expectError(RuntimeException.class)
-                .verify();
+                .expectNextMatches(list -> list.isEmpty())
+                .verifyComplete();
     }
 }

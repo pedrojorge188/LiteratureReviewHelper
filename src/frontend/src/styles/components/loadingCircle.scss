@@ -1,10 +1,16 @@
 @use "../variables" as vars;
 
 .loader-outer {
-  min-height: calc(100vh - 100px);
+  min-height: calc(100vh - 156px);
   display: flex;
   justify-content: center;
   align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  min-width: calc(100vw - 147px);
+  background-color: vars.$background-color;
+  z-index: 10;
 }
 
 .sr-only {

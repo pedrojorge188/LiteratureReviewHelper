@@ -6,6 +6,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap; // Import ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.stereotype.Service;
 
@@ -34,39 +35,39 @@ public class LiteratureReviewService implements ILiteratureReviewService {
         List<Engines> sources = parseSources(sourceStr);
 
         return Flux.fromIterable(sources)
-            .flatMap(engine -> {
-                var key = apiKeysByEngine.get(engine);
-                if (key != null) {
-                    allParams.put(Params.API_KEY, key);
-                }
-
-                return apiService.search(engine, allParams)
-                        .flatMapMany(Flux::fromIterable)
-                        .collectList()
-                        .map(articles -> Map.entry(engine, articles));
-            })
-            .collectList()
-            .map(listOfEntries -> {
-                Map<Engines, Integer> articlesByEngine = new EnumMap<>(Engines.class);
-                Map<String, Article> uniqueArticlesMap = new ConcurrentHashMap<>();
-                int articlesDuplicatedRemoved = 0;
-
-                for (Map.Entry<Engines, List<Article>> entry : listOfEntries) {
-                    articlesByEngine.put(entry.getKey(), entry.getValue().size());
-                    for (Article article : entry.getValue()) {
-                        String originalTitle = article.title();
-                        String processedTitle = getProcessedTitle(originalTitle);
-                        if (uniqueArticlesMap.putIfAbsent(processedTitle, article) != null) {
-                            articlesDuplicatedRemoved++;
-                        }
+                .flatMap(engine -> {
+                    var key = apiKeysByEngine.get(engine);
+                    if (key != null) {
+                        allParams.put(Params.API_KEY, key);
                     }
-                }
 
-                List<Article> allArticles = new ArrayList<>(uniqueArticlesMap.values());
-                int totalArticles = allArticles.size();
+                    return apiService.search(engine, allParams)
+                            .flatMapMany(Flux::fromIterable)
+                            .collectList()
+                            .map(articles -> Map.entry(engine, articles));
+                })
+                .collectList()
+                .map(listOfEntries -> {
+                    Map<Engines, Integer> articlesByEngine = new EnumMap<>(Engines.class);
+                    Map<String, Article> uniqueArticlesMap = new ConcurrentHashMap<>();
+                    AtomicInteger articlesDuplicatedRemoved = new AtomicInteger(0);
 
-                return new SearchResponseDto(query, totalArticles, articlesByEngine, allArticles, articlesDuplicatedRemoved); // Pass messages to constructor
-            });
+                    listOfEntries.parallelStream().forEach(entry -> {
+                        articlesByEngine.put(entry.getKey(), entry.getValue().size());
+                        entry.getValue().parallelStream().forEach(article -> {
+                            String originalTitle = article.title();
+                            String processedTitle = getProcessedTitle(originalTitle);
+                            if (uniqueArticlesMap.putIfAbsent(processedTitle, article) != null) {
+                                articlesDuplicatedRemoved.incrementAndGet();
+                            }
+                        });
+                    });
+
+                    List<Article> allArticles = new ArrayList<>(uniqueArticlesMap.values());
+                    int totalArticles = allArticles.size();
+
+                    return new SearchResponseDto(query, totalArticles, articlesByEngine, allArticles, articlesDuplicatedRemoved.get());
+                });
     }
 
     /**

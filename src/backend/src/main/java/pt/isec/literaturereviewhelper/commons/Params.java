@@ -8,4 +8,5 @@ public final class Params {
     public static final String ROWS    = "rows";
     public static final String WT      = "wt";
     public static final String API_KEY = "api_key";
+    public static final String DEEP_SEARCH_LIMIT = "deep_search_limit";
 }

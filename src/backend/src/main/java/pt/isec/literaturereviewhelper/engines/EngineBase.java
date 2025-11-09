@@ -3,9 +3,7 @@ package pt.isec.literaturereviewhelper.engines;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +14,7 @@ import pt.isec.literaturereviewhelper.interfaces.IResultMapper;
 import pt.isec.literaturereviewhelper.interfaces.ISearchEngine;
 import pt.isec.literaturereviewhelper.models.Article;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -60,7 +59,7 @@ public abstract class EngineBase<R> implements ISearchEngine {
 
     /**
      * Builds a complete URL with query parameters for the API request.
-     * 
+     *
      * @param params Map of query parameters to include in the URL
      * @return The complete URL string with encoded parameters
      */
@@ -75,7 +74,7 @@ public abstract class EngineBase<R> implements ISearchEngine {
         if (!rawQuery.isEmpty()) {
             fullURL += "?" + rawQuery;
         }
-        
+
         return fullURL;
     }
 
@@ -134,16 +133,43 @@ public abstract class EngineBase<R> implements ISearchEngine {
     public Mono<List<Article>> search(Map<String, String> params) {
         validateParameters(params);
 
-        String fullURL = buildURL(mapParams(params));
         String engineName = getEngineName();
-        
-        return webClient.get()
-                .uri(URI.create(fullURL))
-                .accept(getMediaType())
-                .retrieve()
-                .bodyToMono(getResponseType())
-                .doOnError(e -> log.error("❌ Error fetching from {}: {}", engineName, e.getMessage()))
-                .doOnNext(resp -> log.info("✅ Response received from {}", engineName))
-                .map(mapper::map);
+
+        int startLimit = 10; // Default deep_search_limit
+        if (params.containsKey("deep_search_limit"))
+        {
+            try {
+                startLimit = Integer.parseInt(params.get("deep_search_limit"));
+            } catch (NumberFormatException e) {
+                log.warn("Invalid Parameter 'deep_search_limit' {}", startLimit);
+            }
+        }
+
+        List<Article> accumulatedArticles = new ArrayList<>();
+
+        try {
+            for (int start = 0; start < startLimit; start++) {
+                Map<String, String> pagedParams = new HashMap<>(params);
+                pagedParams.put("start", String.valueOf(start));
+
+                String fullURL = buildURL(mapParams(pagedParams));
+
+                List<Article> pageArticles = webClient.get()
+                        .uri(URI.create(fullURL))
+                        .accept(getMediaType())
+                        .retrieve()
+                        .bodyToMono(getResponseType())
+                        .map(mapper::map)
+                        .block();
+
+                if (pageArticles != null && !pageArticles.isEmpty()) {
+                    accumulatedArticles.addAll(pageArticles);
+                }
+            }
+        } catch (Exception e) {
+            log.error("Exception occurred, returning accumulated articles: {}", e.getMessage());
+        }
+
+        return Mono.just(accumulatedArticles);
     }
 }

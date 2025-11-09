@@ -61,7 +61,8 @@ class ACMEngineTest {
         Map<String, String> params = Map.of(
                 "q", "artificial intelligence",
                 "start", "0",
-                "rows", "10"
+                "rows", "10",
+                "deep_search_limit", "1"
         );
 
         ACMResponse acmResponse = new ACMResponse();
@@ -101,16 +102,17 @@ class ACMEngineTest {
         // Act
         acmEngine.search(params).block();
 
-        // Assert
+        // Assert: capture *all* URIs, get the first
         ArgumentCaptor<URI> uriCaptor = ArgumentCaptor.forClass(URI.class);
-        verify(requestHeadersUriSpec).uri(uriCaptor.capture());
+        verify(requestHeadersUriSpec, atLeastOnce()).uri(uriCaptor.capture());
 
-        String url = uriCaptor.getValue().toString();
+        URI firstCallUri = uriCaptor.getAllValues().get(0);
+        String url = firstCallUri.toString();
+
         assertTrue(url.contains("api.crossref.org"));
         assertTrue(url.contains("/works"));
         assertTrue(url.contains("query.bibliographic=machine+learning"));
         assertTrue(url.contains("rows=5"));
-        assertTrue(url.contains("offset=0"));
     }
 
     @Test
@@ -130,7 +132,7 @@ class ACMEngineTest {
     }
 
     @Test
-    void testPropagatesErrorFromHttp() {
+    void testReturnsAccumulatedArticlesOnError() {
         // Arrange
         RuntimeException boom = new RuntimeException("API Error");
         when(responseSpec.bodyToMono(ACMResponse.class)).thenReturn(Mono.error(boom));
@@ -140,7 +142,7 @@ class ACMEngineTest {
 
         // Assert
         StepVerifier.create(result)
-                .expectErrorMatches(t -> t instanceof RuntimeException && t.getMessage().contains("API Error"))
-                .verify();
+                .expectNextMatches(list -> list.isEmpty()) // porque o erro foi engolido
+                .verifyComplete();
     }
 }

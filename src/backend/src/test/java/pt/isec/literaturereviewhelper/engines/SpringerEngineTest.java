@@ -57,7 +57,8 @@ class SpringerEngineTest {
                 "q", "artificial intelligence",
                 "start", "0",
                 "rows", "10",
-                "api_key", "test-key"
+                "api_key", "test-key",
+                "deep_search_limit", "1"
         );
 
         SpringerResponse resp = new SpringerResponse();
@@ -91,7 +92,8 @@ class SpringerEngineTest {
                 "q", "machine learning",
                 "start", "0",
                 "rows", "5",
-                "api_key", "abc123"
+                "api_key", "abc123",
+                "deep_search_limit", "1"
         );
 
         when(responseSpec.bodyToMono(SpringerResponse.class))
@@ -119,7 +121,8 @@ class SpringerEngineTest {
                 "q", "ai",
                 "start", "0",
                 // rows missing
-                "api_key", "k"
+                "api_key", "k",
+                "deep_search_limit", "1"
         );
 
         // .search() will throw because we have validateParams() on the engine itself
@@ -136,14 +139,15 @@ class SpringerEngineTest {
                 "q", "ai",
                 "start", "0",
                 "rows", "5",
-                "api_key", "k"
+                "api_key", "k",
+                "deep_search_limit", "1"
         );
 
         when(responseSpec.bodyToMono(SpringerResponse.class))
                 .thenReturn(Mono.error(new RuntimeException("API Error")));
 
         StepVerifier.create(springerEngine.search(raw))
-                .expectErrorMatches(e -> e instanceof RuntimeException && e.getMessage().contains("API Error"))
-                .verify();
+                .expectNextMatches(list -> list.isEmpty()) // retorna lista vazia
+                .verifyComplete();
     }
 }

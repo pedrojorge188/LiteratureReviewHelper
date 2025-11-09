@@ -1,10 +1,35 @@
 @use "../utilities" as *;
 @use "../variables" as vars;
 
+.container-article {
+  &.show {
+    position: relative;
+    opacity: 100%;
+    pointer-events: all;
+  }
+  &.hide {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    height: 0;
+    overflow: hidden;
+  }
+}
+
 .pesquisa-container {
   width: 100%;
   padding: 1.5rem;
   color: vars.$color-gray-2;
+  position: relative;
+  opacity: 100%;
+  pointer-events: all;
+  &.hide-pesquisa {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    height: 0;
+    overflow: hidden;
+  }
   &__content {
     max-width: 800px;
     margin-left: 130px;

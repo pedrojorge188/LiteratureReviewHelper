@@ -145,8 +145,6 @@ public abstract class EngineBase<R> implements ISearchEngine {
     public Mono<List<Article>> search(Map<String, String> params) {
         validateParameters(params);
 
-        String engineName = getEngineName();
-
         int startLimit = 10; // Default deep_search_limit
         if (params.containsKey("deep_search_limit"))
         {

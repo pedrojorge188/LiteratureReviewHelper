@@ -40,7 +40,7 @@ class HalMapperTest {
         assertEquals(1, result.size());
         Article a = result.get(0);
         assertEquals("Machine Learning in Healthcare", a.title());
-        assertEquals("Doe, John, Smith, Jane", a.authors());
+        assertEquals(List.of("Doe, John", "Smith, Jane"), a.authors());
         assertEquals("2024", a.publicationYear());
         assertEquals("Medical Informatics Journal", a.venue());
         assertEquals("Journal Article", a.venueType());
@@ -141,7 +141,7 @@ class HalMapperTest {
         assertEquals("Minimal Article", a.title());
         assertEquals("", a.publicationYear());
         assertEquals("", a.venue());
-        assertEquals("", a.authors());
+        assertEquals(List.of(), a.authors());
         assertEquals("", a.link());
     }
 

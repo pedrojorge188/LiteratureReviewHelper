@@ -70,7 +70,7 @@ class ACMEngineTest {
 
         List<Article> mapped = List.of(
                 new Article("AI Research Paper", "2024", "Journal of AI", "journal-article",
-                        "John Doe, Jane Smith", "https://example.com/article", Engines.ACM)
+                        List.of("John Doe", "Jane Smith"), "https://example.com/article", Engines.ACM)
         );
 
         when(resultMapper.map(acmResponse)).thenReturn(mapped);

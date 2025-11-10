@@ -10,7 +10,6 @@ import pt.isec.literaturereviewhelper.models.Engines;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component
 public class ACMMapper implements IResultMapper<ACMResponse> {
@@ -42,14 +41,14 @@ public class ACMMapper implements IResultMapper<ACMResponse> {
                                     .orElse(""));
 
                     // Authors
-                    String authors = Optional.ofNullable(item.getAuthor())
-                            .filter(a -> !a.isEmpty())
+                    List<String> authors = Optional.ofNullable(item.getAuthors())
                             .map(list -> list.stream()
                                     .map(a -> String.format("%s %s",
                                             Optional.ofNullable(a.given()).orElse(""),
                                             Optional.ofNullable(a.family()).orElse("")).trim())
-                                    .collect(Collectors.joining(", ")))
-                            .orElse("");
+                                    .filter(name -> !name.isEmpty())
+                                    .toList())
+                            .orElse(List.of());
 
                     // Venue
                     String venue = Optional.ofNullable(item.getContainerTitle())

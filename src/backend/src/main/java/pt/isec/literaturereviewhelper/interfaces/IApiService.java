@@ -1,9 +1,8 @@
 package pt.isec.literaturereviewhelper.interfaces;
 
-import java.util.List;
 import java.util.Map;
 
-import pt.isec.literaturereviewhelper.models.Article;
+import pt.isec.literaturereviewhelper.dtos.SearchResultDto;
 import pt.isec.literaturereviewhelper.models.Engines;
 import reactor.core.publisher.Mono;
 
@@ -13,7 +12,7 @@ public interface IApiService {
      * 
      * @param engine The search engine to use (SPRINGER, HAL, ACM)
      * @param params Map of search parameters
-     * @return Mono containing list of articles
+     * @return Mono containing search results (articles and statistics)
      */
-    Mono<List<Article>> search(Engines engine, Map<String, String> params);
+    Mono<SearchResultDto> search(Engines engine, Map<String, String> params);
 }

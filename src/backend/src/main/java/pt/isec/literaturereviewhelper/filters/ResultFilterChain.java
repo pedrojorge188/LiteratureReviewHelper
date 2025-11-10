@@ -3,6 +3,13 @@ package pt.isec.literaturereviewhelper.filters;
 import pt.isec.literaturereviewhelper.interfaces.IResultFilter;
 import pt.isec.literaturereviewhelper.models.Article;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import static pt.isec.literaturereviewhelper.commons.Params.AUTHOR;
 import static pt.isec.literaturereviewhelper.commons.Params.EXCLUDE_AUTHOR;
 import static pt.isec.literaturereviewhelper.commons.Params.EXCLUDE_TITLE;
@@ -13,21 +20,14 @@ import static pt.isec.literaturereviewhelper.commons.Params.VENUE;
 import static pt.isec.literaturereviewhelper.commons.Params.YEAR_END;
 import static pt.isec.literaturereviewhelper.commons.Params.YEAR_START;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
 /**
  * Simple filter chain that applies multiple filters in sequence.
  * Every filter must pass for the article to be accepted.
  */
 public final class ResultFilterChain implements IResultFilter {
     private final List<IResultFilter> filters;
-    private int inputCount = Integer.MIN_VALUE;
-    private int outputCount = Integer.MIN_VALUE;
-    private int droppedCount = Integer.MIN_VALUE;
+    private final Map<String, Map<Statistic, Integer>> allExecutionStatistics = new HashMap<>();
+    private boolean filtered = false;
 
     public ResultFilterChain(List<IResultFilter> filters) {
         this.filters = new ArrayList<>(Objects.requireNonNull(filters));
@@ -38,25 +38,32 @@ public final class ResultFilterChain implements IResultFilter {
         List<Article> filtered = articles;
         for (IResultFilter f : filters) {
             filtered = f.filter(filtered);
+            allExecutionStatistics.put(f.getClass().getSimpleName(), f.getExecutionStatistics());
         }
-
-        inputCount = articles.size();
-        outputCount = filtered.size();
-        droppedCount = inputCount - outputCount;
-
+        this.filtered = true;
         return filtered;
     }
 
     @Override
     public Map<Statistic, Integer> getExecutionStatistics() {
-        if (inputCount == Integer.MIN_VALUE) {
-            throw new IllegalStateException("Filter has not been executed yet.");
+        if (!filtered) {
+            throw new IllegalStateException("Cannot get execution statistics before filter() has been called.");
+        }
+
+        int totalInput = 0;
+        int totalOutput = 0;
+        int totalDropped = 0;
+
+        for (Map<Statistic, Integer> stats : allExecutionStatistics.values()) {
+            totalInput += stats.getOrDefault(Statistic.INPUT, 0);
+            totalOutput += stats.getOrDefault(Statistic.OUTPUT, 0);
+            totalDropped += stats.getOrDefault(Statistic.DROPPED, 0);
         }
 
         return Map.of(
-                Statistic.INPUT, inputCount,
-                Statistic.OUTPUT, outputCount,
-                Statistic.DROPPED, droppedCount
+                Statistic.INPUT, totalInput,
+                Statistic.OUTPUT, totalOutput,
+                Statistic.DROPPED, totalDropped
         );
     }
 
@@ -109,6 +116,8 @@ public final class ResultFilterChain implements IResultFilter {
                 List<String> titles = List.of(params.get(EXCLUDE_TITLE).split(VALUE_DELIMITER));
                 filters.add(new TitleResultFilter(titles, true));
             }
+
+            filters.add(new DuplicateResultFilter());
 
             return this;
         }

@@ -2,6 +2,7 @@ package pt.isec.literaturereviewhelper.services;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import pt.isec.literaturereviewhelper.dtos.SearchResultDto;
 import pt.isec.literaturereviewhelper.factories.SearchEngineFactory;
 import pt.isec.literaturereviewhelper.interfaces.ISearchEngine;
 import pt.isec.literaturereviewhelper.models.Article;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -37,10 +39,11 @@ class ApiServiceTest {
         );
 
         when(factory.createSearchEngine(Engines.SPRINGER)).thenReturn(engineMock);
-        when(engineMock.search(params)).thenReturn(Mono.just(List.of(expected)));
+        when(engineMock.search(params)).thenReturn(Mono.just(new SearchResultDto(List.of(expected), Map.of())));
 
         StepVerifier.create(apiService.search(Engines.SPRINGER, params))
-                .assertNext(list -> {
+                .assertNext(searchResult -> {
+                    List<Article> list = searchResult.getArticles();
                     assertEquals(1, list.size());
                     assertEquals("Test Article", list.get(0).title());
                 })
@@ -59,10 +62,11 @@ class ApiServiceTest {
         );
 
         when(factory.createSearchEngine(Engines.HAL)).thenReturn(engineMock);
-        when(engineMock.search(params)).thenReturn(Mono.just(List.of(expected)));
+        when(engineMock.search(params)).thenReturn(Mono.just(new SearchResultDto(List.of(expected), Map.of())));
 
         StepVerifier.create(apiService.search(Engines.HAL, params))
-                .assertNext(list -> {
+                .assertNext(searchResult -> {
+                    List<Article> list = searchResult.getArticles();
                     assertEquals(1, list.size());
                     assertEquals("HAL Paper", list.get(0).title());
                 })
@@ -85,10 +89,11 @@ class ApiServiceTest {
         );
 
         when(factory.createSearchEngine(Engines.ACM)).thenReturn(engineMock);
-        when(engineMock.search(params)).thenReturn(Mono.just(List.of(expected)));
+        when(engineMock.search(params)).thenReturn(Mono.just(new SearchResultDto(List.of(expected), Map.of())));
 
         StepVerifier.create(apiService.search(Engines.ACM, params))
-                .assertNext(list -> {
+                .assertNext(searchResult -> {
+                    List<Article> list = searchResult.getArticles();
                     assertEquals(1, list.size());
                     assertEquals("ACM Paper", list.get(0).title());
                 })
@@ -103,10 +108,10 @@ class ApiServiceTest {
         Map<String, String> params = Map.of("any", "value");
 
         when(factory.createSearchEngine(any())).thenReturn(engineMock);
-        when(engineMock.search(anyMap())).thenReturn(Mono.just(List.of()));
+        when(engineMock.search(anyMap())).thenReturn(Mono.just(new SearchResultDto(List.of(), Map.of())));
 
         StepVerifier.create(apiService.search(Engines.SPRINGER, params))
-                .expectNext(List.of())
+                .assertNext(searchResult -> assertTrue(searchResult.getArticles().isEmpty()))
                 .verifyComplete();
 
         verify(factory, times(1)).createSearchEngine(Engines.SPRINGER);

@@ -6,6 +6,7 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import pt.isec.literaturereviewhelper.dtos.SearchResultDto;
 import pt.isec.literaturereviewhelper.interfaces.IResultMapper;
 import pt.isec.literaturereviewhelper.models.Article;
 
@@ -84,17 +85,19 @@ class HalEngineTest {
         when(mapper.map(bibtexResponse)).thenReturn(List.of(article));
 
         // Act
-        Mono<List<Article>> result = halEngine.search(rawParams);
+        Mono<SearchResultDto> result = halEngine.search(rawParams);
 
         // Assert
         StepVerifier.create(result)
-                .assertNext(articles -> {
+                .assertNext(searchResult -> {
+                    List<Article> articles = searchResult.getArticles();
                     assertEquals(1, articles.size());
                     Article a = articles.get(0);
                     assertEquals("Machine Learning in Healthcare", a.title());
                     assertEquals("2024", a.publicationYear());
                     assertEquals("Medical Informatics Journal", a.venue());
                     assertEquals("HAL", a.source().toString());
+                    assertTrue(searchResult.getStatistics().size() > 1); // No filters applied in this test
                 })
                 .verifyComplete();
 
@@ -114,7 +117,7 @@ class HalEngineTest {
         when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.just(""));
         when(mapper.map("")).thenReturn(List.of());
 
-        halEngine.search(rawParams).subscribe();
+        halEngine.search(rawParams).block();
 
         ArgumentCaptor<URI> uriCaptor = ArgumentCaptor.forClass(URI.class);
         verify(requestHeadersUriSpec).uri(uriCaptor.capture());
@@ -140,7 +143,7 @@ class HalEngineTest {
         when(mapper.map("")).thenReturn(List.of());
 
         StepVerifier.create(halEngine.search(rawParams))
-                .assertNext(list -> assertTrue(list.isEmpty()))
+                .assertNext(searchResult -> assertTrue(searchResult.getArticles().isEmpty()))
                 .verifyComplete();
     }
 
@@ -175,7 +178,7 @@ class HalEngineTest {
         when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.error(ex));
 
         StepVerifier.create(halEngine.search(rawParams))
-                .expectNextMatches(list -> list.isEmpty())
+                .expectNextMatches(searchResult -> searchResult.getArticles().isEmpty())
                 .verifyComplete();
     }
 }

@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import pt.isec.literaturereviewhelper.dtos.SearchResultDto;
 import pt.isec.literaturereviewhelper.interfaces.IResultMapper;
 import pt.isec.literaturereviewhelper.models.Article;
 import pt.isec.literaturereviewhelper.models.Engines;
@@ -70,14 +71,14 @@ class EngineBaseTest {
         when(resultMapper.map(testResponse)).thenReturn(mapped);
 
         // Act
-        Mono<List<Article>> firstCall = testEngine.search(Map.of(
+        Mono<SearchResultDto> firstCall = testEngine.search(Map.of(
                 "q", "data science",
                 "start", "0",
                 "rows", "10",
                 "deep_search_limit", "1" // only get 1st page of results
                 // missing filter parameters
         ));
-        Mono<List<Article>> secondCall = testEngine.search(Map.of(
+        Mono<SearchResultDto> secondCall = testEngine.search(Map.of(
                 "q", "data science",
                 "start", "0",
                 "rows", "10",
@@ -88,18 +89,11 @@ class EngineBaseTest {
 
         // Assert
         verify(webClient, times(1)).get();
-        assertEquals(firstCall.block(), List.of(
-                new Article("Old Data Science Paper", "2010", "Old Journal", "journal-article",
-                        List.of("Jane Smith"), "https://example.com/old-ds-article", Engines.ACM),
-                new Article("Future Data Science Paper", "2050", "Future Journal", "journal-article",
-                        List.of("John Doe"), "https://example.com/future-ds-article", Engines.ACM),
+        assertEquals(mapped, firstCall.block().getArticles());
+        assertEquals(List.of(
                 new Article("Valid Data Science Paper", "2018", "Valid Journal", "journal-article",
                         List.of("John Doe"), "https://example.com/valid-ds-article", Engines.ACM)
-        ));
-        assertEquals(secondCall.block(), List.of(
-                new Article("Valid Data Science Paper", "2018", "Valid Journal", "journal-article",
-                        List.of("John Doe"), "https://example.com/valid-ds-article", Engines.ACM)
-        ));
+        ), secondCall.block().getArticles());
     }
 
     private class TestEngine extends EngineBase<TestEngineResponse> {

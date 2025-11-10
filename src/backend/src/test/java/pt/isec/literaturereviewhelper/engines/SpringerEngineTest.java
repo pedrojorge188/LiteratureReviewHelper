@@ -6,6 +6,7 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import pt.isec.literaturereviewhelper.dtos.SearchResultDto;
 import pt.isec.literaturereviewhelper.interfaces.IResultMapper;
 import pt.isec.literaturereviewhelper.models.Article;
 import pt.isec.literaturereviewhelper.models.SpringerResponse;
@@ -75,13 +76,15 @@ class SpringerEngineTest {
         when(responseSpec.bodyToMono(SpringerResponse.class)).thenReturn(Mono.just(resp));
         when(resultMapper.map(resp)).thenReturn(mapped);
 
-        Mono<List<Article>> out = springerEngine.search(raw);
+        Mono<SearchResultDto> out = springerEngine.search(raw);
 
         StepVerifier.create(out)
-                .assertNext(list -> {
+                .assertNext(searchResult -> {
+                    List<Article> list = searchResult.getArticles();
                     assertEquals(1, list.size());
                     assertEquals("AI Research Paper", list.get(0).title());
                     assertEquals("2024", list.get(0).publicationYear());
+                    assertTrue(searchResult.getStatistics().size() > 1); // No filters applied in this test
                 })
                 .verifyComplete();
     }
@@ -147,7 +150,7 @@ class SpringerEngineTest {
                 .thenReturn(Mono.error(new RuntimeException("API Error")));
 
         StepVerifier.create(springerEngine.search(raw))
-                .expectNextMatches(list -> list.isEmpty()) // retorna lista vazia
+                .expectNextMatches(searchResult -> searchResult.getArticles().isEmpty()) // retorna lista vazia
                 .verifyComplete();
     }
 }

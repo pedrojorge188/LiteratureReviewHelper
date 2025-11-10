@@ -5,15 +5,13 @@ import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap; // Import ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger;
-
 import org.springframework.stereotype.Service;
-
 import pt.isec.literaturereviewhelper.commons.Params;
 import pt.isec.literaturereviewhelper.dtos.SearchResponseDto;
 import pt.isec.literaturereviewhelper.interfaces.IApiService;
 import pt.isec.literaturereviewhelper.interfaces.ILiteratureReviewService;
+import pt.isec.literaturereviewhelper.interfaces.IResultFilter;
 import pt.isec.literaturereviewhelper.models.Article;
 import pt.isec.literaturereviewhelper.models.Engines;
 import reactor.core.publisher.Flux;
@@ -25,6 +23,7 @@ public class LiteratureReviewService implements ILiteratureReviewService {
 
     public LiteratureReviewService(IApiService apiService) {
         this.apiService = apiService;
+
     }
 
     @Override
@@ -33,6 +32,7 @@ public class LiteratureReviewService implements ILiteratureReviewService {
         String query = allParams.getOrDefault("q", "");
 
         List<Engines> sources = parseSources(sourceStr);
+        AtomicInteger totalDroppedDuplicates = new AtomicInteger(0);
 
         return Flux.fromIterable(sources)
                 .flatMap(engine -> {
@@ -42,31 +42,22 @@ public class LiteratureReviewService implements ILiteratureReviewService {
                     }
 
                     return apiService.search(engine, allParams)
-                            .flatMapMany(Flux::fromIterable)
-                            .collectList()
-                            .map(articles -> Map.entry(engine, articles));
+                            .map(filteredResult -> {
+                                totalDroppedDuplicates.getAndAdd(filteredResult.getStatistics().getOrDefault(IResultFilter.Statistic.DROPPED, 0));
+                                return Map.entry(engine, filteredResult.getArticles());
+                            });
                 })
                 .collectList()
                 .map(listOfEntries -> {
                     Map<Engines, Integer> articlesByEngine = new EnumMap<>(Engines.class);
-                    Map<String, Article> uniqueArticlesMap = new ConcurrentHashMap<>();
-                    AtomicInteger articlesDuplicatedRemoved = new AtomicInteger(0);
+                    List<Article> allArticles = new ArrayList<>();
 
-                    listOfEntries.parallelStream().forEach(entry -> {
+                    for (var entry : listOfEntries) {
                         articlesByEngine.put(entry.getKey(), entry.getValue().size());
-                        entry.getValue().parallelStream().forEach(article -> {
-                            String originalTitle = article.title();
-                            String processedTitle = getProcessedTitle(originalTitle);
-                            if (uniqueArticlesMap.putIfAbsent(processedTitle, article) != null) {
-                                articlesDuplicatedRemoved.incrementAndGet();
-                            }
-                        });
-                    });
+                        allArticles.addAll(entry.getValue());
+                    }
 
-                    List<Article> allArticles = new ArrayList<>(uniqueArticlesMap.values());
-                    int totalArticles = allArticles.size();
-
-                    return new SearchResponseDto(query, totalArticles, articlesByEngine, allArticles, articlesDuplicatedRemoved.get());
+                    return new SearchResponseDto(query, allArticles.size(), articlesByEngine, allArticles, totalDroppedDuplicates.get());
                 });
     }
 
@@ -95,19 +86,5 @@ public class LiteratureReviewService implements ILiteratureReviewService {
                         throw new IllegalArgumentException("Unsupported source: " + s);
                     }
                 }).toList();
-    }
-
-    /**
-     * Processes an article title by converting it to lowercase and removing special characters.
-     * This is used for removing duplication purposes.
-     *
-     * @param title The original article title.
-     * @return The processed title.
-     */
-    private String getProcessedTitle(String title) {
-        if (title == null) {
-            return "";
-        }
-        return title.toLowerCase().replaceAll("[!@#$%^&*()_+\\-=\\[\\]{};:'\",.<>?/~`|\\\\]+", "");
     }
 }

@@ -35,13 +35,13 @@ public final class ResultFilterChain implements IResultFilter {
 
     @Override
     public List<Article> filter(List<Article> articles) {
-        List<Article> filtered = articles;
+        List<Article> filteredArticles = articles;
         for (IResultFilter f : filters) {
-            filtered = f.filter(filtered);
+            filteredArticles = f.filter(filteredArticles);
             allExecutionStatistics.put(f.getClass().getSimpleName(), f.getExecutionStatistics());
         }
         this.filtered = true;
-        return filtered;
+        return filteredArticles;
     }
 
     @Override

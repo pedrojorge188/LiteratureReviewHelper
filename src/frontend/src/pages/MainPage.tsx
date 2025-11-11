@@ -25,6 +25,7 @@ export const MainPage = () => {
   const [showList, setShowList] = useState(false);
   const [response, setResponse] = useState<SearchResponseDto | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState(false);
 
   const normalizarQueries = (lista: Query[]): Query[] => {
     return lista.map((q, i) => {
@@ -66,6 +67,7 @@ export const MainPage = () => {
     if (bibliotecaSelecionada && !bibliotecas.includes(bibliotecaSelecionada)) {
       setBibliotecas([...bibliotecas, bibliotecaSelecionada]);
       setBibliotecaSelecionada("");
+      setApiError(false);
     }
   };
 
@@ -85,13 +87,20 @@ export const MainPage = () => {
   };
 
   const pesquisar = async () => {
+    // Validate that at least one API is selected
+    if (bibliotecas.length === 0) {
+      setApiError(true);
+      return;
+    }
+
+    setApiError(false);
     setIsLoading(true);
     const queryString = queries
       .map((q, i) => (i === 0 ? q.valor : `${q.metadado} ${q.valor}`))
       .join(" ");
 
     // Build the source parameter from selected bibliotecas
-    const sourceParam = bibliotecas.length > 0 ? bibliotecas.join(",") : undefined;
+    const sourceParam = bibliotecas.join(",");
 
     try {
       const resultAction = await dispatch(
@@ -307,6 +316,11 @@ export const MainPage = () => {
                 </li>
               ))}
             </ul>
+            {apiError && bibliotecas.length === 0 && (
+              <p style={{ color: 'red', marginTop: '10px', fontSize: '14px' }}>
+                {t("home:erro_selecionar_api")}
+              </p>
+            )}
           </div>
 
           {/* Botões principais */}

@@ -16,7 +16,6 @@ export const getNavbarData = createAsyncThunk("Navbar", async () => {
 export const getArticles = createAsyncThunk(
   "Articles",
   async ({ query, apiList, source }: { query: string; apiList: string; source?: string }) => {
-    // Build URL with source parameter if provided
     let url = `${API_URL}/search?q=${query}&start=0&rows=10&wt=bibtex`;
     if (source) {
       url += `&source=${source}`;

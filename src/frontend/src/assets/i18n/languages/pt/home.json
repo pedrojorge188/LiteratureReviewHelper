@@ -23,6 +23,7 @@
   "botao_remover": "Remover",
   "botao_guardar": "Guardar",
   "botao_pesquisar": "Pesquisar",
+  "erro_selecionar_api": "Por favor, selecione pelo menos uma API/biblioteca antes de pesquisar.",
   "dados_guardados": "Dados guardados:",
   "pesquisar_com": "Pesquisar com:",
   "results": "resultados obtidos"

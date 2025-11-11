@@ -9,12 +9,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.springframework.stereotype.Service;
 import pt.isec.literaturereviewhelper.commons.Params;
 import pt.isec.literaturereviewhelper.dtos.SearchResponseDto;
+import pt.isec.literaturereviewhelper.filters.ResultFilterChain;
 import pt.isec.literaturereviewhelper.interfaces.IApiService;
 import pt.isec.literaturereviewhelper.interfaces.ILiteratureReviewService;
 import pt.isec.literaturereviewhelper.interfaces.IResultFilter;
 import pt.isec.literaturereviewhelper.models.Article;
 import pt.isec.literaturereviewhelper.models.Engines;
 import reactor.core.publisher.Flux;
+import pt.isec.literaturereviewhelper.filters.DuplicateResultFilter;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -32,8 +34,6 @@ public class LiteratureReviewService implements ILiteratureReviewService {
         String query = allParams.getOrDefault("q", "");
 
         List<Engines> sources = parseSources(sourceStr);
-        AtomicInteger totalDroppedDuplicates = new AtomicInteger(0);
-
         return Flux.fromIterable(sources)
                 .flatMap(engine -> {
                     var key = apiKeysByEngine.get(engine);
@@ -42,23 +42,35 @@ public class LiteratureReviewService implements ILiteratureReviewService {
                     }
 
                     return apiService.search(engine, allParams)
-                            .map(filteredResult -> {
-                                totalDroppedDuplicates.getAndAdd(filteredResult.getStatistics().getOrDefault(IResultFilter.Statistic.DROPPED, 0));
-                                return Map.entry(engine, filteredResult.getArticles());
-                            });
-                })
-                .collectList()
-                .map(listOfEntries -> {
-                    Map<Engines, Integer> articlesByEngine = new EnumMap<>(Engines.class);
-                    List<Article> allArticles = new ArrayList<>();
+                        .map(searchResultDto -> Map.entry(engine, searchResultDto));})
+                        .collectList()
+                        .map(listOfEntries -> {
+                            List<Article> allArticles = new ArrayList<>();
+                            int totalDropped = 0;
+                            for (var entry : listOfEntries) {
+                                allArticles.addAll(entry.getValue().getArticles());
+                                Map<String, Map<IResultFilter.Statistic, Integer>> stats = entry.getValue().getStatistics();
+                                if (stats != null && stats.containsKey("DuplicateResultFilter")) {
+                                    int duplicates = stats.get("DuplicateResultFilter").getOrDefault(IResultFilter.Statistic.DROPPED, 0);
+                                    totalDropped += duplicates;
+                                }
+                            }
 
-                    for (var entry : listOfEntries) {
-                        articlesByEngine.put(entry.getKey(), entry.getValue().size());
-                        allArticles.addAll(entry.getValue());
-                    }
+                            DuplicateResultFilter Duplicatedfilter = new DuplicateResultFilter();
+                            List<Article> filteredArticles = Duplicatedfilter.filter(allArticles);
+                            totalDropped += Duplicatedfilter.getExecutionStatistics().get(IResultFilter.Statistic.DROPPED);
 
-                    return new SearchResponseDto(query, allArticles.size(), articlesByEngine, allArticles, totalDroppedDuplicates.get());
-                });
+                            Map<Engines, Integer> articlesByEngineAfterFilter = new EnumMap<>(Engines.class);
+                            for (Engines source : sources) {
+                                articlesByEngineAfterFilter.put(source, 0);
+                            }
+                            System.out.println(articlesByEngineAfterFilter);
+                            for (Article article : filteredArticles) {
+                                articlesByEngineAfterFilter.merge(article.source(), 1, Integer::sum);
+                            }
+
+                            return new SearchResponseDto(query, filteredArticles.size(), articlesByEngineAfterFilter, filteredArticles, totalDropped);
+                        });
     }
 
     /**

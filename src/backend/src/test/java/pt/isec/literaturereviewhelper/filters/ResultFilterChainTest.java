@@ -179,8 +179,8 @@ class ResultFilterChainTest {
         // Assert
         assertEquals(
                 Map.of(
-                        IResultFilter.Statistic.INPUT, 15,
-                        IResultFilter.Statistic.OUTPUT, 11,
+                        IResultFilter.Statistic.INPUT, 5,
+                        IResultFilter.Statistic.OUTPUT, 1,
                         IResultFilter.Statistic.DROPPED, 4
                 ),
                 chain.getExecutionStatistics()

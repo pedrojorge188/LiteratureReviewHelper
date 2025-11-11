@@ -97,7 +97,7 @@ class HalEngineTest {
                     assertEquals("2024", a.publicationYear());
                     assertEquals("Medical Informatics Journal", a.venue());
                     assertEquals("HAL", a.source().toString());
-                    assertTrue(searchResult.getStatistics().size() > 1); // No filters applied in this test
+                    assertEquals(1,searchResult.getStatistics().size()); // No filters applied in this test
                 })
                 .verifyComplete();
 

@@ -83,7 +83,7 @@ class ACMEngineTest {
         StepVerifier.create(result)
                 .expectNextMatches(searchResult -> {
                     assertEquals(mapped, searchResult.getArticles());
-                    assertTrue(searchResult.getStatistics().size() > 1); // No filters applied in this test
+                    assertEquals(1,searchResult.getStatistics().size()); // No filters applied in this test
                     return true;
                 })
                 .verifyComplete();
@@ -147,7 +147,7 @@ class ACMEngineTest {
 
         // Assert
         StepVerifier.create(result)
-                .expectNextMatches(searchResult -> searchResult.getArticles().isEmpty()) // because the error was swallowed
+                .expectNextMatches(searchResult -> searchResult.getArticles().isEmpty()) // because the error was supressed
                 .verifyComplete();
     }
 }

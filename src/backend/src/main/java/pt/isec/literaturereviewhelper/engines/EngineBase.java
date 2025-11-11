@@ -194,11 +194,8 @@ public abstract class EngineBase<R> implements ISearchEngine {
             log.error("Exception occurred, returning accumulated articles: {}", e.getMessage());
         }
 
-
         ResultFilterChain filterChain = new ResultFilterChain.Builder().fromParams(params).build();
         List<Article> filteredArticles = filterChain.filter(accumulatedArticles);
-        Map<IResultFilter.Statistic, Integer> statistics = filterChain.getExecutionStatistics();
-
-        return Mono.just(new SearchResultDto(filteredArticles, statistics));
+        return Mono.just(new SearchResultDto(filteredArticles, filterChain.getAllExecutionStatistics()));
     }
 }

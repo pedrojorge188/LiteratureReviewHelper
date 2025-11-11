@@ -8,9 +8,9 @@ import java.util.Map;
 
 public class SearchResultDto {
     private final List<Article> articles;
-    private final Map<IResultFilter.Statistic, Integer> statistics;
+    private final Map<String, Map<IResultFilter.Statistic, Integer>> statistics;
 
-    public SearchResultDto(List<Article> articles, Map<IResultFilter.Statistic, Integer> statistics) {
+    public SearchResultDto(List<Article> articles, Map<String, Map<IResultFilter.Statistic, Integer>> statistics) {
         this.articles = articles;
         this.statistics = statistics;
     }
@@ -19,7 +19,7 @@ public class SearchResultDto {
         return articles;
     }
 
-    public Map<IResultFilter.Statistic, Integer> getStatistics() {
+    public Map<String, Map<IResultFilter.Statistic, Integer>> getStatistics() {
         return statistics;
     }
 }

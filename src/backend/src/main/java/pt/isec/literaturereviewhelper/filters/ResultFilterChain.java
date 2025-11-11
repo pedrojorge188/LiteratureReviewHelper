@@ -26,8 +26,15 @@ import static pt.isec.literaturereviewhelper.commons.Params.YEAR_START;
  */
 public final class ResultFilterChain implements IResultFilter {
     private final List<IResultFilter> filters;
+
+    public Map<String, Map<Statistic, Integer>> getAllExecutionStatistics() {
+        return allExecutionStatistics;
+    }
+
     private final Map<String, Map<Statistic, Integer>> allExecutionStatistics = new HashMap<>();
-    private boolean filtered = false;
+    private int inputCount = Integer.MIN_VALUE;
+    private int outputCount = Integer.MIN_VALUE;
+    private int droppedCount = Integer.MIN_VALUE;
 
     public ResultFilterChain(List<IResultFilter> filters) {
         this.filters = new ArrayList<>(Objects.requireNonNull(filters));
@@ -40,32 +47,25 @@ public final class ResultFilterChain implements IResultFilter {
             filteredArticles = f.filter(filteredArticles);
             allExecutionStatistics.put(f.getClass().getSimpleName(), f.getExecutionStatistics());
         }
-        this.filtered = true;
+        inputCount = articles.size();
+        outputCount = filteredArticles.size();
+        droppedCount = inputCount - outputCount;
         return filteredArticles;
     }
 
     @Override
     public Map<Statistic, Integer> getExecutionStatistics() {
-        if (!filtered) {
-            throw new IllegalStateException("Cannot get execution statistics before filter() has been called.");
-        }
-
-        int totalInput = 0;
-        int totalOutput = 0;
-        int totalDropped = 0;
-
-        for (Map<Statistic, Integer> stats : allExecutionStatistics.values()) {
-            totalInput += stats.getOrDefault(Statistic.INPUT, 0);
-            totalOutput += stats.getOrDefault(Statistic.OUTPUT, 0);
-            totalDropped += stats.getOrDefault(Statistic.DROPPED, 0);
+        if (inputCount == Integer.MIN_VALUE) {
+            throw new IllegalStateException("Filter has not been executed yet.");
         }
 
         return Map.of(
-                Statistic.INPUT, totalInput,
-                Statistic.OUTPUT, totalOutput,
-                Statistic.DROPPED, totalDropped
+                Statistic.INPUT, inputCount,
+                Statistic.OUTPUT, outputCount,
+                Statistic.DROPPED, droppedCount
         );
     }
+
 
     public static class Builder {
         private final List<IResultFilter> filters = new ArrayList<>();

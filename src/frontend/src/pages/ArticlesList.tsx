@@ -95,9 +95,10 @@ export const ArticlesList = ({ response, setShow }: ArtigosProps) => {
           <div className="results-container__text">
             {response?.totalArticles ?? artigos.length} {t("home:results")}
             <br />
-            {response?.articlesDuplicatedRemoved > 0 && (
+            {response?.duplicatedResultsRemoved > 0 && (
               <>
-                {response.articlesDuplicatedRemoved} {t("home:articlesDuplicatedRemoved")}
+                {response.duplicatedResultsRemoved}{" "}
+                {t("home:duplicatedResultsRemoved")}
               </>
             )}
           </div>

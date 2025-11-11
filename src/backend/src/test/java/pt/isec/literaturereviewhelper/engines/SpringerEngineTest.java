@@ -84,7 +84,7 @@ class SpringerEngineTest {
                     assertEquals(1, list.size());
                     assertEquals("AI Research Paper", list.get(0).title());
                     assertEquals("2024", list.get(0).publicationYear());
-                    assertTrue(searchResult.getStatistics().size() > 1); // No filters applied in this test
+                    assertEquals(1,searchResult.getStatistics().size()); // No filters applied in this test
                 })
                 .verifyComplete();
     }

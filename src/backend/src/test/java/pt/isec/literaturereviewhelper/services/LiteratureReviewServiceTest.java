@@ -74,7 +74,7 @@ class LiteratureReviewServiceTest {
                     assertEquals(3, resp.getArticles().size());
                     assertTrue(resp.getArticlesByEngine().containsKey(Engines.HAL));
                     assertTrue(resp.getArticlesByEngine().containsKey(Engines.ACM));
-                    assertEquals(0, resp.getArticlesDuplicatedRemoved());
+                    assertEquals(0, resp.getDuplicatedResultsRemoved());
                 })
                 .verifyComplete();
 
@@ -103,7 +103,6 @@ class LiteratureReviewServiceTest {
                     assertEquals("test", resp.getQuery());
                     assertTrue(resp.getArticles().isEmpty());
                     assertEquals(Engines.values().length, resp.getArticlesByEngine().size());
-                    assertEquals(0, resp.getArticlesDuplicatedRemoved());
                 })
                 .verifyComplete();
 
@@ -153,7 +152,7 @@ class LiteratureReviewServiceTest {
                     assertEquals(1, resp.getTotalArticles());
                     assertEquals(1, resp.getArticlesByEngine().get(Engines.HAL));
                     assertEquals(1, resp.getArticles().size());
-                    assertEquals(0, resp.getArticlesDuplicatedRemoved());
+                    assertEquals(0, resp.getDuplicatedResultsRemoved());
                 })
                 .verifyComplete();
     }

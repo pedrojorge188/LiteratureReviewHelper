@@ -5,11 +5,9 @@ import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import org.springframework.stereotype.Service;
 import pt.isec.literaturereviewhelper.commons.Params;
 import pt.isec.literaturereviewhelper.dtos.SearchResponseDto;
-import pt.isec.literaturereviewhelper.filters.ResultFilterChain;
 import pt.isec.literaturereviewhelper.interfaces.IApiService;
 import pt.isec.literaturereviewhelper.interfaces.ILiteratureReviewService;
 import pt.isec.literaturereviewhelper.interfaces.IResultFilter;
@@ -56,15 +54,15 @@ public class LiteratureReviewService implements ILiteratureReviewService {
                                 }
                             }
 
-                            DuplicateResultFilter Duplicatedfilter = new DuplicateResultFilter();
-                            List<Article> filteredArticles = Duplicatedfilter.filter(allArticles);
-                            totalDropped += Duplicatedfilter.getExecutionStatistics().get(IResultFilter.Statistic.DROPPED);
+                            DuplicateResultFilter filter = new DuplicateResultFilter();
+                            List<Article> filteredArticles = filter.filter(allArticles);
+                            totalDropped += filter.getExecutionStatistics().get(IResultFilter.Statistic.DROPPED);
 
                             Map<Engines, Integer> articlesByEngineAfterFilter = new EnumMap<>(Engines.class);
                             for (Engines source : sources) {
                                 articlesByEngineAfterFilter.put(source, 0);
                             }
-                            System.out.println(articlesByEngineAfterFilter);
+
                             for (Article article : filteredArticles) {
                                 articlesByEngineAfterFilter.merge(article.source(), 1, Integer::sum);
                             }

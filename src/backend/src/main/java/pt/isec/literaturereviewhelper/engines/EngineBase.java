@@ -19,7 +19,6 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 
 import pt.isec.literaturereviewhelper.dtos.SearchResultDto;
 import pt.isec.literaturereviewhelper.filters.ResultFilterChain;
-import pt.isec.literaturereviewhelper.interfaces.IResultFilter;
 import pt.isec.literaturereviewhelper.interfaces.IResultMapper;
 import pt.isec.literaturereviewhelper.interfaces.ISearchEngine;
 import pt.isec.literaturereviewhelper.models.Article;

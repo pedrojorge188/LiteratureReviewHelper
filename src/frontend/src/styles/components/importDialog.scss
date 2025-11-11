@@ -44,30 +44,30 @@
     text-align: center;
     margin: 1.5rem 0;
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     &::before,
     &::after {
       content: "";
-      position: absolute;
-      top: 50%;
-      width: 45%;
+      flex: 1;
       height: 1px;
       background: vars.$color-gray-1;
     }
 
     &::before {
-      left: 0;
+      margin-right: 1rem;
     }
 
     &::after {
-      right: 0;
+      margin-left: 1rem;
     }
 
     span {
-      background: vars.$color-white;
-      padding: 0 1rem;
       color: vars.$color-gray-3;
       font-size: 0.9rem;
+      white-space: nowrap;
     }
   }
 

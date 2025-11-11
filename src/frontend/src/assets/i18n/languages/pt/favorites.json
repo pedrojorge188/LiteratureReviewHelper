@@ -1,0 +1,20 @@
+{
+  "title": "Pesquisas Favoritas",
+  "no_searches": "Ainda não tem pesquisas favoritas. Guarde uma pesquisa na página principal para vê-la aqui!",
+  "query": "Query",
+  "years": "Anos",
+  "libraries": "Bibliotecas",
+  "excluded_venues": "Venues Excluídos",
+  "excluded_titles": "Títulos Excluídos",
+  "load": "Carregar",
+  "edit": "Editar",
+  "delete": "Eliminar",
+  "export": "Exportar Tudo",
+  "import": "Importar",
+  "clear_all": "Limpar Tudo",
+  "confirm_delete": "Tem a certeza que deseja eliminar esta pesquisa?",
+  "confirm_clear_all": "Tem a certeza que deseja eliminar todas as pesquisas guardadas? Esta ação não pode ser revertida.",
+  "export_error": "Erro ao exportar pesquisas",
+  "import_success": "Pesquisas importadas com sucesso!",
+  "import_error": "Erro ao importar pesquisas. Por favor, verifique o formato do ficheiro."
+}

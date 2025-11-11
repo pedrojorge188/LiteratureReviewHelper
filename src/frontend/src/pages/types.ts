@@ -20,3 +20,29 @@ export interface SearchResponseDto {
   articles: Artigo[];
 }
 
+// Saved Search Types for localStorage
+export interface Query {
+  value: string;
+  operator?: string;
+}
+
+export interface SearchParameters {
+  queries: Query[];
+  yearFrom: string;
+  yearTo: string;
+  excludeVenues: string;
+  excludeTitles: string;
+  libraries: string[];
+}
+
+export interface SavedSearch {
+  id: string;
+  customLabel: string;
+  timestamp: string;
+  searchParameters: SearchParameters;
+}
+
+export interface SavedSearchesStorage {
+  searches: SavedSearch[];
+}
+

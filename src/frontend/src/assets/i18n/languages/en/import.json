@@ -1,0 +1,12 @@
+{
+  "title": "Import",
+  "import_from_file": "Import from File",
+  "or_load_from_saved": "Or load from saved searches",
+  "no_searches": "No saved searches found.",
+  "load": "Load",
+  "delete": "Delete",
+  "close": "Close",
+  "confirm_delete": "Delete this search?",
+  "import_success": "Searches imported successfully!",
+  "import_error": "Error importing file. Please check the file format."
+}

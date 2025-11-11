@@ -1,0 +1,8 @@
+{
+  "title": "Guardar Pesquisa",
+  "label_prompt": "Insira um nome para esta pesquisa:",
+  "placeholder": "ex: Artigos Machine Learning 2024",
+  "error_empty_label": "Por favor, insira um nome",
+  "save": "Guardar",
+  "cancel": "Cancelar"
+}

@@ -69,7 +69,7 @@ export const SaveDialog = ({
             }}
             onKeyDown={handleKeyPress}
             placeholder={
-              t("saveDialog:placeholder") || "e.g., Machine Learning Papers 2024"
+              t("saveDialog:placeholder") || "e.g., AI usage"
             }
             autoFocus
           />

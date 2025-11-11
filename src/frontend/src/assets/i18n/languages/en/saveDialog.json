@@ -1,7 +1,7 @@
 {
   "title": "Save Search",
   "label_prompt": "Enter a name for this search:",
-  "placeholder": "e.g., Machine Learning Papers 2024",
+  "placeholder": "e.g., AI usage",
   "error_empty_label": "Please enter a label",
   "save": "Save",
   "cancel": "Cancel"

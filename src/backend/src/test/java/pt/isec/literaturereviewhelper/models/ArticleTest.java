@@ -19,15 +19,19 @@ class ArticleTest {
             Engines.HAL
         );
 
-        String expected = "\nArticle\n{" +
-                "\ttitle='Test Title',\n" +
-                "\tpublicationYear='2023',\n" +
-                "\tvenue='Test Venue',\n" +
-                "\tvenueType='Journal',\n" +
-                "\tauthors='John Doe, Jane Smith',\n" +
-                "\tlink='http://example.com',\n" +
-                "\tsource='HAL'\n" +
-                "}\n";
+        String expected =
+                """
+
+                Article
+                {\ttitle='Test Title',
+                \tpublicationYear='2023',
+                \tvenue='Test Venue',
+                \tvenueType='Journal',
+                \tauthors='John Doe, Jane Smith',
+                \tlink='http://example.com',
+                \tsource='HAL'
+                }
+                """;
 
         assertEquals(expected, article.toString());
     }
@@ -44,15 +48,19 @@ class ArticleTest {
             Engines.HAL
         );
 
-        String expected = "\nArticle\n{" +
-                "\ttitle='Test Title',\n" +
-                "\tpublicationYear='2023',\n" +
-                "\tvenue='Test Venue',\n" +
-                "\tvenueType='Journal',\n" +
-                "\tauthors='',\n" +
-                "\tlink='http://example.com',\n" +
-                "\tsource='HAL'\n" +
-                "}\n";
+        String expected =
+                """
+
+                Article
+                {\ttitle='Test Title',
+                \tpublicationYear='2023',
+                \tvenue='Test Venue',
+                \tvenueType='Journal',
+                \tauthors='',
+                \tlink='http://example.com',
+                \tsource='HAL'
+                }
+                """;
 
         assertEquals(expected, article.toString());
     }

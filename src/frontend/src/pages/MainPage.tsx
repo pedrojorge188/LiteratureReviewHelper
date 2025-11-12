@@ -31,6 +31,7 @@ export const MainPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [saveError, setSaveError] = useState<string>("");
 
   const normalizarQueries = (lista: Query[]): Query[] => {
     return lista.map((q, i) => {
@@ -81,6 +82,7 @@ export const MainPage = () => {
 
   const guardar = () => {
     // Open the save dialog instead of just logging
+    setSaveError("");
     setIsSaveDialogOpen(true);
   };
 
@@ -97,16 +99,14 @@ export const MainPage = () => {
 
       saveSearch(customLabel, searchParameters);
       setIsSaveDialogOpen(false);
-      
-      // Show success message
-      alert(t("home:search_saved_successfully") || "Search saved successfully!");
+      setSaveError("");
     } catch (error) {
       console.error("Error saving search:", error);
-      // Show error message
+      // Set error message to be displayed in the dialog
       if (error instanceof Error) {
-        alert(error.message);
+        setSaveError(error.message);
       } else {
-        alert(t("home:search_save_error") || "Error saving search. Please try again.");
+        setSaveError(t("home:search_save_error") || "Error saving search. Please try again.");
       }
     }
   };
@@ -190,6 +190,7 @@ export const MainPage = () => {
         isOpen={isSaveDialogOpen}
         onClose={() => setIsSaveDialogOpen(false)}
         onSave={handleSaveSearch}
+        externalError={saveError}
       />
 
       <ImportDialog

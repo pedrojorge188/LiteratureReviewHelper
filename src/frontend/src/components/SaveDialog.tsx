@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 interface SaveDialogProps {
@@ -6,6 +6,7 @@ interface SaveDialogProps {
   onClose: () => void;
   onSave: (label: string) => void;
   initialLabel?: string;
+  externalError?: string;
 }
 
 export const SaveDialog = ({
@@ -13,10 +14,18 @@ export const SaveDialog = ({
   onClose,
   onSave,
   initialLabel = "",
+  externalError = "",
 }: SaveDialogProps) => {
   const { t } = useTranslation();
   const [label, setLabel] = useState(initialLabel);
   const [error, setError] = useState("");
+
+  // Update error when external error changes
+  useEffect(() => {
+    if (externalError) {
+      setError(externalError);
+    }
+  }, [externalError]);
 
   const handleSave = () => {
     if (!label.trim()) {

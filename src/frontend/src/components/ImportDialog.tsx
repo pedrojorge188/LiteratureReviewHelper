@@ -31,10 +31,8 @@ export const ImportDialog = ({ isOpen, onClose, onLoad }: ImportDialogProps) => 
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm(t("import:confirm_delete") || "Delete this search?")) {
-      deleteSearch(id);
-      loadSearches();
-    }
+    deleteSearch(id);
+    loadSearches();
   };
 
   const handleImportFromFile = () => {
@@ -51,10 +49,10 @@ export const ImportDialog = ({ isOpen, onClose, onLoad }: ImportDialogProps) => 
         const content = e.target?.result as string;
         importSearches(content);
         loadSearches();
-        alert(t("import:import_success") || "Searches imported successfully!");
+        // Silent success - searches will appear in the list
       } catch (error) {
         console.error("Error importing file:", error);
-        alert(t("import:import_error") || "Error importing file. Please check the file format.");
+        // Silent failure - error is logged to console
       }
     };
     reader.readAsText(file);

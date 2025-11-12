@@ -11,6 +11,7 @@ import {
 } from "../utils/localStorage";
 import { SavedSearch } from "./types";
 import { SaveDialog } from "../components/SaveDialog";
+import { ConfirmDialog } from "../components/ConfirmDialog";
 
 export const FavoritesPage = () => {
   const { t } = useTranslation();
@@ -19,6 +20,9 @@ export const FavoritesPage = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [currentLabel, setCurrentLabel] = useState("");
+  const [editError, setEditError] = useState<string>("");
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
   // Load saved searches on component mount
   useEffect(() => {
@@ -31,15 +35,28 @@ export const FavoritesPage = () => {
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm(t("favorites:confirm_delete") || "Are you sure you want to delete this search?")) {
-      deleteSearch(id);
+    setDeleteTargetId(id);
+    setIsConfirmDeleteOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (deleteTargetId) {
+      deleteSearch(deleteTargetId);
       loadSearches();
     }
+    setIsConfirmDeleteOpen(false);
+    setDeleteTargetId(null);
+  };
+
+  const cancelDelete = () => {
+    setIsConfirmDeleteOpen(false);
+    setDeleteTargetId(null);
   };
 
   const handleEdit = (search: SavedSearch) => {
     setEditingId(search.id);
     setCurrentLabel(search.id);
+    setEditError("");
     setIsEditDialogOpen(true);
   };
 
@@ -50,13 +67,14 @@ export const FavoritesPage = () => {
         setIsEditDialogOpen(false);
         setEditingId(null);
         setCurrentLabel("");
+        setEditError("");
         loadSearches();
       } catch (error) {
         console.error("Error updating label:", error);
         if (error instanceof Error) {
-          alert(error.message);
+          setEditError(error.message);
         } else {
-          alert(t("favorites:update_error") || "Error updating search name. Please try again.");
+          setEditError(t("favorites:update_error") || "Error updating search name. Please try again.");
         }
       }
     }
@@ -93,7 +111,7 @@ export const FavoritesPage = () => {
       URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Error exporting searches:", error);
-      alert(t("favorites:export_error") || "Error exporting searches");
+      // Silent failure - export is not critical
     }
   };
 
@@ -113,7 +131,7 @@ export const FavoritesPage = () => {
       URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Error exporting search:", error);
-      alert(t("favorites:export_error") || "Error exporting search");
+      // Silent failure - export is not critical
     }
   };
 
@@ -127,24 +145,18 @@ export const FavoritesPage = () => {
         const content = e.target?.result as string;
         importSearches(content);
         loadSearches();
-        alert(t("favorites:import_success") || "Searches imported successfully!");
+        // Silent success - just reload the searches
       } catch (error) {
         console.error("Error importing searches:", error);
-        alert(t("favorites:import_error") || "Error importing searches. Please check the file format.");
+        // Silent failure - import errors are logged
       }
     };
     reader.readAsText(file);
   };
 
   const handleClearAll = () => {
-    if (
-      window.confirm(
-        t("favorites:confirm_clear_all") || "Are you sure you want to delete all saved searches? This cannot be undone."
-      )
-    ) {
-      clearAllSearches();
-      loadSearches();
-    }
+    clearAllSearches();
+    loadSearches();
   };
 
   const formatDate = (isoString: string) => {
@@ -172,9 +184,18 @@ export const FavoritesPage = () => {
           setIsEditDialogOpen(false);
           setEditingId(null);
           setCurrentLabel("");
+          setEditError("");
         }}
         onSave={handleUpdateLabel}
         initialLabel={currentLabel}
+        externalError={editError}
+      />
+
+      <ConfirmDialog
+        isOpen={isConfirmDeleteOpen}
+        message={t("favorites:confirm_delete") || "Are you sure you want to delete this search?"}
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
       />
 
       <div className="history-header">

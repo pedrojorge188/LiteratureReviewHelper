@@ -37,7 +37,6 @@ export interface SearchParameters {
 
 export interface SavedSearch {
   id: string;
-  customLabel: string;
   timestamp: string;
   searchParameters: SearchParameters;
 }

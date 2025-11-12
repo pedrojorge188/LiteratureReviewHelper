@@ -120,7 +120,7 @@ export const ImportDialog = ({ isOpen, onClose, onLoad }: ImportDialogProps) => 
               {savedSearches.map((search) => (
                 <div key={search.id} className="search-item">
                   <div className="search-item-header">
-                    <h4>{search.customLabel}</h4>
+                    <h4>{search.id}</h4>
                     <span className="search-date">{formatDate(search.timestamp)}</span>
                   </div>
                   <p className="search-query">{formatQueryString(search.searchParameters.queries)}</p>

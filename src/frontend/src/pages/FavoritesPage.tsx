@@ -39,17 +39,26 @@ export const FavoritesPage = () => {
 
   const handleEdit = (search: SavedSearch) => {
     setEditingId(search.id);
-    setCurrentLabel(search.customLabel);
+    setCurrentLabel(search.id);
     setIsEditDialogOpen(true);
   };
 
   const handleUpdateLabel = (newLabel: string) => {
     if (editingId) {
-      updateSearchLabel(editingId, newLabel);
-      setIsEditDialogOpen(false);
-      setEditingId(null);
-      setCurrentLabel("");
-      loadSearches();
+      try {
+        updateSearchLabel(editingId, newLabel);
+        setIsEditDialogOpen(false);
+        setEditingId(null);
+        setCurrentLabel("");
+        loadSearches();
+      } catch (error) {
+        console.error("Error updating label:", error);
+        if (error instanceof Error) {
+          alert(error.message);
+        } else {
+          alert(t("favorites:update_error") || "Error updating search name. Please try again.");
+        }
+      }
     }
   };
 
@@ -85,6 +94,26 @@ export const FavoritesPage = () => {
     } catch (error) {
       console.error("Error exporting searches:", error);
       alert(t("favorites:export_error") || "Error exporting searches");
+    }
+  };
+
+  const handleExportSingle = (search: SavedSearch) => {
+    try {
+      const jsonString = JSON.stringify([search], null, 2);
+      const blob = new Blob([jsonString], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      // Use the search name as the filename, sanitized for file systems
+      const sanitizedName = search.id.replace(/[<>:"/\\|?*]/g, "-");
+      link.download = `${sanitizedName}-${new Date().toISOString().split("T")[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error exporting search:", error);
+      alert(t("favorites:export_error") || "Error exporting search");
     }
   };
 
@@ -173,7 +202,7 @@ export const FavoritesPage = () => {
           {savedSearches.map((search) => (
             <div key={search.id} className="search-card">
               <div className="search-card-header">
-                <h3>{search.customLabel}</h3>
+                <h3>{search.id}</h3>
                 <span className="search-date">{formatDate(search.timestamp)}</span>
               </div>
 
@@ -220,6 +249,9 @@ export const FavoritesPage = () => {
                 </button>
                 <button className="btn-secondary" onClick={() => handleEdit(search)}>
                   {t("favorites:edit") || "Edit"}
+                </button>
+                <button className="btn-secondary" onClick={() => handleExportSingle(search)}>
+                  {t("favorites:export_single") || "Export"}
                 </button>
                 <button className="btn-danger" onClick={() => handleDelete(search.id)}>
                   {t("favorites:delete") || "Delete"}

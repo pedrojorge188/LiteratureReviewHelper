@@ -98,14 +98,16 @@ export const MainPage = () => {
       saveSearch(customLabel, searchParameters);
       setIsSaveDialogOpen(false);
       
-      // Show success message (you can add a toast notification here)
-      console.log(t("home:search_saved_successfully") || "Search saved successfully!", {
-        label: customLabel,
-        parameters: searchParameters,
-      });
+      // Show success message
+      alert(t("home:search_saved_successfully") || "Search saved successfully!");
     } catch (error) {
       console.error("Error saving search:", error);
-      // Show error message (you can add a toast notification here)
+      // Show error message
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert(t("home:search_save_error") || "Error saving search. Please try again.");
+      }
     }
   };
 

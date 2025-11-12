@@ -10,11 +10,13 @@
   "edit": "Editar",
   "delete": "Eliminar",
   "export": "Exportar Tudo",
+  "export_single": "Exportar",
   "import": "Importar",
   "clear_all": "Limpar Tudo",
   "confirm_delete": "Tem a certeza que deseja eliminar esta pesquisa?",
   "confirm_clear_all": "Tem a certeza que deseja eliminar todas as pesquisas guardadas? Esta ação não pode ser revertida.",
   "export_error": "Erro ao exportar pesquisas",
   "import_success": "Pesquisas importadas com sucesso!",
-  "import_error": "Erro ao importar pesquisas. Por favor, verifique o formato do ficheiro."
+  "import_error": "Erro ao importar pesquisas. Por favor, verifique o formato do ficheiro.",
+  "update_error": "Erro ao atualizar o nome da pesquisa. Por favor, tente novamente."
 }

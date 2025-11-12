@@ -73,14 +73,14 @@ export const saveSearch = (
   try {
     const searches = getSavedSearches();
     
-    // Generate ID from query string (including combinators)
-    const queryString = searchParameters.queries
-      .map((q, i) => (i === 0 ? q.valor : `${q.metadado} ${q.valor}`))
-      .join(" ");
+    // Check if a search with this ID (customLabel) already exists
+    const existingSearch = searches.find(s => s.id === customLabel);
+    if (existingSearch) {
+      throw new Error("A search with this name already exists. Please choose a different name.");
+    }
     
     const newSearch: SavedSearch = {
-      id: queryString,
-      customLabel,
+      id: customLabel,
       timestamp: new Date().toISOString(),
       searchParameters: toStorageFormat(searchParameters),
     };
@@ -105,13 +105,20 @@ export const saveSearch = (
 export const updateSearchLabel = (id: string, newLabel: string): void => {
   try {
     const searches = getSavedSearches();
+    
+    // Check if new label already exists (and it's not the same search)
+    const existingSearch = searches.find(s => s.id === newLabel && s.id !== id);
+    if (existingSearch) {
+      throw new Error("A search with this name already exists. Please choose a different name.");
+    }
+    
     const searchIndex = searches.findIndex((s) => s.id === id);
 
     if (searchIndex === -1) {
       throw new Error("Search not found");
     }
 
-    searches[searchIndex].customLabel = newLabel;
+    searches[searchIndex].id = newLabel;
 
     const storage: SavedSearchesStorage = {
       searches,

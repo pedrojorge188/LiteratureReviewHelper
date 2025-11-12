@@ -42,14 +42,16 @@ public class LiteratureReviewService implements ILiteratureReviewService {
                     return apiService.search(engine, allParams)
                         .map(searchResultDto -> Map.entry(engine, searchResultDto));})
                         .collectList()
-                        .map(listOfEntries -> {
+                        .map(listOfEngines -> {
+                            Map<Engines, Integer> articlesByEngine = new EnumMap<>(Engines.class);
                             List<Article> allArticles = new ArrayList<>();
                             int totalDropped = 0;
-                            for (var entry : listOfEntries) {
+                            for (var entry : listOfEngines) {
+                                articlesByEngine.put(entry.getKey(), entry.getValue().getArticles().size());
                                 allArticles.addAll(entry.getValue().getArticles());
                                 Map<String, Map<IResultFilter.Statistic, Integer>> stats = entry.getValue().getStatistics();
-                                if (stats != null && stats.containsKey("DuplicateResultFilter")) {
-                                    int duplicates = stats.get("DuplicateResultFilter").getOrDefault(IResultFilter.Statistic.DROPPED, 0);
+                                if (stats != null && stats.containsKey(DuplicateResultFilter.class.getSimpleName())) {
+                                    int duplicates = stats.get(DuplicateResultFilter.class.getSimpleName()).getOrDefault(IResultFilter.Statistic.DROPPED, 0);
                                     totalDropped += duplicates;
                                 }
                             }
@@ -58,16 +60,7 @@ public class LiteratureReviewService implements ILiteratureReviewService {
                             List<Article> filteredArticles = filter.filter(allArticles);
                             totalDropped += filter.getExecutionStatistics().get(IResultFilter.Statistic.DROPPED);
 
-                            Map<Engines, Integer> articlesByEngineAfterFilter = new EnumMap<>(Engines.class);
-                            for (Engines source : sources) {
-                                articlesByEngineAfterFilter.put(source, 0);
-                            }
-
-                            for (Article article : filteredArticles) {
-                                articlesByEngineAfterFilter.merge(article.source(), 1, Integer::sum);
-                            }
-
-                            return new SearchResponseDto(query, filteredArticles.size(), articlesByEngineAfterFilter, filteredArticles, totalDropped);
+                            return new SearchResponseDto(query, filteredArticles.size(), articlesByEngine, filteredArticles, totalDropped);
                         });
     }
 

@@ -157,5 +157,44 @@ class LiteratureReviewServiceTest {
                 .verifyComplete();
     }
 
+    @Test
+    void testPerformLiteratureSearch_WithDuplicateArticles_FiltersDuplicates() {
+        Map<String, String> params = new HashMap<>();
+        params.put("q", "duplicates");
+        params.put("source", "HAL,ACM");
 
+        Map<Engines, String> apiKeys = Map.of(
+                Engines.HAL, "key1",
+                Engines.ACM, "key2"
+        );
+
+        Article article1 = new Article("Duplicate Title", "Author 1", "http://url1", "Venue 1", List.of(), "", Engines.HAL);
+        Article article2 = new Article("Duplicate Title", "Author 2", "http://url2", "Venue 2", List.of(), "", Engines.ACM);
+        Article uniqueArticle = new Article("Unique Title", "Author 3", "http://url3", "Venue 3", List.of(), "", Engines.ACM);
+
+
+        List<Article> halArticles = List.of(article1);
+        List<Article> acmArticles = List.of(article2, uniqueArticle);
+
+        when(apiService.search(eq(Engines.HAL), any()))
+                .thenReturn(Mono.just(new SearchResultDto(halArticles, Map.of())));
+        when(apiService.search(eq(Engines.ACM), any()))
+                .thenReturn(Mono.just(new SearchResultDto(acmArticles, Map.of())));
+
+        Mono<SearchResponseDto> result = service.performLiteratureSearch(params, apiKeys);
+
+        StepVerifier.create(result)
+                .assertNext(resp -> {
+                    assertEquals("duplicates", resp.getQuery());
+                    assertEquals(2, resp.getTotalArticles());
+                    assertEquals(1, resp.getDuplicatedResultsRemoved());
+                    assertEquals(1, resp.getArticlesByEngine().get(Engines.HAL));
+                    assertEquals(2, resp.getArticlesByEngine().get(Engines.ACM));
+                    assertEquals(2, resp.getArticles().size());
+                })
+                .verifyComplete();
+
+        verify(apiService, times(1)).search(eq(Engines.HAL), any());
+        verify(apiService, times(1)).search(eq(Engines.ACM), any());
+    }
 }

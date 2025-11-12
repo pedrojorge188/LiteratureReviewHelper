@@ -32,14 +32,13 @@
   }
   &__content {
     max-width: 800px;
-    margin-left: 130px;
   }
-  
+
   .import-section {
     display: flex;
     justify-content: flex-end;
     margin-bottom: 1rem;
-    
+
     .import-btn-top {
       padding: 0.625rem 1.5rem;
       background: vars.$color-blue-1;
@@ -50,13 +49,13 @@
       font-weight: vars.$font-text--medium;
       cursor: pointer;
       transition: vars.$trans-all-3;
-      
+
       &:hover {
         background: darken(vars.$color-blue-1, 10%);
       }
     }
   }
-  
+
   h2 {
     font-size: 1.6rem;
     margin-bottom: 1rem;

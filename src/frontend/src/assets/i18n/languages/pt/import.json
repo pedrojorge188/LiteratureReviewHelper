@@ -1,0 +1,12 @@
+{
+  "title": "Importar",
+  "import_from_file": "Importar de Ficheiro",
+  "or_load_from_saved": "Ou carregar de pesquisas guardadas",
+  "no_searches": "Nenhuma pesquisa guardada encontrada.",
+  "load": "Carregar",
+  "delete": "Eliminar",
+  "close": "Fechar",
+  "confirm_delete": "Eliminar esta pesquisa?",
+  "import_success": "Pesquisas importadas com sucesso!",
+  "import_error": "Erro ao importar ficheiro. Por favor, verifique o formato do ficheiro."
+}

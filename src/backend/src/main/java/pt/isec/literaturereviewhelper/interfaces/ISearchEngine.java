@@ -1,8 +1,7 @@
 package pt.isec.literaturereviewhelper.interfaces;
 
-import pt.isec.literaturereviewhelper.models.Article;
+import pt.isec.literaturereviewhelper.dtos.SearchResultDto;
 
-import java.util.List;
 import java.util.Map;
 
 import reactor.core.publisher.Mono;
@@ -12,9 +11,9 @@ public interface ISearchEngine {
     /**
      * Performs a search with the given parameters
      * @param params Map of search parameters (query, pagination, API-specific params)
-     * @return Mono containing list of articles
+     * @return Mono containing search results (articles and statistics)
      */
-    Mono<List<Article>> search(Map<String, String> params);
+    Mono<SearchResultDto> search(Map<String, String> params);
 
     /**
      * Maps raw parameters to API parameters

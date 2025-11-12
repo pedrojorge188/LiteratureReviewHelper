@@ -3,6 +3,13 @@ package pt.isec.literaturereviewhelper.filters;
 import pt.isec.literaturereviewhelper.interfaces.IResultFilter;
 import pt.isec.literaturereviewhelper.models.Article;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import static pt.isec.literaturereviewhelper.commons.Params.AUTHOR;
 import static pt.isec.literaturereviewhelper.commons.Params.EXCLUDE_AUTHOR;
 import static pt.isec.literaturereviewhelper.commons.Params.EXCLUDE_TITLE;
@@ -13,18 +20,18 @@ import static pt.isec.literaturereviewhelper.commons.Params.VENUE;
 import static pt.isec.literaturereviewhelper.commons.Params.YEAR_END;
 import static pt.isec.literaturereviewhelper.commons.Params.YEAR_START;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
 /**
  * Simple filter chain that applies multiple filters in sequence.
  * Every filter must pass for the article to be accepted.
  */
 public final class ResultFilterChain implements IResultFilter {
     private final List<IResultFilter> filters;
+
+    public Map<String, Map<Statistic, Integer>> getAllExecutionStatistics() {
+        return allExecutionStatistics;
+    }
+
+    private final Map<String, Map<Statistic, Integer>> allExecutionStatistics = new HashMap<>();
     private int inputCount = Integer.MIN_VALUE;
     private int outputCount = Integer.MIN_VALUE;
     private int droppedCount = Integer.MIN_VALUE;
@@ -35,16 +42,15 @@ public final class ResultFilterChain implements IResultFilter {
 
     @Override
     public List<Article> filter(List<Article> articles) {
-        List<Article> filtered = articles;
+        List<Article> filteredArticles = articles;
         for (IResultFilter f : filters) {
-            filtered = f.filter(filtered);
+            filteredArticles = f.filter(filteredArticles);
+            allExecutionStatistics.put(f.getClass().getSimpleName(), f.getExecutionStatistics());
         }
-
         inputCount = articles.size();
-        outputCount = filtered.size();
+        outputCount = filteredArticles.size();
         droppedCount = inputCount - outputCount;
-
-        return filtered;
+        return filteredArticles;
     }
 
     @Override
@@ -59,6 +65,7 @@ public final class ResultFilterChain implements IResultFilter {
                 Statistic.DROPPED, droppedCount
         );
     }
+
 
     public static class Builder {
         private final List<IResultFilter> filters = new ArrayList<>();
@@ -109,6 +116,8 @@ public final class ResultFilterChain implements IResultFilter {
                 List<String> titles = List.of(params.get(EXCLUDE_TITLE).split(VALUE_DELIMITER));
                 filters.add(new TitleResultFilter(titles, true));
             }
+
+            filters.add(new DuplicateResultFilter());
 
             return this;
         }

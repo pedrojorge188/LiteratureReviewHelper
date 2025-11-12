@@ -6,6 +6,7 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import pt.isec.literaturereviewhelper.dtos.SearchResultDto;
 import pt.isec.literaturereviewhelper.interfaces.IResultMapper;
 import pt.isec.literaturereviewhelper.models.ACMResponse;
 import pt.isec.literaturereviewhelper.models.Article;
@@ -76,11 +77,15 @@ class ACMEngineTest {
         when(resultMapper.map(acmResponse)).thenReturn(mapped);
 
         // Act
-        Mono<List<Article>> result = acmEngine.search(params);
+        Mono<SearchResultDto> result = acmEngine.search(params);
 
         // Assert
         StepVerifier.create(result)
-                .expectNext(mapped)
+                .expectNextMatches(searchResult -> {
+                    assertEquals(mapped, searchResult.getArticles());
+                    assertEquals(1,searchResult.getStatistics().size()); // No filters applied in this test
+                    return true;
+                })
                 .verifyComplete();
 
         verify(resultMapper, times(1)).map(acmResponse);
@@ -138,11 +143,11 @@ class ACMEngineTest {
         when(responseSpec.bodyToMono(ACMResponse.class)).thenReturn(Mono.error(boom));
 
         // Act
-        Mono<List<Article>> result = acmEngine.search(Map.of("q", "test", "start", "0", "rows", "1"));
+        Mono<SearchResultDto> result = acmEngine.search(Map.of("q", "test", "start", "0", "rows", "1"));
 
         // Assert
         StepVerifier.create(result)
-                .expectNextMatches(list -> list.isEmpty()) // porque o erro foi engolido
+                .expectNextMatches(searchResult -> searchResult.getArticles().isEmpty()) // because the error was supressed
                 .verifyComplete();
     }
 }

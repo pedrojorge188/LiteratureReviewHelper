@@ -17,12 +17,12 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
+import pt.isec.literaturereviewhelper.dtos.SearchResultDto;
 import pt.isec.literaturereviewhelper.filters.ResultFilterChain;
 import pt.isec.literaturereviewhelper.interfaces.IResultMapper;
 import pt.isec.literaturereviewhelper.interfaces.ISearchEngine;
 import pt.isec.literaturereviewhelper.models.Article;
 
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -142,7 +142,7 @@ public abstract class EngineBase<R> implements ISearchEngine {
      * Subclasses can override if they need custom behavior.
      */
     @Override
-    public Mono<List<Article>> search(Map<String, String> params) {
+    public Mono<SearchResultDto> search(Map<String, String> params) {
         validateParameters(params);
 
         int startLimit = 10; // Default deep_search_limit
@@ -191,10 +191,8 @@ public abstract class EngineBase<R> implements ISearchEngine {
             log.error("Exception occurred, returning accumulated articles: {}", e.getMessage());
         }
 
-
         ResultFilterChain filterChain = new ResultFilterChain.Builder().fromParams(params).build();
         List<Article> filteredArticles = filterChain.filter(accumulatedArticles);
-
-        return Mono.just(filteredArticles);
+        return Mono.just(new SearchResultDto(filteredArticles, filterChain.getAllExecutionStatistics()));
     }
 }

@@ -17,6 +17,7 @@ export interface SearchResponseDto {
   query: string;
   totalArticles: number;
   articlesByEngine: Record<Engines, number>;
+  duplicatedResultsRemoved: number;
   articles: Artigo[];
 }
 

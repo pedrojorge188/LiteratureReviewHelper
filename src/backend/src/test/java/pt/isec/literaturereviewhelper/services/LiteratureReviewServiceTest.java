@@ -3,13 +3,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 
+import pt.isec.literaturereviewhelper.dtos.SearchResultDto;
 import pt.isec.literaturereviewhelper.dtos.SearchResponseDto;
 import pt.isec.literaturereviewhelper.interfaces.IApiService;
 import pt.isec.literaturereviewhelper.models.Article;
 import pt.isec.literaturereviewhelper.models.Engines;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -58,9 +58,9 @@ class LiteratureReviewServiceTest {
         );
 
         when(apiService.search(eq(Engines.HAL), any()))
-                .thenReturn(Mono.just(googleArticles));
+                .thenReturn(Mono.just(new SearchResultDto(googleArticles, Map.of())));
         when(apiService.search(eq(Engines.ACM), any()))
-                .thenReturn(Mono.just(redditArticles));
+                .thenReturn(Mono.just(new SearchResultDto(redditArticles, Map.of())));
 
 
         Mono<SearchResponseDto> result = service.performLiteratureSearch(params, apiKeys);
@@ -74,6 +74,7 @@ class LiteratureReviewServiceTest {
                     assertEquals(3, resp.getArticles().size());
                     assertTrue(resp.getArticlesByEngine().containsKey(Engines.HAL));
                     assertTrue(resp.getArticlesByEngine().containsKey(Engines.ACM));
+                    assertEquals(0, resp.getDuplicatedResultsRemoved());
                 })
                 .verifyComplete();
 
@@ -90,7 +91,7 @@ class LiteratureReviewServiceTest {
         Map<Engines, String> apiKeys = new EnumMap<>(Engines.class);
 
         for (Engines e : Engines.values()) {
-            when(apiService.search(eq(e), any())).thenReturn(Mono.just(List.of()));
+            when(apiService.search(eq(e), any())).thenReturn(Mono.just(new SearchResultDto(List.of(), Map.of())));
         }
 
 
@@ -139,7 +140,7 @@ class LiteratureReviewServiceTest {
         );
 
         when(apiService.search(eq(Engines.HAL), any()))
-                .thenReturn(Mono.just(googleArticles));
+                .thenReturn(Mono.just(new SearchResultDto(googleArticles, Map.of())));
 
 
         Mono<SearchResponseDto> result = service.performLiteratureSearch(params, apiKeys);
@@ -151,7 +152,49 @@ class LiteratureReviewServiceTest {
                     assertEquals(1, resp.getTotalArticles());
                     assertEquals(1, resp.getArticlesByEngine().get(Engines.HAL));
                     assertEquals(1, resp.getArticles().size());
+                    assertEquals(0, resp.getDuplicatedResultsRemoved());
                 })
                 .verifyComplete();
+    }
+
+    @Test
+    void testPerformLiteratureSearch_WithDuplicateArticles_FiltersDuplicates() {
+        Map<String, String> params = new HashMap<>();
+        params.put("q", "duplicates");
+        params.put("source", "HAL,ACM");
+
+        Map<Engines, String> apiKeys = Map.of(
+                Engines.HAL, "key1",
+                Engines.ACM, "key2"
+        );
+
+        Article article1 = new Article("Duplicate Title", "Author 1", "http://url1", "Venue 1", List.of(), "", Engines.HAL);
+        Article article2 = new Article("Duplicate Title", "Author 2", "http://url2", "Venue 2", List.of(), "", Engines.ACM);
+        Article uniqueArticle = new Article("Unique Title", "Author 3", "http://url3", "Venue 3", List.of(), "", Engines.ACM);
+
+
+        List<Article> halArticles = List.of(article1);
+        List<Article> acmArticles = List.of(article2, uniqueArticle);
+
+        when(apiService.search(eq(Engines.HAL), any()))
+                .thenReturn(Mono.just(new SearchResultDto(halArticles, Map.of())));
+        when(apiService.search(eq(Engines.ACM), any()))
+                .thenReturn(Mono.just(new SearchResultDto(acmArticles, Map.of())));
+
+        Mono<SearchResponseDto> result = service.performLiteratureSearch(params, apiKeys);
+
+        StepVerifier.create(result)
+                .assertNext(resp -> {
+                    assertEquals("duplicates", resp.getQuery());
+                    assertEquals(2, resp.getTotalArticles());
+                    assertEquals(1, resp.getDuplicatedResultsRemoved());
+                    assertEquals(1, resp.getArticlesByEngine().get(Engines.HAL));
+                    assertEquals(2, resp.getArticlesByEngine().get(Engines.ACM));
+                    assertEquals(2, resp.getArticles().size());
+                })
+                .verifyComplete();
+
+        verify(apiService, times(1)).search(eq(Engines.HAL), any());
+        verify(apiService, times(1)).search(eq(Engines.ACM), any());
     }
 }

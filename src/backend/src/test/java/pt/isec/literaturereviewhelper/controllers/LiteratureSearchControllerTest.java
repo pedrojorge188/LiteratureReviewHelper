@@ -63,8 +63,8 @@ class LiteratureSearchControllerTest {
                 "AI",
                 8,
                 articlesByEngine,
-                articles
-        );
+                articles,
+                0);
 
         try (MockedStatic<RequestHeaderUtils> mocked = mockStatic(RequestHeaderUtils.class)) {
             mocked.when(() -> RequestHeaderUtils.parseApiKeysHeader(apiKeysHeader))
@@ -104,7 +104,8 @@ class LiteratureSearchControllerTest {
                 "machine learning",
                 1,
                 articlesByEngine,
-                articles
+                articles,
+                0
         );
 
         try (MockedStatic<RequestHeaderUtils> mocked = mockStatic(RequestHeaderUtils.class)) {

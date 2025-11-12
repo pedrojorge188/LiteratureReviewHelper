@@ -1,0 +1,59 @@
+@use "../utilities" as *;
+@use "../variables" as vars;
+
+.pagina-bibliotecas {
+  width: 100%;
+  padding: 1.5rem;
+  color: #444;
+  position: relative;
+  opacity: 100%;
+  pointer-events: all;
+  .biblioteca-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+
+    button {
+      background: vars.$color-gray-2;
+      color: vars.$color-white;
+      border: none;
+      padding: 0.4rem 0.8rem;
+      cursor: pointer;
+      border-radius: 3px;
+      transition: 0.2s;
+
+      &:hover {
+        color: vars.$color-gray-2;
+        background-color: vars.$color-white;
+      }
+    }
+  }
+
+  .bibliotecas-lista {
+    list-style: none;
+    padding: 0;
+    margin-top: 0.5rem;
+    &-titulo {
+      margin-top: 2rem;
+    }
+
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid vars.$color-white-3;
+      padding: 0.3rem 0;
+
+      .remove-btn {
+        background: none;
+        border: none;
+        color: vars.$color-red-2;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}

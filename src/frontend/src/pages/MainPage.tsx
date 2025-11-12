@@ -25,6 +25,7 @@ export const MainPage = () => {
   const [showList, setShowList] = useState(false);
   const [response, setResponse] = useState<SearchResponseDto | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState(false);
 
   const normalizarQueries = (lista: Query[]): Query[] => {
     return lista.map((q, i) => {
@@ -66,6 +67,7 @@ export const MainPage = () => {
     if (bibliotecaSelecionada && !bibliotecas.includes(bibliotecaSelecionada)) {
       setBibliotecas([...bibliotecas, bibliotecaSelecionada]);
       setBibliotecaSelecionada("");
+      setApiError(false);
     }
   };
 
@@ -85,16 +87,27 @@ export const MainPage = () => {
   };
 
   const pesquisar = async () => {
+    // Validate that at least one API is selected
+    if (bibliotecas.length === 0) {
+      setApiError(true);
+      return;
+    }
+
+    setApiError(false);
     setIsLoading(true);
     const queryString = queries
       .map((q, i) => (i === 0 ? q.valor : `${q.metadado} ${q.valor}`))
       .join(" ");
+
+    // Build the source parameter from selected bibliotecas
+    const sourceParam = bibliotecas.join(",");
 
     try {
       const resultAction = await dispatch(
         getArticles({
           query: queryString,
           apiList: "SPRINGER=0c2c20ce9ca00510e69e0bd7ffba864e",
+          source: sourceParam,
         })
       );
 
@@ -277,9 +290,9 @@ export const MainPage = () => {
                 onChange={(e) => setBibliotecaSelecionada(e.target.value)}
               >
                 <option value="">{t("home:selecionar_biblioteca")}</option>
-                <option value="Scopus">Scopus</option>
                 <option value="ACM">ACM</option>
-                <option value="DBLP">DBLP</option>
+                <option value="HAL">HAL</option>
+                <option value="SPRINGER">Springer</option>
               </select>
               <button type="button" onClick={adicionarBiblioteca}>
                 {t("home:botao_adicionar")}
@@ -303,6 +316,11 @@ export const MainPage = () => {
                 </li>
               ))}
             </ul>
+            {apiError && bibliotecas.length === 0 && (
+              <p style={{ color: 'red', marginTop: '10px', fontSize: '14px' }}>
+                {t("home:erro_selecionar_api")}
+              </p>
+            )}
           </div>
 
           {/* Botões principais */}

@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { getArticles } from "../store/ducks/home/thunks";
 import { useDispatch } from "react-redux";
 import { SearchResponseDto } from "./types";
 import { ArticlesList } from "./ArticlesList";
 import { LoadingCircle } from "../components/shared";
+import { ChipInput } from "../components/shared/ChipInput";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
 import { SaveDialog } from "../components/SaveDialog";
 import { ImportDialog } from "../components/ImportDialog";
 import { saveSearch } from "../utils/localStorage";
@@ -21,8 +24,12 @@ export const MainPage = () => {
   const [queries, setQueries] = useState<Query[]>([{ valor: "" }]);
   const [anoDe, setAnoDe] = useState<string>("");
   const [anoAte, setAnoAte] = useState<string>("");
-  const [excluirVenues, setExcluirVenues] = useState<string>("");
-  const [excluirTitulos, setExcluirTitulos] = useState<string>("");
+  const [authors, setAuthors] = useState<string[]>([]);
+  const [venues, setVenues] = useState<string[]>([]);
+  const [titles, setTitles] = useState<string[]>([]);
+  const [excludeAuthors, setExcludeAuthors] = useState<string[]>([]);
+  const [excludeVenues, setExcludeVenues] = useState<string[]>([]);
+  const [excludeTitles, setExcludeTitles] = useState<string[]>([]);
   const [bibliotecaSelecionada, setBibliotecaSelecionada] =
     useState<string>("");
   const [bibliotecas, setBibliotecas] = useState<string[]>([]);
@@ -32,6 +39,9 @@ export const MainPage = () => {
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [saveError, setSaveError] = useState<string>("");
+
+  const toParam = (values: string[]) =>
+    values.length ? values.join(";") : undefined;
 
   const normalizarQueries = (lista: Query[]): Query[] => {
     return lista.map((q, i) => {
@@ -81,72 +91,91 @@ export const MainPage = () => {
   };
 
   const guardar = () => {
-    // Open the save dialog instead of just logging
-    setSaveError("");
-    setIsSaveDialogOpen(true);
-  };
-
-  const handleSaveSearch = (customLabel: string) => {
-    try {
-      const searchParameters = {
-        queries,
-        anoDe,
-        anoAte,
-        excluirVenues,
-        excluirTitulos,
-        bibliotecas,
-      };
-
-      saveSearch(customLabel, searchParameters);
-      setIsSaveDialogOpen(false);
+      // Open the save dialog instead of just logging
       setSaveError("");
-    } catch (error) {
-      console.error("Error saving search:", error);
-      // Set error message to be displayed in the dialog
-      if (error instanceof Error) {
-        setSaveError(error.message);
-      } else {
-        setSaveError(t("home:search_save_error") || "Error saving search. Please try again.");
-      }
-    }
-  };
+      setIsSaveDialogOpen(true);
+  }
 
-  const handleImport = () => {
-    setIsImportDialogOpen(true);
-  };
+    const handleSaveSearch = (customLabel: string) => {
+        try {
+            const searchParameters = {
+                queries,
+                anoDe,
+                anoAte,
+                authors,
+                venues,
+                titles,
+                excludeAuthors,
+                excludeVenues,
+                excludeTitles,
+                bibliotecas,
+            };
 
-  const handleLoadSearch = (search: SavedSearch) => {
-    const params = search.searchParameters;
-    // Convert from English storage format to Portuguese UI format
-    const convertedQueries = params.queries.map((q, i) => {
-      if (i === 0) {
-        return { valor: q.value };
-      }
-      return { valor: q.value, metadado: q.operator };
-    });
-    
-    setQueries(convertedQueries);
-    setAnoDe(params.yearFrom || "");
-    setAnoAte(params.yearTo || "");
-    setExcluirVenues(params.excludeVenues || "");
-    setExcluirTitulos(params.excludeTitles || "");
-    setBibliotecas(params.libraries || []);
-    setIsImportDialogOpen(false);
-  };
+            saveSearch(customLabel, searchParameters);
+            setIsSaveDialogOpen(false);
+            setSaveError("");
+        } catch (error) {
+            console.error("Error saving search:", error);
+            // Set error message to be displayed in the dialog
+            if (error instanceof Error) {
+                setSaveError(error.message);
+            } else {
+                setSaveError(t("home:search_save_error") || "Error saving search. Please try again.");
+            }
+        }
+    };
+
+    const handleImport = () => {
+        setIsImportDialogOpen(true);
+    };
+
+    const handleLoadSearch = (search: SavedSearch) => {
+        const params = search.searchParameters;
+        // Convert from English storage format to Portuguese UI format
+        const convertedQueries = params.queries.map((q, i) => {
+            if (i === 0) {
+                return { valor: q.value };
+            }
+            return { valor: q.value, metadado: q.operator };
+        });
+
+        setQueries(convertedQueries);
+        setAnoDe(params.yearFrom || "");
+        setAnoAte(params.yearTo || "");
+        setAuthors(params.authors.split(";") || []);
+        setVenues(params.venues.split(";") || []);
+        setTitles(params.titles.split(";") || []);
+        setExcludeAuthors(params.excludeAuthors.split(";") || []);
+        setExcludeVenues(params.excludeVenues.split(";") || []);
+        setExcludeTitles(params.excludeTitles.split(";") || []);
+        setBibliotecas(params.libraries || []);
+        setIsImportDialogOpen(false);
+    };
 
   const pesquisar = async () => {
     setIsLoading(true);
-    const queryString = queries
-      .map((q, i) => (i === 0 ? q.valor : `${q.metadado} ${q.valor}`))
-      .join(" ");
+      const baseQuery = queries
+          .map((q, i) => (i === 0 ? q.valor : `${q.metadado} ${q.valor}`))
+          .join(" ")
+          .trim();
+
+      const payload: SearchRequestPayload = {
+          query: baseQuery || undefined,
+          apiList: "SPRINGER=0c2c20ce9ca00510e69e0bd7ffba864e",
+          author: toParam(authors),
+          venue: toParam(venues),
+          title: toParam(titles),
+
+          exclude_author: toParam(excludeAuthors),
+          exclude_venue: toParam(excludeVenues),
+          exclude_title: toParam(excludeTitles),
+
+          year_start: anoDe || undefined,
+          year_end: anoAte || undefined,
+      };
 
     try {
-      const resultAction = await dispatch(
-        getArticles({
-          query: queryString,
-          apiList: "SPRINGER=0c2c20ce9ca00510e69e0bd7ffba864e",
-        })
-      );
+        const resultAction = await dispatch(getArticles(payload));
 
       if (getArticles.fulfilled.match(resultAction)) {
         setResponse(resultAction.payload as SearchResponseDto);
@@ -170,8 +199,12 @@ export const MainPage = () => {
         setQueries(params.queries || [{ valor: "" }]);
         setAnoDe(params.anoDe || "");
         setAnoAte(params.anoAte || "");
-        setExcluirVenues(params.excluirVenues || "");
-        setExcluirTitulos(params.excluirTitulos || "");
+        setAuthors(params.authors || "");
+        setVenues(params.venues || "");
+        setTitles(params.titles || "");
+        setExcludeAuthors(params.authors || "");
+        setExcludeVenues(params.excluirVenues || "");
+        setExcludeTitles(params.excluirTitulos || "");
         setBibliotecas(params.bibliotecas || []);
         sessionStorage.removeItem("loadedSearch");
       } catch (error) {
@@ -277,13 +310,21 @@ export const MainPage = () => {
                 </div>
               </div>
             ))}
-            
-            {/* Import Button below queries */}
-            <div className="import-button-container">
-              <button type="button" onClick={handleImport}>
-                {t("home:importar") || "Import"}
+            <div className="container-bts">
+              <button type="button" onClick={() => { }}>
+                Importar Query
+              </button>
+              <button type="button" onClick={() => { }}>
+                Importar Ficheiro
               </button>
             </div>
+
+              {/* Import Button below queries */}
+              <div className="import-button-container">
+                  <button type="button" onClick={handleImport}>
+                      {t("home:importar") || "Import"}
+                  </button>
+              </div>
           </div>
 
           {/* Ano de publicação */}
@@ -313,24 +354,64 @@ export const MainPage = () => {
             </div>
           </div>
 
-          {/* Excluir venues */}
+          {/* Filtros por ano, venue e autor */}
           <div className="section">
-            <label>{t("home:label_excluir_venues")}</label>
-            <textarea
-              value={excluirVenues}
-              onChange={(e) => setExcluirVenues(e.target.value)}
-              placeholder={t("home:placeholder_excluir_venues") ?? ""}
-            ></textarea>
-          </div>
+            <Typography variant="body1" sx={{ mb: 1 }}>
+              <Trans
+                i18nKey="home:hint_press_enter"
+                components={{ bold: <b /> }}
+              />
+            </Typography>
 
-          {/* Excluir títulos */}
-          <div className="section">
-            <label>{t("home:label_excluir_titulos")}</label>
-            <textarea
-              value={excluirTitulos}
-              onChange={(e) => setExcluirTitulos(e.target.value)}
-              placeholder={t("home:placeholder_excluir_titulos") ?? ""}
-            ></textarea>
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                gap: 2,
+              }}
+            >
+              {/* Row 1: Authors */}
+              <ChipInput
+                label={t("home:label_authors")}
+                placeholder={t("home:placeholder_authors")}
+                values={authors}
+                setValues={setAuthors}
+              />
+              <ChipInput
+                label={t("home:label_exclude_authors")}
+                placeholder={t("home:placeholder_exclude_authors")}
+                values={excludeAuthors}
+                setValues={setExcludeAuthors}
+              />
+
+              {/* Row 2: Venues */}
+              <ChipInput
+                label={t("home:label_venues")}
+                placeholder={t("home:placeholder_venues")}
+                values={venues}
+                setValues={setVenues}
+              />
+              <ChipInput
+                label={t("home:label_exclude_venues")}
+                placeholder={t("home:placeholder_exclude_venues")}
+                values={excludeVenues}
+                setValues={setExcludeVenues}
+              />
+
+              {/* Row 3: Titles */}
+              <ChipInput
+                label={t("home:label_titles")}
+                placeholder={t("home:placeholder_titles")}
+                values={titles}
+                setValues={setTitles}
+              />
+              <ChipInput
+                label={t("home:label_exclude_titles")}
+                placeholder={t("home:placeholder_exclude_titles")}
+                values={excludeTitles}
+                setValues={setExcludeTitles}
+              />
+            </Box>
           </div>
 
           {/* Bibliotecas */}

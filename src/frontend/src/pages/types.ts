@@ -21,6 +21,26 @@ export interface SearchResponseDto {
   articles: Artigo[];
 }
 
+export interface SearchRequestPayload {
+  query: string | undefined;
+  apiList: string;
+
+  author?: string;
+  venue?: string;
+  title?: string;
+
+  exclude_author?: string;
+  exclude_venue?: string;
+  exclude_title?: string;
+
+  year_start?: string;
+  year_end?: string;
+
+  start?: number;
+  rows?: number;
+  wt?: string;
+}
+
 // Saved Search Types for localStorage
 export interface Query {
   value: string;

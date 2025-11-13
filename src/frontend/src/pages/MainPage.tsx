@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { getArticles } from "../store/ducks/home/thunks";
 import { useDispatch } from "react-redux";
-import { SearchResponseDto } from "./types";
+import { SearchRequestPayload, SearchResponseDto } from "./types";
 import { ArticlesList } from "./ArticlesList";
 import { LoadingCircle } from "../components/shared";
 import { ChipInput } from "../components/shared/ChipInput";
@@ -154,28 +154,29 @@ export const MainPage = () => {
 
   const pesquisar = async () => {
     setIsLoading(true);
-      const baseQuery = queries
-          .map((q, i) => (i === 0 ? q.valor : `${q.metadado} ${q.valor}`))
-          .join(" ")
-          .trim();
 
-      const payload: SearchRequestPayload = {
-          query: baseQuery || undefined,
-          apiList: "SPRINGER=0c2c20ce9ca00510e69e0bd7ffba864e",
-          author: toParam(authors),
-          venue: toParam(venues),
-          title: toParam(titles),
+    const baseQuery = queries
+      .map((q, i) => (i === 0 ? q.valor : `${q.metadado} ${q.valor}`))
+      .join(" ")
+      .trim();
 
-          exclude_author: toParam(excludeAuthors),
-          exclude_venue: toParam(excludeVenues),
-          exclude_title: toParam(excludeTitles),
+    const payload: SearchRequestPayload = {
+      query: baseQuery || undefined,
+      apiList: "SPRINGER=0c2c20ce9ca00510e69e0bd7ffba864e",
+      author: toParam(authors),
+      venue: toParam(venues),
+      title: toParam(titles),
 
-          year_start: anoDe || undefined,
-          year_end: anoAte || undefined,
-      };
+      exclude_author: toParam(excludeAuthors),
+      exclude_venue: toParam(excludeVenues),
+      exclude_title: toParam(excludeTitles),
+
+      year_start: anoDe || undefined,
+      year_end: anoAte || undefined,
+    };
 
     try {
-        const resultAction = await dispatch(getArticles(payload));
+      const resultAction = await dispatch(getArticles(payload));
 
       if (getArticles.fulfilled.match(resultAction)) {
         setResponse(resultAction.payload as SearchResponseDto);
@@ -416,13 +417,13 @@ export const MainPage = () => {
 
           {/* Bibliotecas */}
           <div className="section">
-            <label>{t("home:label_bibliotecas")}</label>
+            <label>{t("home:label_libraries")}</label>
             <div className="biblioteca-row">
               <select
                 value={bibliotecaSelecionada}
                 onChange={(e) => setBibliotecaSelecionada(e.target.value)}
               >
-                <option value="">{t("home:selecionar_biblioteca")}</option>
+                <option value="">{t("home:select_library")}</option>
                 <option value="Scopus">Scopus</option>
                 <option value="ACM">ACM</option>
                 <option value="DBLP">DBLP</option>

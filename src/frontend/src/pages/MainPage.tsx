@@ -309,14 +309,6 @@ export const MainPage = () => {
                 </div>
               </div>
             ))}
-            <div className="container-bts">
-              <button type="button" onClick={() => { }}>
-                Importar Query
-              </button>
-              <button type="button" onClick={() => { }}>
-                Importar Ficheiro
-              </button>
-            </div>
 
             {/* Import Button below queries */}
             <div className="import-button-container">

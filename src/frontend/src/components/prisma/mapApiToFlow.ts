@@ -1,3 +1,5 @@
+import { Engines, SearchResponseDto } from "../../pages/types";
+
 export const resolveFilterName = (name: string) => {
     switch (name) {
         case "YearResultFilter":
@@ -13,16 +15,16 @@ export const resolveFilterName = (name: string) => {
     }
 }
 
-export const mapApiToFlow = (data) => {
+export const mapApiToFlow = (data: SearchResponseDto) => {
     if (!data) return { nodes: [], edges: [] };
 
-    const nodes = [];
-    const edges = [];
+    const nodes: any = [];
+    const edges: any = [];
     let idCounter = 1;
 
     const engines = Object.entries(data.articlesByEngine || {});
-    const rawEngineTotals = {};
-    const rawEngineDropped = {};
+    const rawEngineTotals: Record<string, number> = {};
+    const rawEngineDropped: Record<string, number> = {};
 
     Object.entries(data.filterImpactByEngine || {}).forEach(([engine, filters]) => {
         const firstFilter = Object.values(filters)[0];
@@ -59,7 +61,7 @@ export const mapApiToFlow = (data) => {
     const totalWidth = (engines.length - 1) * engineSpacing;
     const startX = 400 - totalWidth / 2;
 
-    const lastFilterNodes = [];
+    const lastFilterNodes: any[] = [];
 
     engines.forEach(([engine, count], engineIdx) => {
         const x = startX + engineIdx * engineSpacing;
@@ -75,7 +77,7 @@ export const mapApiToFlow = (data) => {
 
         edges.push({ id: `e${queryNodeId}-${engineNodeId}`, source: queryNodeId, target: engineNodeId, animated: true, style: { strokeWidth: 3, strokeDasharray: '5,5', color: 'black' } });
 
-        const filters = data.filterImpactByEngine?.[engine];
+        const filters = data.filterImpactByEngine?.[engine as Engines];
 
         if (filters) {
             const filterEntries = Object.entries(filters);

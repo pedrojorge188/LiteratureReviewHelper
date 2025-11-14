@@ -5,6 +5,8 @@ import {
   Background,
   BackgroundVariant,
   Controls,
+  Edge,
+  Node,
   ReactFlow,
 } from "@xyflow/react";
 import { useCallback, useMemo, useRef, useState } from "react";
@@ -12,8 +14,9 @@ import { EditableNode } from "./EditableNode";
 import { mapApiToFlow } from "./mapApiToFlow";
 
 import "@xyflow/react/dist/style.css";
+import { SearchResponseDto } from "../../pages/types";
 
-export const PrismaEditor = ({ apiData }) => {
+export const PrismaEditor = (apiData: SearchResponseDto) => {
   const { nodes: initialNodes, edges: initialEdges } = useMemo(
     () => mapApiToFlow(apiData),
     [apiData]
@@ -24,13 +27,13 @@ export const PrismaEditor = ({ apiData }) => {
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
 
-  const handleNodeDelete = useCallback((id) => {
-    setNodes((nds) => nds.filter((n) => n.id !== id));
-    setEdges((eds) => eds.filter((e) => e.source !== id && e.target !== id));
+  const handleNodeDelete = useCallback((id: string) => {
+    setNodes((nds: any[]) => nds.filter((n: { id: string; }) => n.id !== id));
+    setEdges((eds: any[]) => eds.filter((e: { source: string; target: string; }) => e.source !== id && e.target !== id));
   }, []);
 
-  const handleNodeLabelChange = useCallback((id, value) => {
-    setNodes((nds) =>
+  const handleNodeLabelChange = useCallback((id: string, value: string) => {
+    setNodes((nds: any[]) =>
       nds.map((n) =>
         n.id === id
           ? {
@@ -47,8 +50,8 @@ export const PrismaEditor = ({ apiData }) => {
     );
   }, []);
 
-    const handleNodeTitleChange = useCallback((id, value) => {
-    setNodes((nds) =>
+    const handleNodeTitleChange = useCallback((id: string, value: string) => {
+    setNodes((nds: any[]) =>
       nds.map((n) =>
         n.id === id
           ? {
@@ -66,7 +69,7 @@ export const PrismaEditor = ({ apiData }) => {
   }, []);
 
   const handleAddNode = useCallback(() => {
-    setNodes((nds) => {
+    setNodes((nds: any) => {
       const newId = (nds.length + 1).toString();
       const newNode = {
         id: newId,
@@ -85,12 +88,12 @@ export const PrismaEditor = ({ apiData }) => {
     });
   }, [handleNodeDelete, handleNodeLabelChange]);
 
-  const onNodesChange = useCallback((changes) => setNodes((ns) => applyNodeChanges(changes, ns)), []);
-  const onEdgesChange = useCallback((changes) => setEdges((es) => applyEdgeChanges(changes, es)), [] );
-  const onConnect = useCallback((params) => setEdges((es) => addEdge(params, es)), [] );
+  const onNodesChange = useCallback((changes: any) => setNodes((ns: Node[]) => applyNodeChanges(changes, ns)), []);
+  const onEdgesChange = useCallback((changes: any) => setEdges((es: Edge[]) => applyEdgeChanges(changes, es)), [] );
+  const onConnect = useCallback((params: any) => setEdges((es: any[]) => addEdge(params, es)), [] );
 
   const nodesWithHandlers = useMemo(() => {
-    return nodes.map((n) => ({
+    return nodes.map((n: { data: any; }) => ({
       ...n,
       data: {
         ...n.data,

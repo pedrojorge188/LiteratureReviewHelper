@@ -1,8 +1,9 @@
 import React, { useState, useMemo } from "react";
 import ReactECharts from "echarts-for-react";
 import { resolveFilterName } from "./mapApiToFlow";
+import { Artigo, Engines, SearchResponseDto, Statistic } from "../../pages/types";
 
-export const PrismaCharts = ({ data }) => {
+export const PrismaCharts = (data: SearchResponseDto) => {
   const [property, setProperty] = useState("venueType");
   const [selectedFilter, setSelectedFilter] = useState("");
 
@@ -12,28 +13,29 @@ export const PrismaCharts = ({ data }) => {
   const finalCounts = Object.values(safeData.articlesByEngine || {});
 
   const rawCounts = engines.map(engine => {
-    const filters = safeData.filterImpactByEngine?.[engine];
+    const filters = safeData.filterImpactByEngine?.[engine as Engines];
     if (!filters) return 0;
-    const first = Object.values(filters)[0];
-    return first?.INPUT ?? 0;
+    const firstFilter = Object.values(filters)[0] as Record<Statistic, number> | undefined;
+
+    return firstFilter?.INPUT ?? 0;
   });
 
   const pipelineSteps = [
-    { name: "Total Raw Articles", value: rawCounts.reduce((a, b) => a + b, 0) },
-    { name: "Final Filtered Articles", value: safeData.totalArticles ?? 0 }
+      { name: "Total Raw Articles", value: rawCounts.reduce((a, b) => a + b, 0) },
+      { name: "Final Filtered Articles", value: safeData.totalArticles ?? 0 }
   ];
 
   const availableFilters = useMemo(() => {
-    const set = new Set();
+    const set = new Set<string>();
     Object.values(safeData.filterImpactByEngine || {}).forEach(engineFilters => {
-      Object.keys(engineFilters || {}).forEach(f => set.add(f));
+        Object.keys(engineFilters || {}).forEach(f => set.add(f));
     });
     return Array.from(set);
   }, [safeData.filterImpactByEngine]);
 
   React.useEffect(() => {
     if (availableFilters.length > 0 && !availableFilters.includes(selectedFilter)) {
-      setSelectedFilter(availableFilters[0]);
+        setSelectedFilter(availableFilters[0]);
     }
   }, [availableFilters, selectedFilter]);
 
@@ -44,9 +46,10 @@ export const PrismaCharts = ({ data }) => {
   ];
 
   const propertyCounts = useMemo(() => {
-    const map = {};
+    const map: Record<string, number> = {};
     (safeData.articles || []).forEach(article => {
-      let value = article[property];
+      const keyProp = property as keyof Artigo;
+      let value = article[keyProp];
 
       if (Array.isArray(value)) {
         value.forEach(v => {
@@ -69,13 +72,13 @@ export const PrismaCharts = ({ data }) => {
 
   const buildFilterImpactOption = (filterName: string) => {
     const inputData = engines.map(
-      (engine) => safeData.filterImpactByEngine?.[engine]?.[filterName]?.INPUT ?? 0
+      (engine) => safeData.filterImpactByEngine?.[engine as Engines]?.[filterName]?.INPUT ?? 0
     );
     const outputData = engines.map(
-      (engine) => safeData.filterImpactByEngine?.[engine]?.[filterName]?.OUTPUT ?? 0
+      (engine) => safeData.filterImpactByEngine?.[engine as Engines]?.[filterName]?.OUTPUT ?? 0
     );
     const droppedData = engines.map(
-      (engine) => safeData.filterImpactByEngine?.[engine]?.[filterName]?.DROPPED ?? 0
+      (engine) => safeData.filterImpactByEngine?.[engine as Engines]?.[filterName]?.DROPPED ?? 0
     );
 
     return {
@@ -97,7 +100,7 @@ export const PrismaCharts = ({ data }) => {
       yAxis: {
         type: "value",
         minInterval: 1,
-        axisLabel: { formatter: (v) => Math.floor(v) },
+        axisLabel: { formatter: (v: number) => Math.floor(v) },
       },
       series: [
         { name: "Received", type: "bar", data: inputData, itemStyle: { color: "#888" } },
@@ -118,7 +121,7 @@ export const PrismaCharts = ({ data }) => {
           option={{
             tooltip: {
               trigger: "item",
-              formatter: params => {
+              formatter: (params: any) => {
                 const pct = ((params.data.value / pipelineSteps[0].value) * 100 || 0).toFixed(1);
                 return `${params.name}<br/>${params.value} articles<br/>(${pct}% retained)`;
               }
@@ -141,13 +144,13 @@ export const PrismaCharts = ({ data }) => {
                   borderColor: "#333",
                   borderWidth: 1,
                   opacity: 0.85,
-                  color: params => (params.dataIndex === 0 ? "#999" : "#555")
+                  color: (params: any) => (params.dataIndex === 0 ? "#999" : "#555")
                 },
                 label: {
                   show: true,
                   color: "#111",
                   fontSize: 14,
-                  formatter: params => {
+                  formatter: (params: any) => {
                     const pct = ((params.value / pipelineSteps[0].value) * 100 || 0).toFixed(1);
                     return `${params.name}\n${params.value} (${pct}%)`;
                   }
@@ -170,7 +173,7 @@ export const PrismaCharts = ({ data }) => {
             option={{
               tooltip: {},
               xAxis: { type: "category", data: engines },
-              yAxis: { type: "value", minInterval: 1, axisLabel: { formatter: v => Math.floor(v) } },
+              yAxis: { type: "value", minInterval: 1, axisLabel: { formatter: (v: number) => Math.floor(v) } },
               series: [{ type: "bar", data: finalCounts, itemStyle: { color: "#444" } }]
             }}
           />
@@ -185,7 +188,7 @@ export const PrismaCharts = ({ data }) => {
               tooltip: { trigger: "axis" },
               legend: { data: ["Raw", "Final"] },
               xAxis: { type: "category", data: engines },
-              yAxis: { type: "value", minInterval: 1, axisLabel: { formatter: v => Math.floor(v) } },
+              yAxis: { type: "value", minInterval: 1, axisLabel: { formatter: (v: number) => Math.floor(v) } },
               series: [
                 { name: "Raw", type: "bar", data: rawCounts, itemStyle: { color: "#777" } },
                 { name: "Final", type: "bar", data: finalCounts, itemStyle: { color: "#333" } }
@@ -215,7 +218,7 @@ export const PrismaCharts = ({ data }) => {
           option={{
             tooltip: { trigger: "axis" },
             xAxis: { type: "category", data: propertyCounts.labels, axisLabel: { rotate: 40 } },
-            yAxis: { type: "value", minInterval: 1, axisLabel: { formatter: v => Math.floor(v) } },
+            yAxis: { type: "value", minInterval: 1, axisLabel: { formatter: (v: number) => Math.floor(v) } },
             series: [{ type: "bar", data: propertyCounts.values, itemStyle: { color: "#555" } }]
           }}
         />

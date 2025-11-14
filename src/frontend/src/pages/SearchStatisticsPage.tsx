@@ -6,6 +6,7 @@ import { PrismaEditor } from "../components/prisma/PrismaEditor";
 import { useState } from 'react';
 import { PrismaReport } from '../components/prisma/PrismaReport';
 import { PrismaCharts } from '../components/prisma/PrismaCharts';
+import { SearchResponseDto } from './types';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -35,7 +36,7 @@ function TabPanel(props: TabPanelProps) {
 }
 
 
-const apiData = {
+const apiData: SearchResponseDto = {
   query: "IA",
   totalArticles: 45,
   duplicatedResultsRemoved: 262,
@@ -43,8 +44,7 @@ const apiData = {
   articlesByEngine: {
     ACM: 4,
     HAL: 16,
-    IEEE: 12,
-    Springer: 13,
+    SPRINGER: 13,
   },
 
   filterImpactByEngine: {
@@ -56,11 +56,7 @@ const apiData = {
       YearResultFilter: { INPUT: 200, OUTPUT: 107, DROPPED: 93 },
       DuplicateResultFilter: { INPUT: 107, OUTPUT: 16, DROPPED: 91 },
     },
-    IEEE: {
-      YearResultFilter: { INPUT: 100, OUTPUT: 55, DROPPED: 45 },
-      DuplicateResultFilter: { INPUT: 55, OUTPUT: 12, DROPPED: 43 },
-    },
-    Springer: {
+    SPRINGER: {
       YearResultFilter: { INPUT: 180, OUTPUT: 130, DROPPED: 50 },
       DuplicateResultFilter: { INPUT: 130, OUTPUT: 13, DROPPED: 117 },
     },
@@ -71,7 +67,7 @@ const apiData = {
     /* ---------- ACM (4 articles) ---------- */
     {
       title: "A Survey on Machine Learning Techniques for Edge Computing",
-      publicationYear: "2023",
+      publicationYear: 2023,
       venue: "ACM Computing Surveys",
       venueType: "Journal",
       authors: ["David Miller", "Sofia Alvarez"],
@@ -80,7 +76,7 @@ const apiData = {
     },
     {
       title: "Improving Neural Ranking Models with Contrastive Feedback",
-      publicationYear: "2022",
+      publicationYear: 2022,
       venue:
         "ACM SIGIR Conference on Research and Development in Information Retrieval",
       venueType: "Conference",
@@ -91,7 +87,7 @@ const apiData = {
     {
       title:
         "Federated Learning Approaches for Privacy-Preserving NLP",
-      publicationYear: "2021",
+      publicationYear: 2021,
       venue: "ACM Transactions on Information Systems",
       venueType: "Journal",
       authors: ["Elena Petrova", "Michael O'Neill"],
@@ -101,7 +97,7 @@ const apiData = {
     {
       title:
         "Low-Resource Transformer Adaptation Using Knowledge Distillation",
-      publicationYear: "2020",
+      publicationYear: 2020,
       venue: "Proceedings of the ACM Symposium on Applied Computing",
       venueType: "Conference",
       authors: ["Sarah Gupta", "Lorenzo Ricci"],
@@ -113,7 +109,7 @@ const apiData = {
     {
       title:
         "Deep Reinforcement Learning for Distributed Energy Optimization",
-      publicationYear: "2022",
+      publicationYear: 2022,
       venue: "HAL Archives Ouvertes",
       venueType: "Preprint",
       authors: ["Camille Leroy", "Nicolas Martin"],
@@ -122,7 +118,7 @@ const apiData = {
     },
     {
       title: "Graph Neural Networks for Traffic Flow Forecasting",
-      publicationYear: "2021",
+      publicationYear: 2021,
       venue: "HAL Research Papers",
       venueType: "Preprint",
       authors: ["Pierre Laurent", "Hannah Becker"],
@@ -132,7 +128,7 @@ const apiData = {
     {
       title:
         "Multilingual Language Models for Low-Resource European Languages",
-      publicationYear: "2023",
+      publicationYear: 2023,
       venue: "HAL Linguistics",
       venueType: "Preprint",
       authors: ["Anna Schmidt", "Claire Dubois"],
@@ -142,7 +138,7 @@ const apiData = {
     {
       title:
         "Automatic Speech Recognition for Noisy Industrial Environments",
-      publicationYear: "2020",
+      publicationYear: 2020,
       venue: "HAL Machine Learning",
       venueType: "Preprint",
       authors: ["Julien Moreau", "Alicia Romero"],
@@ -152,7 +148,7 @@ const apiData = {
     {
       title:
         "Efficient Hyperparameter Tuning for Large Language Models",
-      publicationYear: "2023",
+      publicationYear: 2023,
       venue: "HAL Computer Science",
       venueType: "Preprint",
       authors: ["Lucas Bernard", "Marta Fernandes"],
@@ -162,7 +158,7 @@ const apiData = {
     {
       title:
         "Vision Transformers for Satellite Image Segmentation",
-      publicationYear: "2021",
+      publicationYear: 2021,
       venue: "HAL Remote Sensing",
       venueType: "Preprint",
       authors: ["Aurelien Petit", "Noah Clarke"],
@@ -172,7 +168,7 @@ const apiData = {
     {
       title:
         "Neural Style Transfer for Scientific Visualization",
-      publicationYear: "2022",
+      publicationYear: 2022,
       venue: "HAL Visualization",
       venueType: "Preprint",
       authors: ["Léa Fontaine", "Carlos Mendes"],
@@ -182,7 +178,7 @@ const apiData = {
     {
       title:
         "Probabilistic Models for Climate Pattern Analysis",
-      publicationYear: "2020",
+      publicationYear: 2020,
       venue: "HAL Climate Studies",
       venueType: "Preprint",
       authors: ["Marie Rousseau", "Patrick Owens"],
@@ -191,7 +187,7 @@ const apiData = {
     },
     {
       title: "Self-Supervised Learning for Biomedical Imaging",
-      publicationYear: "2023",
+      publicationYear: 2023,
       venue: "HAL Bioinformatics",
       venueType: "Preprint",
       authors: ["Nadia Karim", "Valentin Meyer"],
@@ -201,7 +197,7 @@ const apiData = {
     {
       title:
         "Acoustic Scene Classification Using Convolutional Twins",
-      publicationYear: "2021",
+      publicationYear: 2021,
       venue: "HAL Signal Processing",
       venueType: "Preprint",
       authors: ["Gaël Robert", "Isabella Rossi"],
@@ -211,7 +207,7 @@ const apiData = {
     {
       title:
         "Transformer-Based OCR for Historical Manuscripts",
-      publicationYear: "2020",
+      publicationYear: 2020,
       venue: "HAL Digital Humanities",
       venueType: "Preprint",
       authors: ["Claire Denis", "Mohammed Haddad"],
@@ -221,7 +217,7 @@ const apiData = {
     {
       title:
         "Unsupervised Document Clustering Using Sentence Embeddings",
-      publicationYear: "2022",
+      publicationYear: 2022,
       venue: "HAL NLP",
       venueType: "Preprint",
       authors: ["Sven Hartmann", "Chloé Richard"],
@@ -231,7 +227,7 @@ const apiData = {
     {
       title:
         "Differential Privacy for Distributed Text Mining",
-      publicationYear: "2023",
+      publicationYear: 2023,
       venue: "HAL Security",
       venueType: "Preprint",
       authors: ["Amélie Colin", "Rahul Batra"],
@@ -241,7 +237,7 @@ const apiData = {
     {
       title:
         "Neural Machine Translation for Romance Languages",
-      publicationYear: "2021",
+      publicationYear: 2021,
       venue: "HAL Translation",
       venueType: "Preprint",
       authors: ["Luca Moretti", "Inès Bernard"],
@@ -251,7 +247,7 @@ const apiData = {
     {
       title:
         "Predicting Equipment Failure with Temporal Neural Networks",
-      publicationYear: "2022",
+      publicationYear: 2022,
       venue: "HAL Engineering",
       venueType: "Preprint",
       authors: ["Théo Lambert", "Emily Carter"],
@@ -261,7 +257,7 @@ const apiData = {
     {
       title:
         "Semantic Parsing for Conversational Agents",
-      publicationYear: "2020",
+      publicationYear: 2020,
       venue: "HAL AI Research",
       venueType: "Preprint",
       authors: ["Romain Vidal", "Sara Johansson"],
@@ -273,7 +269,7 @@ const apiData = {
     {
       title:
         "A Lightweight CNN Model for Mobile Image Recognition",
-      publicationYear: "2022",
+      publicationYear: 2022,
       venue: "IEEE Transactions on Mobile Computing",
       venueType: "Journal",
       authors: ["Yun Park", "Emily Foster"],
@@ -283,7 +279,7 @@ const apiData = {
     {
       title:
         "Reinforcement Learning for Smart Grid Stability Control",
-      publicationYear: "2023",
+      publicationYear: 2023,
       venue: "IEEE Transactions on Smart Grid",
       venueType: "Journal",
       authors: ["Ahmed Rashid", "Jean-Paul Marin"],
@@ -293,7 +289,7 @@ const apiData = {
     {
       title:
         "Efficient FPGA Acceleration for Transformer Inference",
-      publicationYear: "2021",
+      publicationYear: 2021,
       venue:
         "IEEE International Symposium on Circuits and Systems",
       venueType: "Conference",
@@ -303,7 +299,7 @@ const apiData = {
     },
     {
       title: "Multi-Agent Systems for Industrial Robotics",
-      publicationYear: "2020",
+      publicationYear: 2020,
       venue: "IEEE Robotics and Automation Letters",
       venueType: "Journal",
       authors: ["Laura Spencer", "Minh Nguyen"],
@@ -312,7 +308,7 @@ const apiData = {
     },
     {
       title: "Deep Learning for Network Intrusion Detection",
-      publicationYear: "2023",
+      publicationYear: 2023,
       venue: "IEEE Conference on Communications",
       venueType: "Conference",
       authors: ["Ravi Shankar", "Elodie Lemaire"],
@@ -322,7 +318,7 @@ const apiData = {
     {
       title:
         "High-Resolution Radar Imaging Using Transformer Architectures",
-      publicationYear: "2021",
+      publicationYear: 2021,
       venue:
         "IEEE Transactions on Geoscience and Remote Sensing",
       venueType: "Journal",
@@ -333,7 +329,7 @@ const apiData = {
     {
       title:
         "Adversarial Training for Reliable Medical Diagnosis",
-      publicationYear: "2020",
+      publicationYear: 2020,
       venue: "IEEE Transactions on Medical Imaging",
       venueType: "Journal",
       authors: ["Fatima Ali", "Thomas Müller"],
@@ -343,7 +339,7 @@ const apiData = {
     {
       title:
         "Optimizing Wireless Sensor Networks with Deep RL",
-      publicationYear: "2022",
+      publicationYear: 2022,
       venue: "IEEE Sensors Journal",
       venueType: "Journal",
       authors: ["Amanda Cook", "Javier Ortega"],
@@ -353,7 +349,7 @@ const apiData = {
     {
       title:
         "Secure Federated Learning for IoT Devices",
-      publicationYear: "2023",
+      publicationYear: 2023,
       venue: "IEEE Internet of Things Journal",
       venueType: "Journal",
       authors: ["Mo Chen", "Linda Walters"],
@@ -363,7 +359,7 @@ const apiData = {
     {
       title:
         "Speech Enhancement Using Cross-Domain Transformers",
-      publicationYear: "2021",
+      publicationYear: 2021,
       venue: "IEEE Signal Processing Letters",
       venueType: "Journal",
       authors: ["Tobias Weber", "Maria Santos"],
@@ -373,7 +369,7 @@ const apiData = {
     {
       title:
         "Hybrid Classical–Quantum Models for Time Series Forecasting",
-      publicationYear: "2022",
+      publicationYear: 2022,
       venue: "IEEE Quantum",
       venueType: "Journal",
       authors: ["Rina Takahashi", "Paulo Coelho"],
@@ -383,7 +379,7 @@ const apiData = {
     {
       title:
         "Graph-Based Intrusion Detection with Temporal Features",
-      publicationYear: "2020",
+      publicationYear: 2020,
       venue: "IEEE CNS",
       venueType: "Conference",
       authors: ["Samir Patel", "Gwen Hardy"],
@@ -395,7 +391,7 @@ const apiData = {
     {
       title:
         "BERT-Based Question Answering for Financial Documents",
-      publicationYear: "2023",
+      publicationYear: 2023,
       venue: "Machine Learning Journal",
       venueType: "Journal",
       authors: ["Andrea König", "Felipe Duarte"],
@@ -405,7 +401,7 @@ const apiData = {
     {
       title:
         "Hybrid CNN–RNN Models for Document Classification",
-      publicationYear: "2022",
+      publicationYear: 2022,
       venue: "Neural Computing and Applications",
       venueType: "Journal",
       authors: ["Carla Ribeiro", "Jonas Nilsson"],
@@ -415,7 +411,7 @@ const apiData = {
     {
       title:
         "AI-Assisted Decision Making in Healthcare Systems",
-      publicationYear: "2021",
+      publicationYear: 2021,
       venue: "Health Informatics Journal",
       venueType: "Journal",
       authors: ["Omar Khalid", "Mélanie Robert"],
@@ -425,7 +421,7 @@ const apiData = {
     {
       title:
         "Semantic Role Labeling with Transformer Embeddings",
-      publicationYear: "2020",
+      publicationYear: 2020,
       venue: "Journal of Language Technology",
       venueType: "Journal",
       authors: ["Jinwoo Park", "Nadia Ferreira"],
@@ -435,7 +431,7 @@ const apiData = {
     {
       title:
         "Uncertainty Estimation in Neural Regression Models",
-      publicationYear: "2023",
+      publicationYear: 2023,
       venue:
         "International Journal of Approximate Reasoning",
       venueType: "Journal",
@@ -446,7 +442,7 @@ const apiData = {
     {
       title:
         "Neural Topic Modeling for Legal Document Analysis",
-      publicationYear: "2021",
+      publicationYear: 2021,
       venue: "Journal of Information Systems",
       venueType: "Journal",
       authors: ["Marco Ferraro", "Pauline Niemann"],
@@ -456,7 +452,7 @@ const apiData = {
     {
       title:
         "Visual Analytics for Explainable AI Models",
-      publicationYear: "2022",
+      publicationYear: 2022,
       venue: "Visual Computer",
       venueType: "Journal",
       authors: ["Naomi Klein", "Fabio Martins"],
@@ -466,7 +462,7 @@ const apiData = {
     {
       title:
         "Deep Learning for Genomic Variant Prediction",
-      publicationYear: "2020",
+      publicationYear: 2020,
       venue: "Bioinformatics Review",
       venueType: "Journal",
       authors: ["Rita Lopes", "Christian Adler"],
@@ -476,7 +472,7 @@ const apiData = {
     {
       title:
         "Graph Embeddings for Financial Fraud Detection",
-      publicationYear: "2023",
+      publicationYear: 2023,
       venue:
         "Journal of Financial Data Science",
       venueType: "Journal",
@@ -487,7 +483,7 @@ const apiData = {
     {
       title:
         "Efficient Knowledge Graph Completion Using Distilled Embeddings",
-      publicationYear: "2022",
+      publicationYear: 2022,
       venue:
         "Data Mining and Knowledge Discovery",
       venueType: "Journal",
@@ -498,7 +494,7 @@ const apiData = {
     {
       title:
         "Adaptive Multi-Task Learning for Scientific Content Analysis",
-      publicationYear: "2021",
+      publicationYear: 2021,
       venue:
         "Journal of Intelligent Information Systems",
       venueType: "Journal",
@@ -509,7 +505,7 @@ const apiData = {
     {
       title:
         "Improving Text Summarization with Reinforcement Signals",
-      publicationYear: "2023",
+      publicationYear: 2023,
       venue: "Neural Processing Letters",
       venueType: "Journal",
       authors: ["Hiro Tanaka", "Maria Costa"],
@@ -519,7 +515,7 @@ const apiData = {
     {
       title:
         "Unsupervised Keyword Extraction with Sentence Embeddings",
-      publicationYear: "2020",
+      publicationYear: 2020,
       venue: "Information Retrieval Journal",
       venueType: "Journal",
       authors: ["Francesco Romano", "Julie Werner"],
@@ -542,15 +538,15 @@ export const SearchStatisticsPage = () => {
       </Tabs>
 
       <TabPanel value={tab} index={0} dir={theme.direction}>
-        <PrismaEditor apiData={apiData} />
+        <PrismaEditor {...apiData} />
       </TabPanel>
 
       <TabPanel value={tab} index={1} dir={theme.direction}>
-        <PrismaReport data={apiData} />
+        <PrismaReport {...apiData} />
       </TabPanel>
 
       <TabPanel value={tab} index={2} dir={theme.direction}>
-        <PrismaCharts data={apiData} />
+        <PrismaCharts {...apiData} />
       </TabPanel>
     </Box>
   );

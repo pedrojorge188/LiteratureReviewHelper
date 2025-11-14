@@ -1,10 +1,12 @@
+import { Engines, SearchResponseDto } from "../../pages/types";
 import { resolveFilterName } from "./mapApiToFlow";
 
-export const PrismaReport = ({ data }) => {
+export const PrismaReport = (data: SearchResponseDto) => {
     if (!data) return null;
 
-    const rawEngineTotals = {};
-    const rawEngineDropped = {};
+    const rawEngineTotals: Record<string, number> = { };
+    const rawEngineDropped: Record<string, number> = { };
+    
     Object.entries(data.filterImpactByEngine || {}).forEach(([engine, filters]) => {
         const firstFilter = Object.values(filters)[0];
         if (firstFilter) rawEngineTotals[engine] = firstFilter.INPUT;

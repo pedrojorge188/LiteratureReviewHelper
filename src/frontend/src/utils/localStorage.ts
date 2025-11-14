@@ -7,8 +7,12 @@ interface InternalSearchParameters {
   queries: Array<{ valor: string; metadado?: string }>;
   anoDe: string;
   anoAte: string;
-  excluirVenues: string;
-  excluirTitulos: string;
+  authors: string[];
+  titles: string[];
+  venues: string[];
+  excludeAuthors: string[];
+  excludeVenues: string[];
+  excludeTitles: string[];
   bibliotecas: string[];
 }
 
@@ -23,8 +27,12 @@ const toStorageFormat = (params: InternalSearchParameters): SearchParameters => 
     })),
     yearFrom: params.anoDe,
     yearTo: params.anoAte,
-    excludeVenues: params.excluirVenues,
-    excludeTitles: params.excluirTitulos,
+    authors: params.authors,
+    titles: params.titles,
+    venues: params.venues,
+    excludeAuthors: params.excludeAuthors,
+    excludeTitles: params.excludeTitles,
+    excludeVenues: params.excludeVenues,
     libraries: params.bibliotecas,
   };
 };
@@ -40,8 +48,12 @@ const fromStorageFormat = (params: SearchParameters): InternalSearchParameters =
     })),
     anoDe: params.yearFrom,
     anoAte: params.yearTo,
-    excluirVenues: params.excludeVenues,
-    excluirTitulos: params.excludeTitles,
+    authors: params.authors,
+    titles: params.titles,
+    venues: params.venues,
+    excludeAuthors: params.excludeAuthors,
+    excludeTitles: params.excludeTitles,
+    excludeVenues: params.excludeVenues,
     bibliotecas: params.libraries,
   };
 };
@@ -72,13 +84,13 @@ export const saveSearch = (
 ): SavedSearch => {
   try {
     const searches = getSavedSearches();
-    
+
     // Check if a search with this ID (customLabel) already exists
     const existingSearch = searches.find(s => s.id === customLabel);
     if (existingSearch) {
       throw new Error("A search with this name already exists. Please choose a different name.");
     }
-    
+
     const newSearch: SavedSearch = {
       id: customLabel,
       timestamp: new Date().toISOString(),
@@ -105,13 +117,13 @@ export const saveSearch = (
 export const updateSearchLabel = (id: string, newLabel: string): void => {
   try {
     const searches = getSavedSearches();
-    
+
     // Check if new label already exists (and it's not the same search)
     const existingSearch = searches.find(s => s.id === newLabel && s.id !== id);
     if (existingSearch) {
       throw new Error("A search with this name already exists. Please choose a different name.");
     }
-    
+
     const searchIndex = searches.findIndex((s) => s.id === id);
 
     if (searchIndex === -1) {

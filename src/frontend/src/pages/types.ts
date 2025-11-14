@@ -51,8 +51,12 @@ export interface SearchParameters {
   queries: Query[];
   yearFrom: string;
   yearTo: string;
-  excludeVenues: string;
-  excludeTitles: string;
+  authors: string[];
+  titles: string[];
+  venues: string[];
+  excludeAuthors: string[];
+  excludeVenues: string[];
+  excludeTitles: string[];
   libraries: string[];
 }
 

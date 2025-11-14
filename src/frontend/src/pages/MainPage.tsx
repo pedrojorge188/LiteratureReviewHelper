@@ -91,66 +91,66 @@ export const MainPage = () => {
   };
 
   const guardar = () => {
-      // Open the save dialog instead of just logging
-      setSaveError("");
-      setIsSaveDialogOpen(true);
+    // Open the save dialog instead of just logging
+    setSaveError("");
+    setIsSaveDialogOpen(true);
   }
 
-    const handleSaveSearch = (customLabel: string) => {
-        try {
-            const searchParameters = {
-                queries,
-                anoDe,
-                anoAte,
-                authors,
-                venues,
-                titles,
-                excludeAuthors,
-                excludeVenues,
-                excludeTitles,
-                bibliotecas,
-            };
+  const handleSaveSearch = (customLabel: string) => {
+    try {
+      const searchParameters = {
+        queries,
+        anoDe,
+        anoAte,
+        authors,
+        venues,
+        titles,
+        excludeAuthors,
+        excludeVenues,
+        excludeTitles,
+        bibliotecas,
+      };
 
-            saveSearch(customLabel, searchParameters);
-            setIsSaveDialogOpen(false);
-            setSaveError("");
-        } catch (error) {
-            console.error("Error saving search:", error);
-            // Set error message to be displayed in the dialog
-            if (error instanceof Error) {
-                setSaveError(error.message);
-            } else {
-                setSaveError(t("home:search_save_error") || "Error saving search. Please try again.");
-            }
-        }
-    };
+      saveSearch(customLabel, searchParameters);
+      setIsSaveDialogOpen(false);
+      setSaveError("");
+    } catch (error) {
+      console.error("Error saving search:", error);
+      // Set error message to be displayed in the dialog
+      if (error instanceof Error) {
+        setSaveError(error.message);
+      } else {
+        setSaveError(t("home:search_save_error") || "Error saving search. Please try again.");
+      }
+    }
+  };
 
-    const handleImport = () => {
-        setIsImportDialogOpen(true);
-    };
+  const handleImport = () => {
+    setIsImportDialogOpen(true);
+  };
 
-    const handleLoadSearch = (search: SavedSearch) => {
-        const params = search.searchParameters;
-        // Convert from English storage format to Portuguese UI format
-        const convertedQueries = params.queries.map((q, i) => {
-            if (i === 0) {
-                return { valor: q.value };
-            }
-            return { valor: q.value, metadado: q.operator };
-        });
+  const handleLoadSearch = (search: SavedSearch) => {
+    const params = search.searchParameters;
+    // Convert from English storage format to Portuguese UI format
+    const convertedQueries = params.queries.map((q, i) => {
+      if (i === 0) {
+        return { valor: q.value };
+      }
+      return { valor: q.value, metadado: q.operator };
+    });
 
-        setQueries(convertedQueries);
-        setAnoDe(params.yearFrom || "");
-        setAnoAte(params.yearTo || "");
-        setAuthors(params.authors.split(";") || []);
-        setVenues(params.venues.split(";") || []);
-        setTitles(params.titles.split(";") || []);
-        setExcludeAuthors(params.excludeAuthors.split(";") || []);
-        setExcludeVenues(params.excludeVenues.split(";") || []);
-        setExcludeTitles(params.excludeTitles.split(";") || []);
-        setBibliotecas(params.libraries || []);
-        setIsImportDialogOpen(false);
-    };
+    setQueries(convertedQueries);
+    setAnoDe(params.yearFrom || "");
+    setAnoAte(params.yearTo || "");
+    setAuthors(params.authors || []);
+    setVenues(params.venues || []);
+    setTitles(params.titles || []);
+    setExcludeAuthors(params.excludeAuthors || []);
+    setExcludeVenues(params.excludeVenues || []);
+    setExcludeTitles(params.excludeTitles || []);
+    setBibliotecas(params.libraries || []);
+    setIsImportDialogOpen(false);
+  };
 
   const pesquisar = async () => {
     setIsLoading(true);
@@ -214,7 +214,7 @@ export const MainPage = () => {
     }
   }, []);
 
-  useEffect(() => {}, [showList]);
+  useEffect(() => { }, [showList]);
 
   return (
     <>
@@ -234,17 +234,15 @@ export const MainPage = () => {
       />
 
       <div
-        className={`container-article ${
-          showList && response ? "show" : "hide"
-        }`}
+        className={`container-article ${showList && response ? "show" : "hide"
+          }`}
       >
         {response && <ArticlesList response={response} setShow={setShowList} />}
       </div>
 
       <div
-        className={`pesquisa-container ${
-          (showList && response) || isLoading ? "hide-pesquisa" : ""
-        }`}
+        className={`pesquisa-container ${(showList && response) || isLoading ? "hide-pesquisa" : ""
+          }`}
       >
         <h2>{t("home:titulo_pesquisa")}</h2>
 
@@ -320,12 +318,12 @@ export const MainPage = () => {
               </button>
             </div>
 
-              {/* Import Button below queries */}
-              <div className="import-button-container">
-                  <button type="button" onClick={handleImport}>
-                      {t("home:importar") || "Import"}
-                  </button>
-              </div>
+            {/* Import Button below queries */}
+            <div className="import-button-container">
+              <button type="button" onClick={handleImport}>
+                {t("home:importar") || "Import"}
+              </button>
+            </div>
           </div>
 
           {/* Ano de publicação */}

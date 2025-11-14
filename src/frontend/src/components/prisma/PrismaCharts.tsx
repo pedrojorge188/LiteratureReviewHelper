@@ -20,11 +20,6 @@ export const PrismaCharts = (data: SearchResponseDto) => {
     return firstFilter?.INPUT ?? 0;
   });
 
-  const pipelineSteps = [
-      { name: "Total Raw Articles", value: rawCounts.reduce((a, b) => a + b, 0) },
-      { name: "Final Filtered Articles", value: safeData.totalArticles ?? 0 }
-  ];
-
   const availableFilters = useMemo(() => {
     const set = new Set<string>();
     Object.values(safeData.filterImpactByEngine || {}).forEach(engineFilters => {
@@ -33,11 +28,38 @@ export const PrismaCharts = (data: SearchResponseDto) => {
     return Array.from(set);
   }, [safeData.filterImpactByEngine]);
 
+    const aggregatedFilterSteps = (() => {
+      const result: { name: string; value: number }[] = [];
+
+      availableFilters.forEach(filterName => {
+        let totalOutput = 0;
+
+        engines.forEach(engine => {
+          const f = safeData.filterImpactByEngine?.[engine as Engines]?.[filterName];
+          if (f?.OUTPUT) totalOutput += f.OUTPUT;
+        });
+
+      result.push({
+        name: resolveFilterName(filterName) || filterName,
+        value: totalOutput
+      });
+  });
+
+  return result;
+})();
+
   React.useEffect(() => {
     if (availableFilters.length > 0 && !availableFilters.includes(selectedFilter)) {
         setSelectedFilter(availableFilters[0]);
     }
   }, [availableFilters, selectedFilter]);
+
+
+  const pipelineSteps = [
+      { name: "Total Raw Articles", value: rawCounts.reduce((a, b) => a + b, 0) },
+      ... aggregatedFilterSteps,
+      { name: "Final Filtered Articles", value: safeData.totalArticles ?? 0 }
+  ];
 
   const selectableProperties = [
     "publicationYear",

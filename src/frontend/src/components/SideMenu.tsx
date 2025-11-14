@@ -75,20 +75,6 @@ export const SideMenu = () => {
                 {t("sideMenu:librayList")}
               </CommonLink>
             </div>
-
-            <div className="side-menu__container__content-menu__link-container">
-              <CommonLink
-                linkClass={`side-menu__container__content-menu__link-container__link ${
-                  location.pathname === `/${routes.statsPage.path}`
-                    ? "selected"
-                    : ""
-                }`}
-                link={{ external: false, url: routes.statsPage.path }}
-                title="stats"
-              >
-                Stats
-              </CommonLink>
-            </div>
           </div>
         </div>
       </div>

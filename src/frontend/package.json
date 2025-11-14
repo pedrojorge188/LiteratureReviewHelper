@@ -32,8 +32,9 @@
     "axios": "^1.13.0",
     "bootstrap": "^5.3.3",
     "date-fns": "^4.1.0",
+    "echarts": "^6.0.0",
+    "echarts-for-react": "^3.0.5",
     "electron-log": "^5.4.3",
-    "html-to-image": "^1.11.13",
     "i18next": "^25.6.0",
     "lucide-react": "^0.553.0",
     "react": "^19.1.1",
@@ -46,9 +47,7 @@
     "react-router-dom": "^7.9.4",
     "reactflow": "^11.11.4",
     "reactstrap": "^9.2.3",
-    "recharts": "^3.4.1",
-    "sass": "^1.93.2",
-    "save-html-as-image": "^1.7.1"
+    "sass": "^1.93.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",

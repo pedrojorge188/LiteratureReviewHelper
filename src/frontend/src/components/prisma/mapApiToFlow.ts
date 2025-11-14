@@ -13,7 +13,6 @@ export const resolveFilterName = (name: string) => {
     }
 }
 
-
 export const mapApiToFlow = (data) => {
     if (!data) return { nodes: [], edges: [] };
 

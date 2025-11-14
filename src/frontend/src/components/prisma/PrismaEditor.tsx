@@ -13,7 +13,7 @@ import { mapApiToFlow } from "./mapApiToFlow";
 
 import "@xyflow/react/dist/style.css";
 
-export const FlowEditor = ({ apiData }) => {
+export const PrismaEditor = ({ apiData }) => {
   const { nodes: initialNodes, edges: initialEdges } = useMemo(
     () => mapApiToFlow(apiData),
     [apiData]

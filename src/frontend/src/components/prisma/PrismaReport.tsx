@@ -1,6 +1,6 @@
 import { resolveFilterName } from "./mapApiToFlow";
 
-export const FlowReport = ({ data }) => {
+export const PrismaReport = ({ data }) => {
     if (!data) return null;
 
     const rawEngineTotals = {};

@@ -132,6 +132,18 @@ export const PrismaCharts = (data: SearchResponseDto) => {
     };
   };
 
+  const funnelColor = (dataLength: number) => (params: any) => {
+    const index = params.dataIndex;
+    const start = 190;
+    const end = 34;
+
+    const value = Math.floor(
+      start + (end - start) * (index / Math.max(dataLength - 1, 1))
+    );
+
+    return `rgb(${value}, ${value}, ${value})`;
+  };
+
   return (
     <div className="prisma-charts">
 
@@ -166,7 +178,7 @@ export const PrismaCharts = (data: SearchResponseDto) => {
                   borderColor: "#333",
                   borderWidth: 1,
                   opacity: 0.85,
-                  color: (params: any) => (params.dataIndex === 0 ? "#999" : "#555")
+                  color: funnelColor(pipelineSteps.length)
                 },
                 label: {
                   show: true,

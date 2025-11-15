@@ -2,17 +2,17 @@ import { useState, useEffect, useRef } from "react";
 import { NodeResizer, Handle, Position } from "@xyflow/react";
 import { X } from "lucide-react"; 
 
-export const EditableNode = ({ id, data, selected }) => {
+export const EditableNode = ({ id, data, selected }: any) => {
   const [label, setLabel] = useState(data.label);
   const [title, setTitle] = useState(data.title);
   const spanRef = useRef<HTMLSpanElement>(null);
 
-  const handleChange = (e) => {
+  const handleChange = (e: { target: { value: any; }; }) => {
     setLabel(e.target.value);
     data.onChange(id, e.target.value);
   };
 
-  const titleChange = (e) => {
+  const titleChange = (e: { target: { value: any; }; }) => {
     setTitle(e.target.value);
     data.onChange(id, e.target.value);
   };

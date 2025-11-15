@@ -44,10 +44,12 @@ public class LiteratureReviewService implements ILiteratureReviewService {
                         .collectList()
                         .map(listOfEngines -> {
                             Map<Engines, Integer> articlesByEngine = new EnumMap<>(Engines.class);
+                            Map<Engines, Map<String, Map<IResultFilter.Statistic, Integer>>> filterImpactByEngine = new EnumMap<>(Engines.class);
                             List<Article> allArticles = new ArrayList<>();
                             int totalDropped = 0;
                             for (var entry : listOfEngines) {
                                 articlesByEngine.put(entry.getKey(), entry.getValue().getArticles().size());
+                                filterImpactByEngine.put(entry.getKey(), entry.getValue().getStatistics());
                                 allArticles.addAll(entry.getValue().getArticles());
                                 Map<String, Map<IResultFilter.Statistic, Integer>> stats = entry.getValue().getStatistics();
                                 if (stats != null && stats.containsKey(DuplicateResultFilter.class.getSimpleName())) {
@@ -60,7 +62,7 @@ public class LiteratureReviewService implements ILiteratureReviewService {
                             List<Article> filteredArticles = filter.filter(allArticles);
                             totalDropped += filter.getExecutionStatistics().get(IResultFilter.Statistic.DROPPED);
 
-                            return new SearchResponseDto(query, filteredArticles.size(), articlesByEngine, filteredArticles, totalDropped);
+                            return new SearchResponseDto(query, filteredArticles.size(), articlesByEngine, filteredArticles, totalDropped, filterImpactByEngine);
                         });
     }
 

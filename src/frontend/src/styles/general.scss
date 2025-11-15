@@ -107,3 +107,20 @@ a {
     }
   }
 }
+
+textarea::-webkit-scrollbar {
+  width: 2px;
+}
+
+textarea::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 4px;
+}
+
+textarea::-webkit-scrollbar-thumb:hover {
+  background-color: #999;
+}
+
+textarea::-webkit-scrollbar-track {
+  background: transparent;
+}

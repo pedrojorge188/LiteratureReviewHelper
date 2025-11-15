@@ -24,12 +24,19 @@
     "electron:build:linux": "npm run build && npm run prepare-resources && electron-builder --linux"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/material": "^7.3.5",
     "@reduxjs/toolkit": "^2.9.2",
+    "@xyflow/react": "^12.9.2",
     "axios": "^1.13.0",
     "bootstrap": "^5.3.3",
     "date-fns": "^4.1.0",
-    "i18next": "^25.6.0",
+    "echarts": "^6.0.0",
+    "echarts-for-react": "^3.0.5",
     "electron-log": "^5.4.3",
+    "i18next": "^25.6.0",
+    "lucide-react": "^0.553.0",
     "react": "^19.1.1",
     "react-datepicker": "^8.8.0",
     "react-dnd": "^16.0.1",
@@ -38,6 +45,7 @@
     "react-i18next": "^16.2.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.9.4",
+    "reactflow": "^11.11.4",
     "reactstrap": "^9.2.3",
     "sass": "^1.93.2"
   },

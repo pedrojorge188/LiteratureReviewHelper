@@ -11,7 +11,7 @@
   "delete": "Eliminar",
   "export": "Exportar Tudo",
   "export_single": "Exportar",
-  "import": "Importar",
+  "import": "Importar de um ficheiro",
   "clear_all": "Limpar Tudo",
   "confirm_delete": "Tem a certeza que deseja eliminar esta pesquisa?",
   "confirm_clear_all": "Tem a certeza que deseja eliminar todas as pesquisas guardadas? Esta ação não pode ser revertida.",

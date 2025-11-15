@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Artigo, SearchResponseDto } from "./types";
 import ArrowIcon from "../assets/images/png/arrow.png";
+import { SearchStatisticsPage } from "./SearchStatisticsPage";
 
 interface ArtigosProps {
   response: SearchResponseDto;
@@ -12,6 +13,7 @@ export const ArticlesList = ({ response, setShow }: ArtigosProps) => {
   const { t } = useTranslation();
   const [artigos, setArtigos] = useState<Artigo[]>([]);
   const [paginaAtual, setPaginaAtual] = useState<number>(1);
+  const [moreInfo, setMoreInfo] = useState<boolean>(false);
   const artigosPorPagina = 10;
 
   useEffect(() => {
@@ -80,94 +82,106 @@ export const ArticlesList = ({ response, setShow }: ArtigosProps) => {
         </div>
 
         <div className="header">
-          <h2>{t("articles:titulo_lista")}</h2>
-          <a
-            href="/api/download"
-            className="download-btn"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {t("articles:botao_download")}
-          </a>
-        </div>
+          <h2>{!moreInfo ? t("articles:titulo_lista") : "Metrics"}</h2>
 
-        <div className="results-container">
-          <div className="results-container__text">
-            {response?.totalArticles ?? artigos.length} {t("home:results")}
-            <br />
-            {response?.duplicatedResultsRemoved > 0 && (
-              <>
-                {response.duplicatedResultsRemoved}{" "}
-                {t("home:duplicatedResultsRemoved")}
-              </>
-            )}
+        <div>
+              <a
+              href="/api/download"
+              className="download-btn"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t("articles:botao_download")}
+            </a>
+
+            <span
+              hidden= {artigos.length < 1 }
+              className="download-btn"
+              onClick={() => setMoreInfo(!moreInfo)}
+            >
+              {!moreInfo ? "More info" : t("articles:titulo_lista")}
+            </span>
           </div>
         </div>
 
-        <table>
-          <thead>
-            <tr>
-              <th>{t("articles:coluna_titulo")}</th>
-              <th>{t("articles:coluna_autores")}</th>
-              <th>{t("articles:coluna_ano")}</th>
-              <th>{t("articles:coluna_venue")}</th>
-              <th>{t("articles:coluna_link")}</th>
-              <th>{t("articles:coluna_fonte")}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {artigosVisiveis.map((artigo, index) => (
-              <tr key={index}>
-                <td>{artigo.title}</td>
-                <td>{artigo.authors}</td>
-                <td>{artigo.publicationYear}</td>
-                <td>{artigo.venue}</td>
-                <td>
-                  <a
-                    href={artigo.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
+      {moreInfo ? (<SearchStatisticsPage {... response}/>) : 
+        (
+        <>
+          <div className="results-container">
+              <div className="results-container__text">
+                {response?.totalArticles ?? artigos.length} {t("home:results")}
+                <br />
+                {response?.duplicatedResultsRemoved > 0 && (
+                  <>
+                    {response.duplicatedResultsRemoved}{" "}
+                    {t("home:duplicatedResultsRemoved")}
+                  </>
+                )}
+              </div>
+            </div><table>
+                <thead>
+                  <tr>
+                    <th>{t("articles:coluna_titulo")}</th>
+                    <th>{t("articles:coluna_autores")}</th>
+                    <th>{t("articles:coluna_ano")}</th>
+                    <th>{t("articles:coluna_venue")}</th>
+                    <th>{t("articles:coluna_link")}</th>
+                    <th>{t("articles:coluna_fonte")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {artigosVisiveis.map((artigo, index) => (
+                    <tr key={index}>
+                      <td>{artigo.title}</td>
+                      <td>{artigo.authors}</td>
+                      <td>{artigo.publicationYear}</td>
+                      <td>{artigo.venue}</td>
+                      <td>
+                        <a
+                          href={artigo.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {artigo.link}
+                        </a>
+                      </td>
+                      <td>{artigo.source}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table><div className="pagination">
+                <button
+                  onClick={() => mudarPagina(paginaAtual - 1)}
+                  disabled={paginaAtual === 1}
+                >
+                  &lt;
+                </button>
+
+                {gerarBotoesPaginacao().map((p, i) => p === "..." ? (
+                  <span key={i} className="ellipsis">
+                    ...
+                  </span>
+                ) : (
+                  <button
+                    key={i}
+                    onClick={() => mudarPagina(p as number)}
+                    className={p === paginaAtual ? "active" : ""}
                   >
-                    {artigo.link}
-                  </a>
-                </td>
-                <td>{artigo.source}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                    {p}
+                  </button>
+                )
+                )}
 
-        <div className="pagination">
-          <button
-            onClick={() => mudarPagina(paginaAtual - 1)}
-            disabled={paginaAtual === 1}
-          >
-            &lt;
-          </button>
-
-          {gerarBotoesPaginacao().map((p, i) =>
-            p === "..." ? (
-              <span key={i} className="ellipsis">
-                ...
-              </span>
-            ) : (
-              <button
-                key={i}
-                onClick={() => mudarPagina(p as number)}
-                className={p === paginaAtual ? "active" : ""}
-              >
-                {p}
-              </button>
-            )
-          )}
-
-          <button
-            onClick={() => mudarPagina(paginaAtual + 1)}
-            disabled={paginaAtual === totalPaginas}
-          >
-            &gt;
-          </button>
-        </div>
+                <button
+                  onClick={() => mudarPagina(paginaAtual + 1)}
+                  disabled={paginaAtual === totalPaginas}
+                >
+                  &gt;
+                </button>
+              </div>
+            </>
+        )
+       };
       </div>
     </div>
   );

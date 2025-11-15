@@ -1,0 +1,44 @@
+.prisma-charts {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+
+  // ---------- Grid layout ----------
+  .grid-two-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    width: 100%;
+    margin: 25px 0;
+
+    @media (max-width: 900px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  // ---------- Chart section ----------
+  .chart-section {
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+
+    h2 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      color: #111;
+      font-weight: 600;
+      font-size: 1.2rem;
+    }
+  }
+
+  // ---------- Override ECharts container ----------
+  .echarts-container {
+    height: 260px; // default height if none provided
+  }
+}

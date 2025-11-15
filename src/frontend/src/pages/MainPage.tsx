@@ -282,11 +282,11 @@ export const MainPage = () => {
             ))}
 
             {/* Import Button below queries */}
-            <div className="import-button-container">
+            {/* <div className="import-button-container">
               <button type="button" onClick={handleImport}>
                 {t("home:importar") || "Import"}
               </button>
-            </div>
+            </div> */}
           </div>
 
           {/* Ano de publicação */}
@@ -354,30 +354,39 @@ export const MainPage = () => {
               </button>
             </div>
 
-            <h3 className="bibliotecas-lista-titulo">
+            <div hidden= {bibliotecas.length === 0}>
+              <h3 className="bibliotecas-lista-titulo">
               {t("home:lista_bibliotecas")}
-            </h3>
-            <ul className="bibliotecas-lista">
-              {bibliotecas.map((b, i) => (
-                <li key={i}>
-                  <span>{b}</span>
-                  <button
-                    type="button"
-                    className="remove-btn"
-                    onClick={() => removerBiblioteca(b)}
-                  >
-                    {t("home:botao_remover")}
-                  </button>
-                </li>
-              ))}
-            </ul>
+              </h3>
+              <ul className="bibliotecas-lista">
+                {bibliotecas.map((b, i) => (
+                  <li key={i}>
+                    <span>{b}</span>
+                    <button
+                      type="button"
+                      className="remove-btn"
+                      onClick={() => removerBiblioteca(b)}
+                    >
+                      {t("home:botao_remover")}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
+
+          <hr hidden={bibliotecas.length > 0}/>
 
           {/* Botões principais */}
           <div className="actions">
-            <button type="button" onClick={guardar}>
-              {t("home:botao_guardar")}
-            </button>
+            <div>
+              <button type="button" onClick={handleImport}>
+                  {t("home:importar") || "Import"}
+              </button>
+              <button type="button" onClick={guardar}>
+                {t("home:botao_guardar")}
+              </button>
+            </div>
             <button type="button" onClick={pesquisar}>
               {t("home:botao_pesquisar")}
             </button>

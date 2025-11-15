@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { getSearchHistory, clearAllSearchHistory } from "../utils/localStorage";
+import { getSearchHistory, clearAllSearchHistory, deleteHistoryEntry } from "../utils/localStorage";
 import { SavedSearch } from "./types";
+import { ConfirmDialog } from "../components/ConfirmDialog";
 
 export const HistoryPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [historySearches, setHistorySearches] = useState<SavedSearch[]>([]);
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
   useEffect(() => {
     loadSearches();
@@ -16,6 +19,25 @@ export const HistoryPage = () => {
   const loadSearches = () => {
     const searches = getSearchHistory();
     setHistorySearches(searches);
+  };
+
+  const handleDelete = (id: string) => {
+    setDeleteTargetId(id);
+    setIsConfirmDeleteOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (deleteTargetId) {
+      deleteHistoryEntry(deleteTargetId);
+      loadSearches();
+    }
+    setIsConfirmDeleteOpen(false);
+    setDeleteTargetId(null);
+  };
+
+  const cancelDelete = () => {
+    setIsConfirmDeleteOpen(false);
+    setDeleteTargetId(null);
   };
 
   const handleLoad = (search: SavedSearch) => {
@@ -56,6 +78,13 @@ export const HistoryPage = () => {
 
   return (
     <div className="history-page">
+      <ConfirmDialog
+        isOpen={isConfirmDeleteOpen}
+        message={t("history:confirm_delete") || "Are you sure you want to delete this search?"}
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+      />
+
       <div className="history-header">
         <h2>{t("history:title") || "Search History"}</h2>
           <div className="history-actions">
@@ -118,6 +147,9 @@ export const HistoryPage = () => {
               <div className="search-card-actions">
                 <button className="btn-primary" onClick={() => handleLoad(search)}>
                   {t("history:load") || "Load"}
+                </button>
+                <button className="btn-danger" onClick={() => handleDelete(search.id)}>
+                  {t("history:delete") || "Delete"}
                 </button>
               </div>
             </div>

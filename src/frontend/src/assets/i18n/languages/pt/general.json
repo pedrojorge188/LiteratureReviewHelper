@@ -1,4 +1,6 @@
 {
   "general": "general",
-  "goTo": "Ir para"
+  "goTo": "Ir para",
+  "confirm": "Confirmar",
+  "cancel": "Cancelar"
 }

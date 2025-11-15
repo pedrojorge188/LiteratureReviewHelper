@@ -1,8 +1,6 @@
 {
     "title": "History",
     "no_searches": "No history available.",
-    "load": "Load",
-    "delete": "Delete",
     "clear_all": "Clear All",
     "confirm_delete": "Are you sure you want to delete this search?"
 }

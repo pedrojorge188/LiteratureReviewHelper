@@ -1,0 +1,11 @@
+{
+  "query": "Query",
+  "years": "Anos",
+  "libraries": "Bibliotecas",
+  "excluded_venues": "Venues Excluídos",
+  "excluded_titles": "Títulos Excluídos",
+  "load": "Carregar",
+  "edit": "Editar",
+  "export": "Exportar",
+  "delete": "Eliminar"
+}

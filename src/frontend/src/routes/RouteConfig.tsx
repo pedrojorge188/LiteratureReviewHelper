@@ -1,11 +1,4 @@
-import {
-  ArticlesList,
-  FavoritesPage,
-  HistoryPage,
-  LibrariesPage,
-  MainPage,
-} from "../pages";
-import { CredentialsLibPage } from "../pages/CredentialsLibPage";
+import { ArticlesList, ConfigurationPage, FavoritesPage, HistoryPage, MainPage } from "../pages";
 import { langDefault, langDefaultRedirect, langs } from "../utils";
 import { IRoute, IRoutePathLang } from "./types";
 
@@ -20,8 +13,7 @@ export const Paths = (): IRoute => ({
     element: <HistoryPage />,
   },
   savePage: { path: "favoritos", element: <FavoritesPage /> },
-  libListPage: { path: "listabibliotecas", element: <LibrariesPage /> },
-  credPage: { path: "credenciaisBiblioteca", element: <CredentialsLibPage /> },
+  libListPage: { path: "configuracoes", element: <ConfigurationPage /> },
   // articlePage: { path: "listaartigos", element: <ArticlesList /> },
 });
 

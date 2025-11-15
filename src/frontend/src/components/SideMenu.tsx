@@ -17,18 +17,12 @@ export const SideMenu = () => {
       <div className="side-menu">
         <div className="side-menu__container">
           <div className="side-menu__container__title-container">
-            <div className="side-menu__container__title-container__title-text">
-              {t("sideMenu:title")}
-            </div>
+            <div className="side-menu__container__title-container__title-text">{t("sideMenu:title")}</div>
           </div>
           <div className="side-menu__container__content-menu">
             <div className="side-menu__container__content-menu__link-container">
               <CommonLink
-                linkClass={`side-menu__container__content-menu__link-container__link ${
-                  location.pathname === `/${routes.searchPage.path}`
-                    ? "selected"
-                    : ""
-                }`}
+                linkClass={`side-menu__container__content-menu__link-container__link ${location.pathname === `/${routes.searchPage.path}` ? "selected" : ""}`}
                 link={{ external: false, url: routes.searchPage.path }}
                 title={t("sideMenu:search")}
               >
@@ -37,11 +31,7 @@ export const SideMenu = () => {
             </div>
             <div className="side-menu__container__content-menu__link-container">
               <CommonLink
-                linkClass={`side-menu__container__content-menu__link-container__link ${
-                  location.pathname === `/${routes.savePage.path}`
-                    ? "selected"
-                    : ""
-                }`}
+                linkClass={`side-menu__container__content-menu__link-container__link ${location.pathname === `/${routes.savePage.path}` ? "selected" : ""}`}
                 link={{ external: false, url: routes.savePage.path }}
                 title={t("sideMenu:favorites")}
               >
@@ -50,11 +40,7 @@ export const SideMenu = () => {
             </div>
             <div className="side-menu__container__content-menu__link-container">
               <CommonLink
-                linkClass={`side-menu__container__content-menu__link-container__link ${
-                  location.pathname === `/${routes.historyPage.path}`
-                    ? "selected"
-                    : ""
-                }`}
+                linkClass={`side-menu__container__content-menu__link-container__link ${location.pathname === `/${routes.historyPage.path}` ? "selected" : ""}`}
                 link={{ external: false, url: routes.historyPage.path }}
                 title={t("sideMenu:history")}
               >
@@ -64,15 +50,11 @@ export const SideMenu = () => {
 
             <div className="side-menu__container__content-menu__link-container">
               <CommonLink
-                linkClass={`side-menu__container__content-menu__link-container__link ${
-                  location.pathname === `/${routes.libListPage.path}`
-                    ? "selected"
-                    : ""
-                }`}
+                linkClass={`side-menu__container__content-menu__link-container__link ${location.pathname === `/${routes.libListPage.path}` ? "selected" : ""}`}
                 link={{ external: false, url: routes.libListPage.path }}
-                title={t("sideMenu:librayList")}
+                title={t("sideMenu:configuration")}
               >
-                {t("sideMenu:librayList")}
+                {t("sideMenu:configuration")}
               </CommonLink>
             </div>
           </div>

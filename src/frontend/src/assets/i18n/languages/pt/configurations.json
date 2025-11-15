@@ -1,0 +1,24 @@
+{
+  "title": "Configurações",
+  "errors": {
+    "loadSettings": "Erro ao ler definições das bibliotecas:"
+  },
+  "alerts": {
+    "rowsSaved": "Nº de elementos guardado!",
+    "maxResultsSaved": "Máximo de pesquisas guardado!",
+    "librarySettingsSaved": "Definições para {{libName}} guardadas!"
+  },
+  "labels": {
+    "rowsPerPage": "Nº Elementos por pagina",
+    "maxResults": "Max de Pesquisas por Biblioteca",
+    "noTokenNeeded": "Não precisa de token"
+  },
+  "buttons": {
+    "save": "Guardar"
+  },
+  "placeholders": {
+    "insertToken": "Inserir token"
+  },
+  "titleModalSuccess": "Sucesso",
+  "messageModalSuccess": "A sua ação foi gravada com sucesso!"
+}

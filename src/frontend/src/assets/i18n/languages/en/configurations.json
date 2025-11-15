@@ -1,0 +1,22 @@
+{
+  "title": "Configurations",
+  "errors": {
+    "loadSettings": "Error reading library settings:"
+  },
+  "alerts": {
+    "rowsSaved": "Number of elements saved!",
+    "maxResultsSaved": "Maximum searches saved!",
+    "librarySettingsSaved": "Settings for {{libName}} saved!"
+  },
+  "labels": {
+    "rowsPerPage": "Elements per page",
+    "maxResults": "Max Searches per Library",
+    "noTokenNeeded": "No token needed"
+  },
+  "buttons": {
+    "save": "Save"
+  },
+  "placeholders": {
+    "insertToken": "Insert token"
+  }
+}

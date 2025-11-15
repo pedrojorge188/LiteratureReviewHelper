@@ -12,6 +12,7 @@ import {
 import { SavedSearch } from "./types";
 import { SaveDialog } from "../components/SaveDialog";
 import { SavedSearchCard } from "../components/SavedSearchCard";
+import { SavedSearchPageHeader } from "../components/SavedSearchPageHeader";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 
 export const FavoritesPage = () => {
@@ -182,21 +183,13 @@ export const FavoritesPage = () => {
         onCancel={cancelDelete}
       />
 
-      <div className="history-header">
-        <h2>{t("favorites:title") || "Favorite Searches"}</h2>
-        <div className="history-actions">
-          <button className="btn-secondary" onClick={handleExport} disabled={savedSearches.length === 0}>
-            {t("favorites:export") || "Export All"}
-          </button>
-          <label className="btn-secondary import-btn">
-            {t("favorites:import") || "Import"}
-            <input type="file" accept=".json" onChange={handleImport} style={{ display: "none" }} />
-          </label>
-          <button className="btn-danger" onClick={handleClearAll} disabled={savedSearches.length === 0}>
-            {t("favorites:clear_all") || "Clear All"}
-          </button>
-        </div>
-      </div>
+      <SavedSearchPageHeader
+        title={t("favorites:title") || "Favorite Searches"}
+        savedSearches={savedSearches}
+        onExport={handleExport}
+        onImport={handleImport}
+        onClear={handleClearAll}
+      />
 
       {savedSearches.length === 0 ? (
         <div className="empty-state">

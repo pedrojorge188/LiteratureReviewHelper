@@ -271,3 +271,14 @@ export const saveHistoryEntry = (
   }
 };
 
+/**
+ * Clear all search history
+ */
+export const clearAllSearchHistory = (): void => {
+  try {
+    localStorage.removeItem(STORAGE_HISTORY_KEY);
+  } catch (error) {
+    console.error("Error clearing search history:", error);
+    throw error;
+  }
+};

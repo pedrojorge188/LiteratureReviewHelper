@@ -1,5 +1,6 @@
 {
     "title": "Histórico",
     "no_searches": "Nenhum histórico disponível.",
-    "load": "Carregar"
+    "load": "Carregar",
+    "clear_all": "Limpar Tudo"
 }

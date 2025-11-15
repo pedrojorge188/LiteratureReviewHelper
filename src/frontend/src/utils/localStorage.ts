@@ -1,6 +1,6 @@
 import { SavedSearch, SavedSearchesStorage, SearchParameters } from "../pages/types";
 
-const STORAGE_KEY = "literatureReviewHelper_savedSearches";
+const STORAGE_FAVORITES_KEY = "literatureReviewHelper_savedSearches";
 const STORAGE_HISTORY_KEY = "literatureReviewHelper_searchHistory";
 
 // Type for internal app usage (Portuguese field names)
@@ -52,7 +52,7 @@ const fromStorageFormat = (params: SearchParameters): InternalSearchParameters =
  */
 export const getSavedSearches = (): SavedSearch[] => {
   try {
-    const data = localStorage.getItem(STORAGE_KEY);
+    const data = localStorage.getItem(STORAGE_FAVORITES_KEY);
     if (!data) {
       return [];
     }
@@ -92,7 +92,7 @@ export const saveSearch = (
       searches,
     };
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(storage));
+    localStorage.setItem(STORAGE_FAVORITES_KEY, JSON.stringify(storage));
     return newSearch;
   } catch (error) {
     console.error("Error saving search:", error);
@@ -125,7 +125,7 @@ export const updateSearchLabel = (id: string, newLabel: string): void => {
       searches,
     };
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(storage));
+    localStorage.setItem(STORAGE_FAVORITES_KEY, JSON.stringify(storage));
   } catch (error) {
     console.error("Error updating search label:", error);
     throw error;
@@ -144,7 +144,7 @@ export const deleteSearch = (id: string): void => {
       searches: filteredSearches,
     };
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(storage));
+    localStorage.setItem(STORAGE_FAVORITES_KEY, JSON.stringify(storage));
   } catch (error) {
     console.error("Error deleting search:", error);
     throw error;
@@ -183,7 +183,7 @@ export const getSearchParametersForUI = (id: string): InternalSearchParameters |
  */
 export const clearAllSearches = (): void => {
   try {
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(STORAGE_FAVORITES_KEY);
   } catch (error) {
     console.error("Error clearing searches:", error);
     throw error;
@@ -216,7 +216,7 @@ export const importSearches = (jsonString: string): void => {
       searches: uniqueSearches,
     };
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(storage));
+    localStorage.setItem(STORAGE_FAVORITES_KEY, JSON.stringify(storage));
   } catch (error) {
     console.error("Error importing searches:", error);
     throw error;

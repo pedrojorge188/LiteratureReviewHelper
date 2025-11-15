@@ -1,3 +1,12 @@
 export const HistoryPage = () => {
-  return <>History page</>;
+  return (
+    <div className="history-page">
+      <div className="history-header">
+       
+      </div>
+      <div className="empty-state">
+      </div>
+    </div>
+  );
 };
+

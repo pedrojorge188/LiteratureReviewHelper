@@ -34,6 +34,29 @@
     max-width: 800px;
     margin-left: 130px;
   }
+  
+  .import-section {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+    
+    .import-btn-top {
+      padding: 0.625rem 1.5rem;
+      background: vars.$color-blue-1;
+      color: vars.$color-white;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.95rem;
+      font-weight: vars.$font-text--medium;
+      cursor: pointer;
+      transition: vars.$trans-all-3;
+      
+      &:hover {
+        background: darken(vars.$color-blue-1, 10%);
+      }
+    }
+  }
+  
   h2 {
     font-size: 1.6rem;
     margin-bottom: 1rem;
@@ -149,6 +172,27 @@
             text-decoration: underline;
           }
         }
+      }
+    }
+  }
+
+  .import-button-container {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-start;
+
+    button {
+      background: vars.$color-gray-2;
+      color: vars.$color-white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: 0.2s;
+
+      &:hover {
+        color: vars.$color-gray-2;
+        background-color: vars.$color-white;
       }
     }
   }

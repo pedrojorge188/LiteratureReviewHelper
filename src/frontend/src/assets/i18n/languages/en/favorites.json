@@ -1,0 +1,22 @@
+{
+  "title": "Favorite Searches",
+  "no_searches": "No favorite searches yet. Save a search from the main page!",
+  "query": "Query",
+  "years": "Years",
+  "libraries": "Libraries",
+  "excluded_venues": "Excluded Venues",
+  "excluded_titles": "Excluded Titles",
+  "load": "Load",
+  "edit": "Edit",
+  "delete": "Delete",
+  "export": "Export All",
+  "export_single": "Export",
+  "import": "Import",
+  "clear_all": "Clear All",
+  "confirm_delete": "Are you sure you want to delete this search?",
+  "confirm_clear_all": "Are you sure you want to delete all saved searches? This cannot be undone.",
+  "export_error": "Error exporting searches",
+  "import_success": "Searches imported successfully!",
+  "import_error": "Error importing searches. Please check the file format.",
+  "update_error": "Error updating search name. Please try again."
+}

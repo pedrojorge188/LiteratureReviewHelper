@@ -5,6 +5,10 @@ import { useDispatch } from "react-redux";
 import { SearchResponseDto } from "./types";
 import { ArticlesList } from "./ArticlesList";
 import { LoadingCircle } from "../components/shared";
+import { SaveDialog } from "../components/SaveDialog";
+import { ImportDialog } from "../components/ImportDialog";
+import { saveSearch } from "../utils/localStorage";
+import { SavedSearch } from "./types";
 
 interface Query {
   valor: string;
@@ -25,6 +29,9 @@ export const MainPage = () => {
   const [showList, setShowList] = useState(false);
   const [response, setResponse] = useState<SearchResponseDto | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [saveError, setSaveError] = useState<string>("");
 
   const normalizarQueries = (lista: Query[]): Query[] => {
     return lista.map((q, i) => {
@@ -74,14 +81,57 @@ export const MainPage = () => {
   };
 
   const guardar = () => {
-    console.log(t("home:dados_guardados"), {
-      queries,
-      anoDe,
-      anoAte,
-      excluirVenues,
-      excluirTitulos,
-      bibliotecas,
+    // Open the save dialog instead of just logging
+    setSaveError("");
+    setIsSaveDialogOpen(true);
+  };
+
+  const handleSaveSearch = (customLabel: string) => {
+    try {
+      const searchParameters = {
+        queries,
+        anoDe,
+        anoAte,
+        excluirVenues,
+        excluirTitulos,
+        bibliotecas,
+      };
+
+      saveSearch(customLabel, searchParameters);
+      setIsSaveDialogOpen(false);
+      setSaveError("");
+    } catch (error) {
+      console.error("Error saving search:", error);
+      // Set error message to be displayed in the dialog
+      if (error instanceof Error) {
+        setSaveError(error.message);
+      } else {
+        setSaveError(t("home:search_save_error") || "Error saving search. Please try again.");
+      }
+    }
+  };
+
+  const handleImport = () => {
+    setIsImportDialogOpen(true);
+  };
+
+  const handleLoadSearch = (search: SavedSearch) => {
+    const params = search.searchParameters;
+    // Convert from English storage format to Portuguese UI format
+    const convertedQueries = params.queries.map((q, i) => {
+      if (i === 0) {
+        return { valor: q.value };
+      }
+      return { valor: q.value, metadado: q.operator };
     });
+    
+    setQueries(convertedQueries);
+    setAnoDe(params.yearFrom || "");
+    setAnoAte(params.yearTo || "");
+    setExcluirVenues(params.excludeVenues || "");
+    setExcluirTitulos(params.excludeTitles || "");
+    setBibliotecas(params.libraries || []);
+    setIsImportDialogOpen(false);
   };
 
   const pesquisar = async () => {
@@ -111,11 +161,43 @@ export const MainPage = () => {
     }
   };
 
+  // Load search parameters from sessionStorage if coming from HistoryPage
+  useEffect(() => {
+    const loadedSearch = sessionStorage.getItem("loadedSearch");
+    if (loadedSearch) {
+      try {
+        const params = JSON.parse(loadedSearch);
+        setQueries(params.queries || [{ valor: "" }]);
+        setAnoDe(params.anoDe || "");
+        setAnoAte(params.anoAte || "");
+        setExcluirVenues(params.excluirVenues || "");
+        setExcluirTitulos(params.excluirTitulos || "");
+        setBibliotecas(params.bibliotecas || []);
+        sessionStorage.removeItem("loadedSearch");
+      } catch (error) {
+        console.error("Error loading search from history:", error);
+      }
+    }
+  }, []);
+
   useEffect(() => {}, [showList]);
 
   return (
     <>
       {isLoading && <LoadingCircle />}
+
+      <SaveDialog
+        isOpen={isSaveDialogOpen}
+        onClose={() => setIsSaveDialogOpen(false)}
+        onSave={handleSaveSearch}
+        externalError={saveError}
+      />
+
+      <ImportDialog
+        isOpen={isImportDialogOpen}
+        onClose={() => setIsImportDialogOpen(false)}
+        onLoad={handleLoadSearch}
+      />
 
       <div
         className={`container-article ${
@@ -195,12 +277,11 @@ export const MainPage = () => {
                 </div>
               </div>
             ))}
-            <div className="container-bts">
-              <button type="button" onClick={() => {}}>
-                Importar Querie
-              </button>
-              <button type="button" onClick={() => {}}>
-                Importar Ficheiro
+            
+            {/* Import Button below queries */}
+            <div className="import-button-container">
+              <button type="button" onClick={handleImport}>
+                {t("home:importar") || "Import"}
               </button>
             </div>
           </div>
@@ -240,14 +321,6 @@ export const MainPage = () => {
               onChange={(e) => setExcluirVenues(e.target.value)}
               placeholder={t("home:placeholder_excluir_venues") ?? ""}
             ></textarea>
-            <div className="container-bts">
-              <button type="button" onClick={() => {}}>
-                Importar Venues
-              </button>
-              <button type="button" onClick={() => {}}>
-                Importar Ficheiro
-              </button>
-            </div>
           </div>
 
           {/* Excluir títulos */}
@@ -258,14 +331,6 @@ export const MainPage = () => {
               onChange={(e) => setExcluirTitulos(e.target.value)}
               placeholder={t("home:placeholder_excluir_titulos") ?? ""}
             ></textarea>
-            <div className="container-bts">
-              <button type="button" onClick={() => {}}>
-                Importar Titulos
-              </button>
-              <button type="button" onClick={() => {}}>
-                Importar Ficheiro
-              </button>
-            </div>
           </div>
 
           {/* Bibliotecas */}

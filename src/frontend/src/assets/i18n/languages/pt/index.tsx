@@ -7,6 +7,7 @@ import importDialog from "./import.json";
 import favorites from "./favorites.json";
 import history from "./history.json";
 import savedsearchcard from "./savedsearchcard.json";
+import savedsearchpageheader from "./savedsearchpageheader.json";
 
 export const pt = {
   general: general,
@@ -18,4 +19,5 @@ export const pt = {
   favorites: favorites,
   history: history,
   savedsearchcard: savedsearchcard,
+  savedsearchpageheader: savedsearchpageheader,
 };

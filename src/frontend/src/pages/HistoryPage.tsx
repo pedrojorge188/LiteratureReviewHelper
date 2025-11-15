@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { getSearchHistory, clearAllSearchHistory, deleteHistoryEntry } from "../utils/localStorage";
 import { SavedSearch } from "./types";
 import { SavedSearchCard } from "../components/SavedSearchCard";
+import { SavedSearchPageHeader } from "../components/SavedSearchPageHeader";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 
 export const HistoryPage = () => {
@@ -71,14 +72,11 @@ export const HistoryPage = () => {
         onCancel={cancelDelete}
       />
 
-      <div className="history-header">
-        <h2>{t("history:title") || "Search History"}</h2>
-          <div className="history-actions">
-          <button className="btn-danger" onClick={handleClearAll} disabled={historySearches.length === 0}>
-            {t("history:clear_all") || "Clear All"}
-          </button>
-        </div>
-      </div>
+      <SavedSearchPageHeader
+        title={t("history:title") || "Search History"}
+        savedSearches={historySearches}
+        onClear={handleClearAll}
+      />
 
       {historySearches.length === 0 ? (
         <div className="empty-state">

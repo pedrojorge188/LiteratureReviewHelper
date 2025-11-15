@@ -24,6 +24,7 @@
   "botao_guardar": "Save search",
   "botao_pesquisar": "Search",
   "importar": "Load search",
+  "erro_selecionar_api": "Please select at least one API/library before searching.",
   "dados_guardados": "Saved data:",
   "pesquisar_com": "Search with:",
   "results": "results obtained",

@@ -2,5 +2,7 @@
     "title": "Histórico",
     "no_searches": "Nenhum histórico disponível.",
     "load": "Carregar",
-    "clear_all": "Limpar Tudo"
+    "delete": "Eliminar",
+    "clear_all": "Limpar Tudo",
+    "confirm_delete": "Tem a certeza que deseja eliminar esta pesquisa?"
 }

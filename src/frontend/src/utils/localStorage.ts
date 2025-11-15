@@ -272,6 +272,25 @@ export const saveHistoryEntry = (
 };
 
 /**
+ * Delete a search from history.
+ */
+export const deleteHistoryEntry = (id: string): void => {
+  try {
+    const searches = getSearchHistory();
+    const filteredSearches = searches.filter((s) => s.id !== id);
+
+    const storage: SavedSearchesStorage = {
+      searches: filteredSearches,
+    };
+
+    localStorage.setItem(STORAGE_HISTORY_KEY, JSON.stringify(storage));
+  } catch (error) {
+    console.error("Error deleting search from history:", error);
+    throw error;
+  }
+};
+
+/**
  * Clear all search history
  */
 export const clearAllSearchHistory = (): void => {

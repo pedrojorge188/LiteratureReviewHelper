@@ -5,6 +5,9 @@ import articles from "./articles.json";
 import saveDialog from "./saveDialog.json";
 import importDialog from "./import.json";
 import favorites from "./favorites.json";
+import history from "./history.json";
+import savedsearchcard from "./savedsearchcard.json";
+import savedsearchpageheader from "./savedsearchpageheader.json";
 
 export const en = {
   general: general,
@@ -14,4 +17,7 @@ export const en = {
   saveDialog: saveDialog,
   import: importDialog,
   favorites: favorites,
+  history: history,
+  savedsearchcard: savedsearchcard,
+  savedsearchpageheader: savedsearchpageheader,
 };

@@ -1,6 +1,7 @@
 import { SavedSearch, SavedSearchesStorage, SearchParameters } from "../pages/types";
 
-const STORAGE_KEY = "literatureReviewHelper_savedSearches";
+const STORAGE_FAVORITES_KEY = "literatureReviewHelper_savedSearches";
+const STORAGE_HISTORY_KEY = "literatureReviewHelper_searchHistory";
 
 // Type for internal app usage (Portuguese field names)
 interface InternalSearchParameters {
@@ -51,7 +52,7 @@ const fromStorageFormat = (params: SearchParameters): InternalSearchParameters =
  */
 export const getSavedSearches = (): SavedSearch[] => {
   try {
-    const data = localStorage.getItem(STORAGE_KEY);
+    const data = localStorage.getItem(STORAGE_FAVORITES_KEY);
     if (!data) {
       return [];
     }
@@ -91,7 +92,7 @@ export const saveSearch = (
       searches,
     };
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(storage));
+    localStorage.setItem(STORAGE_FAVORITES_KEY, JSON.stringify(storage));
     return newSearch;
   } catch (error) {
     console.error("Error saving search:", error);
@@ -124,7 +125,7 @@ export const updateSearchLabel = (id: string, newLabel: string): void => {
       searches,
     };
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(storage));
+    localStorage.setItem(STORAGE_FAVORITES_KEY, JSON.stringify(storage));
   } catch (error) {
     console.error("Error updating search label:", error);
     throw error;
@@ -143,7 +144,7 @@ export const deleteSearch = (id: string): void => {
       searches: filteredSearches,
     };
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(storage));
+    localStorage.setItem(STORAGE_FAVORITES_KEY, JSON.stringify(storage));
   } catch (error) {
     console.error("Error deleting search:", error);
     throw error;
@@ -182,7 +183,7 @@ export const getSearchParametersForUI = (id: string): InternalSearchParameters |
  */
 export const clearAllSearches = (): void => {
   try {
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(STORAGE_FAVORITES_KEY);
   } catch (error) {
     console.error("Error clearing searches:", error);
     throw error;
@@ -215,9 +216,88 @@ export const importSearches = (jsonString: string): void => {
       searches: uniqueSearches,
     };
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(storage));
+    localStorage.setItem(STORAGE_FAVORITES_KEY, JSON.stringify(storage));
   } catch (error) {
     console.error("Error importing searches:", error);
+    throw error;
+  }
+};
+
+/**
+ * Get search history from localStorage
+ */
+export const getSearchHistory = (): SavedSearch[] => {
+  try {
+    const data = localStorage.getItem(STORAGE_HISTORY_KEY);
+    if (!data) {
+      return [];
+    }
+    const storage: SavedSearchesStorage = JSON.parse(data);
+    return storage.searches || [];
+  } catch (error) {
+    console.error("Error loading search history:", error);
+    return [];
+  }
+};
+
+/**
+ * Save a new search to history.
+ */
+export const saveHistoryEntry = (
+  searchParameters: InternalSearchParameters
+): SavedSearch => {
+  try {
+    const searches = getSearchHistory();
+
+    const id = new Date().toISOString();
+
+    const newSearch: SavedSearch = {
+      id,
+      timestamp: new Date().toISOString(),
+      searchParameters: toStorageFormat(searchParameters),
+    };
+
+    searches.unshift(newSearch);
+
+    const storage: SavedSearchesStorage = {
+      searches,
+    };
+
+    localStorage.setItem(STORAGE_HISTORY_KEY, JSON.stringify(storage));
+    return newSearch;
+  } catch (error) {
+    console.error("Error saving history entry:", error);
+    throw error;
+  }
+};
+
+/**
+ * Delete a search from history.
+ */
+export const deleteHistoryEntry = (id: string): void => {
+  try {
+    const searches = getSearchHistory();
+    const filteredSearches = searches.filter((s) => s.id !== id);
+
+    const storage: SavedSearchesStorage = {
+      searches: filteredSearches,
+    };
+
+    localStorage.setItem(STORAGE_HISTORY_KEY, JSON.stringify(storage));
+  } catch (error) {
+    console.error("Error deleting search from history:", error);
+    throw error;
+  }
+};
+
+/**
+ * Clear all search history
+ */
+export const clearAllSearchHistory = (): void => {
+  try {
+    localStorage.removeItem(STORAGE_HISTORY_KEY);
+  } catch (error) {
+    console.error("Error clearing search history:", error);
     throw error;
   }
 };

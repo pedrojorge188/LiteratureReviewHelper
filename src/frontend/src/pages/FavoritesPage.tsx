@@ -11,6 +11,8 @@ import {
 } from "../utils/localStorage";
 import { SavedSearch } from "./types";
 import { SaveDialog } from "../components/SaveDialog";
+import { SavedSearchCard } from "../components/SavedSearchCard";
+import { SavedSearchPageHeader } from "../components/SavedSearchPageHeader";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 
 export const FavoritesPage = () => {
@@ -159,23 +161,6 @@ export const FavoritesPage = () => {
     loadSearches();
   };
 
-  const formatDate = (isoString: string) => {
-    const date = new Date(isoString);
-    return date.toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  const formatQueryString = (queries: Array<{ value: string; operator?: string }>) => {
-    return queries
-      .map((q, i) => (i === 0 ? q.value : `${q.operator} ${q.value}`))
-      .join(" ");
-  };
-
   return (
     <div className="history-page">
       <SaveDialog
@@ -198,21 +183,13 @@ export const FavoritesPage = () => {
         onCancel={cancelDelete}
       />
 
-      <div className="history-header">
-        <h2>{t("favorites:title") || "Favorite Searches"}</h2>
-        <div className="history-actions">
-          <button className="btn-secondary" onClick={handleExport} disabled={savedSearches.length === 0}>
-            {t("favorites:export") || "Export All"}
-          </button>
-          <label className="btn-secondary import-btn">
-            {t("favorites:import") || "Import"}
-            <input type="file" accept=".json" onChange={handleImport} style={{ display: "none" }} />
-          </label>
-          <button className="btn-danger" onClick={handleClearAll} disabled={savedSearches.length === 0}>
-            {t("favorites:clear_all") || "Clear All"}
-          </button>
-        </div>
-      </div>
+      <SavedSearchPageHeader
+        title={t("favorites:title") || "Favorite Searches"}
+        savedSearches={savedSearches}
+        onExport={handleExport}
+        onImport={handleImport}
+        onClear={handleClearAll}
+      />
 
       {savedSearches.length === 0 ? (
         <div className="empty-state">
@@ -221,67 +198,13 @@ export const FavoritesPage = () => {
       ) : (
         <div className="searches-list">
           {savedSearches.map((search) => (
-            <div key={search.id} className="search-card">
-              <div className="search-card-header">
-                <h3>{search.id}</h3>
-                <span className="search-date">{formatDate(search.timestamp)}</span>
-              </div>
-
-              <div className="search-card-body">
-                <div className="search-detail">
-                  <strong>{t("favorites:query") || "Query"}:</strong>
-                  <span>{formatQueryString(search.searchParameters.queries)}</span>
-                </div>
-
-                {(search.searchParameters.yearFrom || search.searchParameters.yearTo) && (
-                  <div className="search-detail">
-                    <strong>{t("favorites:years") || "Years"}:</strong>
-                    <span>
-                      {search.searchParameters.yearFrom || "..."} - {search.searchParameters.yearTo || "..."}
-                    </span>
-                  </div>
-                )}
-
-                {search.searchParameters.libraries.length > 0 && (
-                  <div className="search-detail">
-                    <strong>{t("favorites:libraries") || "Libraries"}:</strong>
-                    <span>{search.searchParameters.libraries.join(", ")}</span>
-                  </div>
-                )}
-
-                {search.searchParameters.excludeVenues && (
-                  <div className="search-detail">
-                    <strong>{t("favorites:excluded_venues") || "Excluded Venues"}:</strong>
-                    <span className="truncate">{search.searchParameters.excludeVenues}</span>
-                  </div>
-                )}
-
-                {search.searchParameters.excludeTitles && (
-                  <div className="search-detail">
-                    <strong>{t("favorites:excluded_titles") || "Excluded Titles"}:</strong>
-                    <span className="truncate">{search.searchParameters.excludeTitles}</span>
-                  </div>
-                )}
-              </div>
-
-              <div className="search-card-actions">
-                <button className="btn-primary" onClick={() => handleLoad(search)}>
-                  {t("favorites:load") || "Load"}
-                </button>
-                
-                {
-                /**TODO: Implement US: https://github.com/pedrojorge188/LiteratureReviewHelper/issues/21  
-                  <button className="btn-secondary"  onClick={() => handleEdit(search)}>
-                  {t("favorites:edit") || "Edit"}
-                </button> */}
-                <button className="btn-secondary" onClick={() => handleExportSingle(search)}>
-                  {t("favorites:export_single") || "Export"}
-                </button>
-                <button className="btn-danger" onClick={() => handleDelete(search.id)}>
-                  {t("favorites:delete") || "Delete"}
-                </button>
-              </div>
-            </div>
+            <SavedSearchCard
+              search={search}
+              onLoad={handleLoad}
+              onEdit={handleEdit}
+              onExport={handleExportSingle}
+              onDelete={handleDelete}
+            />
           ))}
         </div>
       )}

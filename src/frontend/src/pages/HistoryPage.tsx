@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { getSearchHistory } from "../utils/localStorage";
+import { getSearchHistory, clearAllSearchHistory } from "../utils/localStorage";
 import { SavedSearch } from "./types";
 
 export const HistoryPage = () => {
@@ -34,6 +34,11 @@ export const HistoryPage = () => {
     navigate("/");
   };
 
+    const handleClearAll = () => {
+      clearAllSearchHistory();
+      loadSearches();
+    };
+
   const formatDate = (isoString: string) => {
     const date = new Date(isoString);
     return date.toLocaleDateString(undefined, {
@@ -53,6 +58,11 @@ export const HistoryPage = () => {
     <div className="history-page">
       <div className="history-header">
         <h2>{t("history:title") || "Search History"}</h2>
+          <div className="history-actions">
+          <button className="btn-danger" onClick={handleClearAll} disabled={historySearches.length === 0}>
+            {t("history:clear_all") || "Clear All"}
+          </button>
+        </div>
       </div>
 
       {historySearches.length === 0 ? (

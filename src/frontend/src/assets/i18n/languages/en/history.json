@@ -1,5 +1,6 @@
 {
     "title": "History",
     "no_searches": "No history available.",
-    "load": "Load"
+    "load": "Load",
+    "clear_all": "Clear All"
 }

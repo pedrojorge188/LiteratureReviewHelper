@@ -59,5 +59,5 @@ export const SearchStatisticsPage = (apiData: SearchResponseDto) => {
         <PrismaCharts {...apiData} />
       </TabPanel>
     </Box>
-  );
+  )
 };

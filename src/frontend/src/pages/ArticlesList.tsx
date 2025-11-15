@@ -86,7 +86,6 @@ export const ArticlesList = ({ response, setShow }: ArtigosProps) => {
 
         <div>
               <a
-              hidden = {moreInfo}
               href="/api/download"
               className="download-btn"
               target="_blank"

@@ -15,6 +15,15 @@ interface Query {
   metadado?: string;
 }
 
+interface ApiSetting {
+  token: string;
+  noToken: boolean;
+}
+
+interface ApiSettings {
+  [key: string]: ApiSetting;
+}
+
 export const MainPage = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch<any>();
@@ -33,6 +42,29 @@ export const MainPage = () => {
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [saveError, setSaveError] = useState<string>("");
   const [apiError, setApiError] = useState(false);
+  const SETTINGS_KEY = "librarySettings";
+  const [apiSettings, setApiSettings] = useState<ApiSettings>({});
+
+  useEffect(() => {
+    const savedSettings = localStorage.getItem(SETTINGS_KEY);
+    if (savedSettings) {
+      try {
+        const parsedSettings = JSON.parse(savedSettings) as ApiSettings;
+        setApiSettings(parsedSettings);
+      } catch (error) {
+        console.error("Erro ao carregar configurações das APIs:", error);
+      }
+    }
+  }, []);
+
+  const availableLibraries = Object.keys(apiSettings).filter((key) => {
+    const settings = apiSettings[key];
+    if (!settings) return false;
+    // Filtra para incluir apenas se noToken=true OU se tiver um token
+    return (
+      settings.noToken === true || (settings.token && settings.token.length > 0)
+    );
+  });
 
   const normalizarQueries = (lista: Query[]): Query[] => {
     return lista.map((q, i) => {
@@ -155,11 +187,25 @@ export const MainPage = () => {
     // Build the source parameter from selected bibliotecas
     const sourceParam = bibliotecas.join(",");
 
+    // Constrói dinamicamente o parâmetro apiList
+    const apiListParam = bibliotecas
+      .filter((libName) => {
+        // 1. Encontra a configuração da biblioteca selecionada
+        const settings = apiSettings[libName];
+        // 2. Filtra: Mantém apenas se a configuração existir E tiver um token
+        return settings && settings.token && settings.token.length > 0;
+      })
+      .map((libNameWithToken) => {
+        // 3. Formata como "CHAVE=VALOR" (ex: "SPRINGER=0c2c2...")
+        return `${libNameWithToken}=${apiSettings[libNameWithToken].token}`;
+      })
+      .join(","); // 4. Junta tudo com vírgulas
+
     try {
       const resultAction = await dispatch(
         getArticles({
           query: queryString,
-          apiList: "SPRINGER=0c2c20ce9ca00510e69e0bd7ffba864e",
+          apiList: apiListParam,
           source: sourceParam,
         })
       );
@@ -195,8 +241,6 @@ export const MainPage = () => {
       }
     }
   }, []);
-
-  useEffect(() => {}, [showList]);
 
   return (
     <>
@@ -358,47 +402,53 @@ export const MainPage = () => {
                 onChange={(e) => setBibliotecaSelecionada(e.target.value)}
               >
                 <option value="">{t("home:selecionar_biblioteca")}</option>
-                <option value="ACM">ACM</option>
-                <option value="HAL">HAL</option>
-                <option value="SPRINGER">Springer</option>
+
+                {/* Opções geradas dinamicamente */}
+                {availableLibraries.map((libName) => (
+                  <option key={libName} value={libName}>
+                    {libName}
+                  </option>
+                ))}
               </select>
               <button type="button" onClick={adicionarBiblioteca}>
                 {t("home:botao_adicionar")}
               </button>
             </div>
-
-            <div hidden= {bibliotecas.length === 0}>
+            <div hidden={bibliotecas.length === 0}>
               <h3 className="bibliotecas-lista-titulo">
-              {t("home:lista_bibliotecas")}
-            </h3>
-            <ul className="bibliotecas-lista">
-              {bibliotecas.map((b, i) => (
-                <li key={i}>
-                  <span>{b}</span>
-                  <button
-                    type="button"
-                    className="remove-btn"
-                    onClick={() => removerBiblioteca(b)}
-                  >
-                    {t("home:botao_remover")}
-                  </button>
-                </li>
-              ))}
-            </ul>
-            {apiError && bibliotecas.length === 0 && (
-              <p style={{ color: 'red', marginTop: '10px', fontSize: '14px' }}>
-                {t("home:erro_selecionar_api")}
-              </p>
-            )}
+                {t("home:lista_bibliotecas")}
+              </h3>
+              <ul className="bibliotecas-lista">
+                {bibliotecas.map((b, i) => (
+                  <li key={i}>
+                    <span>{b}</span>
+                    <button
+                      type="button"
+                      className="remove-btn"
+                      onClick={() => removerBiblioteca(b)}
+                    >
+                      {t("home:botao_remover")}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              {apiError && bibliotecas.length === 0 && (
+                <p
+                  style={{ color: "red", marginTop: "10px", fontSize: "14px" }}
+                >
+                  {t("home:erro_selecionar_api")}
+                </p>
+              )}
+            </div>
           </div>
 
-          <hr hidden={bibliotecas.length > 0}/>
+          <hr hidden={bibliotecas.length > 0} />
 
           {/* Botões principais */}
           <div className="actions">
             <div>
               <button type="button" onClick={handleImport}>
-                  {t("home:importar") || "Import"}
+                {t("home:importar") || "Import"}
               </button>
               <button type="button" onClick={guardar}>
                 {t("home:botao_guardar")}

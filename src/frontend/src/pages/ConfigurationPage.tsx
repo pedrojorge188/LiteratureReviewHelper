@@ -1,4 +1,4 @@
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { InfoDialog } from "../components";
 
@@ -6,6 +6,7 @@ import { InfoDialog } from "../components";
 const SETTINGS_KEY = "librarySettings";
 
 export const ConfigurationPage = () => {
+  const { t } = useTranslation();
   const bibliotecas = ["HAL", "ACM", "SPRINGER"];
   const [isInfoOpen, setIsInfoOpen] = useState(false);
 
@@ -85,7 +86,6 @@ export const ConfigurationPage = () => {
       ...allSettings,
       [libName]: settings[libName],
     };
-
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(updatedSettings));
     // Usa interpolação para passar a variável para o i18n
     setIsInfoOpen(true);
@@ -100,7 +100,6 @@ export const ConfigurationPage = () => {
         onClose={() => setIsInfoOpen(false)}
         duration={1300}
       />
-      ;
       <div className="pagina-bibliotecas">
         <h3>{t("configurations:title")}</h3>
 

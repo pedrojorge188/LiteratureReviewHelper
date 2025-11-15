@@ -1,6 +1,7 @@
 import { SavedSearch, SavedSearchesStorage, SearchParameters } from "../pages/types";
 
 const STORAGE_KEY = "literatureReviewHelper_savedSearches";
+const STORAGE_HISTORY_KEY = "literatureReviewHelper_searchHistory";
 
 // Type for internal app usage (Portuguese field names)
 interface InternalSearchParameters {
@@ -221,3 +222,52 @@ export const importSearches = (jsonString: string): void => {
     throw error;
   }
 };
+
+/**
+ * Get search history from localStorage
+ */
+export const getSearchHistory = (): SavedSearch[] => {
+  try {
+    const data = localStorage.getItem(STORAGE_HISTORY_KEY);
+    if (!data) {
+      return [];
+    }
+    const storage: SavedSearchesStorage = JSON.parse(data);
+    return storage.searches || [];
+  } catch (error) {
+    console.error("Error loading search history:", error);
+    return [];
+  }
+};
+
+/**
+ * Save a new search to history.
+ */
+export const saveHistoryEntry = (
+  searchParameters: InternalSearchParameters
+): SavedSearch => {
+  try {
+    const searches = getSearchHistory();
+
+    const id = new Date().toISOString();
+
+    const newSearch: SavedSearch = {
+      id,
+      timestamp: new Date().toISOString(),
+      searchParameters: toStorageFormat(searchParameters),
+    };
+
+    searches.unshift(newSearch);
+
+    const storage: SavedSearchesStorage = {
+      searches,
+    };
+
+    localStorage.setItem(STORAGE_HISTORY_KEY, JSON.stringify(storage));
+    return newSearch;
+  } catch (error) {
+    console.error("Error saving history entry:", error);
+    throw error;
+  }
+};
+

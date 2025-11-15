@@ -104,7 +104,7 @@ export const ArticlesList = ({ response, setShow }: ArtigosProps) => {
           </div>
         </div>
 
-       {moreInfo ? (<SearchStatisticsPage {... response}/>) : 
+      {moreInfo ? (<SearchStatisticsPage {... response}/>) : 
         (
         <>
           <div className="results-container">

@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { getSearchHistory } from "../utils/localStorage";
 import { SavedSearch } from "./types";
 
 export const HistoryPage = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [historySearches, setHistorySearches] = useState<SavedSearch[]>([]);
 
   useEffect(() => {
@@ -14,6 +16,22 @@ export const HistoryPage = () => {
   const loadSearches = () => {
     const searches = getSearchHistory();
     setHistorySearches(searches);
+  };
+
+  const handleLoad = (search: SavedSearch) => {
+    const internalParams = {
+      queries: search.searchParameters.queries.map(q => ({
+        valor: q.value,
+        metadado: q.operator
+      })),
+      anoDe: search.searchParameters.yearFrom,
+      anoAte: search.searchParameters.yearTo,
+      excluirVenues: search.searchParameters.excludeVenues,
+      excluirTitulos: search.searchParameters.excludeTitles,
+      bibliotecas: search.searchParameters.libraries,
+    };
+    sessionStorage.setItem("loadedSearch", JSON.stringify(internalParams));
+    navigate("/");
   };
 
   const formatDate = (isoString: string) => {
@@ -85,6 +103,12 @@ export const HistoryPage = () => {
                     <span className="truncate">{search.searchParameters.excludeTitles}</span>
                   </div>
                 )}
+              </div>
+
+              <div className="search-card-actions">
+                <button className="btn-primary" onClick={() => handleLoad(search)}>
+                  {t("history:load") || "Load"}
+                </button>
               </div>
             </div>
           ))}

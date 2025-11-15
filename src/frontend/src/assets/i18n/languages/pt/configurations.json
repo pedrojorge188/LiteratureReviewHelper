@@ -18,5 +18,7 @@
   },
   "placeholders": {
     "insertToken": "Inserir token"
-  }
+  },
+  "titleModalSuccess": "Sucesso",
+  "messageModalSuccess": "A sua ação foi gravada com sucesso!"
 }

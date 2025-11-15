@@ -43,6 +43,22 @@
       }
     }
   }
+  .save-container {
+    button {
+      background: vars.$color-gray-2;
+      color: vars.$color-white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: 0.2s;
+
+      &:hover {
+        color: vars.$color-gray-2;
+        background-color: vars.$color-white;
+      }
+    }
+  }
   .biblioteca-row {
     display: flex;
     gap: 0.5rem;
@@ -78,8 +94,12 @@
       padding: 0.3rem 0;
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-
       gap: 10px;
+      label {
+        input {
+          cursor: pointer;
+        }
+      }
       .details {
         display: flex;
         justify-content: flex-end;
@@ -88,7 +108,7 @@
       .details-btn {
         background: none;
         border: none;
-        color: vars.$color-red-2;
+        color: vars.$color-black;
         max-width: 105px;
         width: 105px;
         cursor: pointer;
@@ -97,7 +117,7 @@
           justify-content: flex-end;
         }
         &:hover {
-          text-decoration: underline;
+          font-weight: 700;
         }
       }
     }

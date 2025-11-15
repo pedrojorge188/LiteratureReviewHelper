@@ -1,11 +1,17 @@
 import { t } from "i18next";
 import { useState } from "react";
+import { InfoDialog } from "../components";
 
 // Chave para guardar as definições das bibliotecas no localStorage
 const SETTINGS_KEY = "librarySettings";
 
 export const ConfigurationPage = () => {
   const bibliotecas = ["HAL", "ACM", "SPRINGER"];
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
+
+  const mostrarAviso = () => {
+    setIsInfoOpen(true);
+  };
 
   // --- Estado para Rows e Max Results ---
   const [rowsPerPage, setRowsPerPage] = useState(
@@ -17,19 +23,16 @@ export const ConfigurationPage = () => {
 
   const handleSaveRows = () => {
     localStorage.setItem("rowsPerPage", rowsPerPage);
-    // alert(t("configurations:alerts.rowsSaved"));
   };
 
   const handleSaveMaxResults = () => {
     localStorage.setItem("maxResults", maxResults);
-    // alert(t("configurations:alerts.maxResultsSaved"));
   };
 
   const handleSaveTop = () => {
     handleSaveMaxResults();
     handleSaveRows();
-    // alert(t("configurations:alerts.maxResultsSaved"));
-    <InfoDialog isOpen={} title={} message={} onClose={} duration={3000} />;
+    setIsInfoOpen(true);
   };
 
   // --- Nova Lógica para Definições das Bibliotecas ---
@@ -85,13 +88,19 @@ export const ConfigurationPage = () => {
 
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(updatedSettings));
     // Usa interpolação para passar a variável para o i18n
-    alert(
-      t("configurations:alerts.librarySettingsSaved", { libName: libName })
-    );
+    setIsInfoOpen(true);
   };
 
   return (
     <>
+      <InfoDialog
+        isOpen={isInfoOpen}
+        title={t("configurations:titleModalSuccess")}
+        message={t("configurations:messageModalSuccess")}
+        onClose={() => setIsInfoOpen(false)}
+        duration={1300}
+      />
+      ;
       <div className="pagina-bibliotecas">
         <h3>{t("configurations:title")}</h3>
 

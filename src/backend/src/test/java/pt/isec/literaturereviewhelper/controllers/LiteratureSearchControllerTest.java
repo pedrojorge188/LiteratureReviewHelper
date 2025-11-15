@@ -8,6 +8,7 @@ import org.springframework.util.Assert;
 import pt.isec.literaturereviewhelper.commons.RequestHeaderUtils;
 import pt.isec.literaturereviewhelper.dtos.SearchResponseDto;
 import pt.isec.literaturereviewhelper.interfaces.ILiteratureReviewService;
+import pt.isec.literaturereviewhelper.interfaces.IResultFilter;
 import pt.isec.literaturereviewhelper.models.Article;
 import pt.isec.literaturereviewhelper.models.Engines;
 import reactor.core.publisher.Mono;
@@ -58,13 +59,23 @@ class LiteratureSearchControllerTest {
                 Engines.ACM, 5,
                 Engines.HAL, 3
         );
+        Map<Engines, Map<String, Map<IResultFilter.Statistic, Integer>>> filterImpactByEngine =
+                Map.of(
+                        Engines.HAL, Map.of(
+                                "DuplicateFilterResult", Map.of(
+                                        IResultFilter.Statistic.OUTPUT, 0,
+                                        IResultFilter.Statistic.INPUT, 5
+                                )
+                )
+        );
 
         SearchResponseDto expectedResponse = new SearchResponseDto(
                 "AI",
                 8,
                 articlesByEngine,
                 articles,
-                0);
+                0,
+                filterImpactByEngine);
 
         try (MockedStatic<RequestHeaderUtils> mocked = mockStatic(RequestHeaderUtils.class)) {
             mocked.when(() -> RequestHeaderUtils.parseApiKeysHeader(apiKeysHeader))
@@ -99,13 +110,23 @@ class LiteratureSearchControllerTest {
 
         List<Article> articles = List.of(new Article("ML Basics", "Author X", null, null, null, null, null));
         Map<Engines, Integer> articlesByEngine = Map.of(Engines.HAL, 1);
+        Map<Engines, Map<String, Map<IResultFilter.Statistic, Integer>>> filterImpactByEngine =
+                Map.of(
+                        Engines.HAL, Map.of(
+                                "DuplicateFilterResult", Map.of(
+                                        IResultFilter.Statistic.OUTPUT, 0,
+                                        IResultFilter.Statistic.INPUT, 5
+                                )
+                )
+        );
 
         SearchResponseDto expectedResponse = new SearchResponseDto(
                 "machine learning",
                 1,
                 articlesByEngine,
                 articles,
-                0
+                0,
+                filterImpactByEngine
         );
 
         try (MockedStatic<RequestHeaderUtils> mocked = mockStatic(RequestHeaderUtils.class)) {

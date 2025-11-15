@@ -1,0 +1,78 @@
+.node-container {
+  background: #fff;
+  border-radius: 10px;
+  width: 100%;
+  height: 100%;
+  min-width: 150px;
+  min-height: 120px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.15s ease;
+
+  &.selected {
+    border: 1.5px solid #444;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  &:not(.selected) {
+    border: 1px solid #ccc;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  }
+
+  input.node-title {
+    width: 100%;
+    padding: 6px 8px;
+    border: none;
+    border-bottom: 1px solid #ccc;
+    outline: none;
+    font-weight: bold;
+    font-size: 14px;
+    border-radius: 10px 10px 0 0;
+    box-sizing: border-box;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  textarea.node-label {
+    flex: 1;
+    width: 100%;
+    padding: 8px;
+    border: none;
+    outline: none;
+    resize: none;
+    background: transparent;
+    font-size: 12px;
+    line-height: 1.4;
+    font-family: 'Inter', system-ui, sans-serif;
+    box-sizing: border-box;
+    color: black;
+  }
+
+  .node-delete {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    background: inherit;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+
+    &:hover {
+      background: #e5e5e5;
+      border-color: #bbb;
+    }
+  }
+}
+
+.react-flow-handle {
+  background: #555;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}

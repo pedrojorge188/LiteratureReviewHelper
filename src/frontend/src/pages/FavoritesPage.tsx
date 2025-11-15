@@ -268,9 +268,12 @@ export const FavoritesPage = () => {
                 <button className="btn-primary" onClick={() => handleLoad(search)}>
                   {t("favorites:load") || "Load"}
                 </button>
-                <button className="btn-secondary" onClick={() => handleEdit(search)}>
+                
+                {
+                /**TODO: Implement US: https://github.com/pedrojorge188/LiteratureReviewHelper/issues/21  
+                  <button className="btn-secondary"  onClick={() => handleEdit(search)}>
                   {t("favorites:edit") || "Edit"}
-                </button>
+                </button> */}
                 <button className="btn-secondary" onClick={() => handleExportSingle(search)}>
                   {t("favorites:export_single") || "Export"}
                 </button>

@@ -106,7 +106,10 @@ export const MainPage = () => {
       if (error instanceof Error) {
         setSaveError(error.message);
       } else {
-        setSaveError(t("home:search_save_error") || "Error saving search. Please try again.");
+        setSaveError(
+          t("home:search_save_error") ||
+            "Error saving search. Please try again."
+        );
       }
     }
   };
@@ -124,7 +127,7 @@ export const MainPage = () => {
       }
       return { valor: q.value, metadado: q.operator };
     });
-    
+
     setQueries(convertedQueries);
     setAnoDe(params.yearFrom || "");
     setAnoAte(params.yearTo || "");
@@ -277,7 +280,7 @@ export const MainPage = () => {
                 </div>
               </div>
             ))}
-            
+
             {/* Import Button below queries */}
             <div className="import-button-container">
               <button type="button" onClick={handleImport}>

@@ -20,8 +20,8 @@ export const getArticles = createAsyncThunk(
       `${API_URL}/search?q=${query}&start=0&rows=10&wt=bibtex`,
       {
         headers: {
-          'X-API-KEYS': apiList
-        }
+          "X-API-KEYS": apiList,
+        },
       }
     );
     return response.data;
@@ -29,3 +29,4 @@ export const getArticles = createAsyncThunk(
 );
 
 //http://localhost:8080/api/search?q=AI&start=0&rows=25&wt=bibtex&api_key=0c2c20ce9ca00510e69e0bd7ffba864e
+//deep_search_limit

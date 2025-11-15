@@ -1,11 +1,95 @@
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { getSearchHistory } from "../utils/localStorage";
+import { SavedSearch } from "./types";
+
 export const HistoryPage = () => {
+  const { t } = useTranslation();
+  const [historySearches, setHistorySearches] = useState<SavedSearch[]>([]);
+
+  useEffect(() => {
+    loadSearches();
+  }, []);
+
+  const loadSearches = () => {
+    const searches = getSearchHistory();
+    setHistorySearches(searches);
+  };
+
+  const formatDate = (isoString: string) => {
+    const date = new Date(isoString);
+    return date.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const formatQueryString = (queries: Array<{ value: string; operator?: string }>) => {
+    return queries.map((q, i) => (i === 0 ? q.value : `${q.operator} ${q.value}`)).join(" ");
+  };
+
   return (
     <div className="history-page">
       <div className="history-header">
-       
+        <h2>{t("history:title") || "Search History"}</h2>
       </div>
-      <div className="empty-state">
-      </div>
+
+      {historySearches.length === 0 ? (
+        <div className="empty-state">
+          <p>{t("history:no_searches") || "No history available."}</p>
+        </div>
+      ) : (
+        <div className="searches-list">
+          {historySearches.map((search) => (
+            <div key={search.id} className="search-card">
+              <div className="search-card-header">
+                <h3>{search.id}</h3>
+                <span className="search-date">{formatDate(search.timestamp)}</span>
+              </div>
+
+              <div className="search-card-body">
+                <div className="search-detail">
+                  <strong>{t("history:query") || "Query"}:</strong>
+                  <span>{formatQueryString(search.searchParameters.queries)}</span>
+                </div>
+
+                {(search.searchParameters.yearFrom || search.searchParameters.yearTo) && (
+                  <div className="search-detail">
+                    <strong>{t("history:years") || "Years"}:</strong>
+                    <span>
+                      {search.searchParameters.yearFrom || "..."} - {search.searchParameters.yearTo || "..."}
+                    </span>
+                  </div>
+                )}
+
+                {search.searchParameters.libraries.length > 0 && (
+                  <div className="search-detail">
+                    <strong>{t("history:libraries") || "Libraries"}:</strong>
+                    <span>{search.searchParameters.libraries.join(", ")}</span>
+                  </div>
+                )}
+
+                {search.searchParameters.excludeVenues && (
+                  <div className="search-detail">
+                    <strong>{t("history:excluded_venues") || "Excluded Venues"}:</strong>
+                    <span className="truncate">{search.searchParameters.excludeVenues}</span>
+                  </div>
+                )}
+
+                {search.searchParameters.excludeTitles && (
+                  <div className="search-detail">
+                    <strong>{t("history:excluded_titles") || "Excluded Titles"}:</strong>
+                    <span className="truncate">{search.searchParameters.excludeTitles}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

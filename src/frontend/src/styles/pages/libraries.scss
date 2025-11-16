@@ -1,0 +1,125 @@
+@use "../utilities" as *;
+@use "../variables" as vars;
+
+.pagina-bibliotecas {
+  width: 100%;
+  padding: 1.5rem;
+  color: #444;
+  position: relative;
+  opacity: 100%;
+  pointer-events: all;
+  .section {
+    &__top {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+  }
+  .rows-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    &__label {
+    }
+    &__input {
+      min-height: 30px;
+      max-width: 100px;
+      input {
+        max-width: 100px;
+      }
+    }
+  }
+  .deep-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    &__label {
+    }
+    &__input {
+      min-height: 30px;
+      max-width: 100px;
+      input {
+        max-width: 100px;
+      }
+    }
+  }
+  .save-container {
+    button {
+      background: vars.$color-gray-2;
+      color: vars.$color-white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: 0.2s;
+
+      &:hover {
+        color: vars.$color-gray-2;
+        background-color: vars.$color-white;
+      }
+    }
+  }
+  .biblioteca-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+
+    button {
+      background: vars.$color-gray-2;
+      color: vars.$color-white;
+      border: none;
+      padding: 0.4rem 0.8rem;
+      cursor: pointer;
+      border-radius: 3px;
+      transition: 0.2s;
+
+      &:hover {
+        color: vars.$color-gray-2;
+        background-color: vars.$color-white;
+      }
+    }
+  }
+
+  .bibliotecas-lista {
+    list-style: none;
+    padding: 0;
+    margin-top: 0.5rem;
+    &-titulo {
+      margin-top: 2rem;
+    }
+
+    li {
+      align-items: center;
+      border-bottom: 1px solid vars.$color-white-3;
+      padding: 0.3rem 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      label {
+        input {
+          cursor: pointer;
+        }
+      }
+      .details {
+        display: flex;
+        justify-content: flex-end;
+        width: 100%;
+      }
+      .details-btn {
+        background: none;
+        border: none;
+        color: vars.$color-black;
+        max-width: 105px;
+        width: 105px;
+        cursor: pointer;
+        &__text {
+          display: flex;
+          justify-content: flex-end;
+        }
+        &:hover {
+          font-weight: 700;
+        }
+      }
+    }
+  }
+}

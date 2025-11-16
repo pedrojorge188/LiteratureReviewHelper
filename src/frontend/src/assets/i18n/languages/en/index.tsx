@@ -5,6 +5,7 @@ import articles from "./articles.json";
 import saveDialog from "./saveDialog.json";
 import importDialog from "./import.json";
 import favorites from "./favorites.json";
+import configurations from "./configurations.json";
 
 export const en = {
   general: general,
@@ -14,4 +15,5 @@ export const en = {
   saveDialog: saveDialog,
   import: importDialog,
   favorites: favorites,
+  configurations: configurations,
 };

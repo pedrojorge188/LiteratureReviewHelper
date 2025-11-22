@@ -47,7 +47,7 @@ public class SpringerEngine extends EngineBase<SpringerResponse> {
         Map<String, Object> p = new HashMap<>();
 
         p.put("q", raw.get(QUERY));
-        p.put("s", parseInteger(raw.get(START), START));
+        p.put("s", parseInteger(raw.get(START), START) * parseInteger(raw.get(ROWS), ROWS));
         p.put("p", parseInteger(raw.get(ROWS), ROWS));
         p.put("api_key", raw.get(API_KEY));
 

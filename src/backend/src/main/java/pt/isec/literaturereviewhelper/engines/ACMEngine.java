@@ -51,7 +51,7 @@ public class ACMEngine extends EngineBase<ACMResponse> {
         Map<String, Object> p = new HashMap<>();
 
         p.put("query.bibliographic", raw.get(QUERY));
-        p.put("offset", parseInteger(raw.get(START), START));
+        p.put("offset", parseInteger(raw.get(START), START) * parseInteger(raw.get(ROWS), ROWS));
         p.put("rows",   parseInteger(raw.get(ROWS), ROWS));
         p.put("filter", raw.getOrDefault("filter", "prefix:10.1145"));
 

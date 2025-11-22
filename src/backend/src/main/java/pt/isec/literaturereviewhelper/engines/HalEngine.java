@@ -53,7 +53,7 @@ public class HalEngine extends EngineBase<String> {
         Map<String, Object> p = new HashMap<>();
 
         p.put("q", raw.get(QUERY));
-        p.put("start", parseInteger(raw.get(START), START));
+        p.put("start", parseInteger(raw.get(START), START) * parseInteger(raw.get(ROWS), ROWS));
         p.put("rows", parseInteger(raw.get(ROWS), ROWS));
         p.put("wt", raw.get(WT));
 

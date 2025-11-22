@@ -1,4 +1,4 @@
-import { ArticlesList, ConfigurationPage, FavoritesPage, HistoryPage, MainPage } from "../pages";
+import { ArticlesList, ConfigurationPage, FavoritesPage, HistoryPage, MainPage, EditSearchPage } from "../pages";
 import { langDefault, langDefaultRedirect, langs } from "../utils";
 import { IRoute, IRoutePathLang } from "./types";
 
@@ -15,6 +15,7 @@ export const Paths = (): IRoute => ({
   savePage: { path: "favoritos", element: <FavoritesPage /> },
   libListPage: { path: "configuracoes", element: <ConfigurationPage /> },
   // articlePage: { path: "listaartigos", element: <ArticlesList /> },
+  editSearchPage: { path: "editar", element: <EditSearchPage /> },
 });
 
 // Return the root path (ex: / or /en)

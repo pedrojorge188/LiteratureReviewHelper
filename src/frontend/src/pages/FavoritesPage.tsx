@@ -4,13 +4,11 @@ import { useNavigate } from "react-router-dom";
 import {
   getSavedSearches,
   deleteSearch,
-  updateSearchLabel,
   exportSearches,
   importSearches,
   clearAllSearches,
 } from "../utils/localStorage";
 import { SavedSearch } from "./types";
-import { SaveDialog } from "../components/SaveDialog";
 import { SavedSearchCard } from "../components/SavedSearchCard";
 import { SavedSearchPageHeader } from "../components/SavedSearchPageHeader";
 import { ConfirmDialog } from "../components/ConfirmDialog";
@@ -20,10 +18,6 @@ export const FavoritesPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([]);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [currentLabel, setCurrentLabel] = useState("");
-  const [editError, setEditError] = useState<string>("");
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
   const [isConfirmDeleteAllOpen, setIsConfirmDeleteAllOpen] = useState(false);
   const [confirmDeleteAll, setConfirmDeleteAll] = useState(false);

@@ -4,13 +4,11 @@ import { useNavigate } from "react-router-dom";
 import {
   getSavedSearches,
   deleteSearch,
-  updateSearchLabel,
   exportSearches,
   importSearches,
   clearAllSearches,
 } from "../utils/localStorage";
 import { SavedSearch } from "./types";
-import { SaveDialog } from "../components/SaveDialog";
 import { SavedSearchCard } from "../components/SavedSearchCard";
 import { SavedSearchPageHeader } from "../components/SavedSearchPageHeader";
 import { ConfirmDialog } from "../components/ConfirmDialog";
@@ -19,10 +17,6 @@ export const FavoritesPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([]);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [currentLabel, setCurrentLabel] = useState("");
-  const [editError, setEditError] = useState<string>("");
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
@@ -56,30 +50,20 @@ export const FavoritesPage = () => {
   };
 
   const handleEdit = (search: SavedSearch) => {
-    setEditingId(search.id);
-    setCurrentLabel(search.id);
-    setEditError("");
-    setIsEditDialogOpen(true);
-  };
-
-  const handleUpdateLabel = (newLabel: string) => {
-    if (editingId) {
-      try {
-        updateSearchLabel(editingId, newLabel);
-        setIsEditDialogOpen(false);
-        setEditingId(null);
-        setCurrentLabel("");
-        setEditError("");
-        loadSearches();
-      } catch (error) {
-        console.error("Error updating label:", error);
-        if (error instanceof Error) {
-          setEditError(error.message);
-        } else {
-          setEditError(t("favorites:update_error") || "Error updating search name. Please try again.");
-        }
-      }
-    }
+    const internalParams = {
+      queries: search.searchParameters.queries.map(q => ({
+        valor: q.value,
+        metadado: q.operator
+      })),
+      anoDe: search.searchParameters.yearFrom,
+      anoAte: search.searchParameters.yearTo,
+      excluirVenues: search.searchParameters.excludeVenues,
+      excluirTitulos: search.searchParameters.excludeTitles,
+      bibliotecas: search.searchParameters.libraries,
+    };
+    sessionStorage.setItem("editableSearchLabel", search.id);
+    sessionStorage.setItem("editableSearch", JSON.stringify(internalParams));
+    navigate("/editar");
   };
 
   const handleLoad = (search: SavedSearch) => {
@@ -163,19 +147,6 @@ export const FavoritesPage = () => {
 
   return (
     <div className="history-page">
-      <SaveDialog
-        isOpen={isEditDialogOpen}
-        onClose={() => {
-          setIsEditDialogOpen(false);
-          setEditingId(null);
-          setCurrentLabel("");
-          setEditError("");
-        }}
-        onSave={handleUpdateLabel}
-        initialLabel={currentLabel}
-        externalError={editError}
-      />
-
       <ConfirmDialog
         isOpen={isConfirmDeleteOpen}
         message={t("favorites:confirm_delete") || "Are you sure you want to delete this search?"}

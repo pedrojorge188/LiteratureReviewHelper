@@ -79,12 +79,11 @@ export const SavedSearchCard = ({ search, onLoad, onEdit, onExport, onDelete }: 
                     {t("savedsearchcard:load") || "Load"}
                 </button>
             )}
-            {/** TODO: Implement US: https://github.com/pedrojorge188/LiteratureReviewHelper/issues/21
             {onEdit && (
                 <button className="btn-secondary" onClick={() => onEdit(search)}>
                     {t("savedsearchcard:edit") || "Edit"}
                 </button>
-            )} */}
+            )}
             {onExport && (
                 <button className="btn-secondary" onClick={() => onExport(search)}>
                     {t("savedsearchcard:export") || "Export"}

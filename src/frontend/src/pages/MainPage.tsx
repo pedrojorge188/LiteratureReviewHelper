@@ -7,7 +7,7 @@ import { ArticlesList } from "./ArticlesList";
 import { LoadingCircle } from "../components/shared";
 import { SaveDialog } from "../components/SaveDialog";
 import { ImportDialog } from "../components/ImportDialog";
-import { saveSearch } from "../utils/localStorage";
+import { saveSearch, saveHistoryEntry } from "../utils/localStorage";
 import { SavedSearch } from "./types";
 
 interface Query {
@@ -200,6 +200,20 @@ export const MainPage = () => {
         return `${libNameWithToken}=${apiSettings[libNameWithToken].token}`;
       })
       .join(","); // 4. Junta tudo com vírgulas
+
+    try {
+      const internalParams = {
+        queries: normalizarQueries(queries),
+        anoDe,
+        anoAte,
+        excluirVenues,
+        excluirTitulos,
+        bibliotecas,
+      };
+      saveHistoryEntry(internalParams);
+    } catch (err) {
+      console.error("Error saving search history:", err);
+    }
 
     try {
       const resultAction = await dispatch(

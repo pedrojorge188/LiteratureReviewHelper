@@ -28,7 +28,7 @@ export const getArticles = createAsyncThunk(
   }) => {
     // --- Estado para Rows e Max Results ---
     const rowsPerPage = localStorage.getItem("rowsPerPage") || "10";
-    const maxResults = localStorage.getItem("maxResults") || "10";
+    const maxResults = localStorage.getItem("maxResults") || "300";
     console.log(rowsPerPage);
     console.log(maxResults);
     let url = `${API_URL}/search?q=${query}&start=0&rows=${rowsPerPage}&deep_search_limit=${maxResults}&wt=bibtex`;

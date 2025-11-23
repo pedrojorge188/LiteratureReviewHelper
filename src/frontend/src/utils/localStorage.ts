@@ -8,8 +8,11 @@ interface InternalSearchParameters {
   queries: Array<{ valor: string; metadado?: string }>;
   anoDe: string;
   anoAte: string;
-  excluirVenues: string;
-  excluirTitulos: string;
+  authors: string[],
+  venues: string[],
+  excludeAuthors: string[],
+  excludeVenues: string[],
+  excludeTitles: string[],
   bibliotecas: string[];
 }
 
@@ -24,8 +27,11 @@ const toStorageFormat = (params: InternalSearchParameters): SearchParameters => 
     })),
     yearFrom: params.anoDe,
     yearTo: params.anoAte,
-    excludeVenues: params.excluirVenues,
-    excludeTitles: params.excluirTitulos,
+    authors: params.authors,
+    venues: params.venues,
+    excludeAuthors: params.excludeAuthors,
+    excludeVenues: params.excludeVenues,
+    excludeTitles: params.excludeTitles,
     libraries: params.bibliotecas,
   };
 };
@@ -41,8 +47,11 @@ const fromStorageFormat = (params: SearchParameters): InternalSearchParameters =
     })),
     anoDe: params.yearFrom,
     anoAte: params.yearTo,
-    excluirVenues: params.excludeVenues,
-    excluirTitulos: params.excludeTitles,
+    authors: params.authors,
+    venues: params.venues,
+    excludeAuthors: params.excludeAuthors,
+    excludeVenues: params.excludeVenues,
+    excludeTitles: params.excludeTitles,
     bibliotecas: params.libraries,
   };
 };

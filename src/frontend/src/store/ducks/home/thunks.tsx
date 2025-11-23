@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { useState } from "react";
+import { SearchRequestPayload } from "../../../pages/types";
 
 const API_URL = import.meta.env.VITE_APP_API_URL;
 //exemplos
@@ -17,30 +17,43 @@ export const getNavbarData = createAsyncThunk("Navbar", async () => {
 //usado
 export const getArticles = createAsyncThunk(
   "Articles",
-  async ({
-    query,
-    apiList,
-    source,
-  }: {
-    query: string;
-    apiList: string;
-    source?: string;
-  }) => {
-    // --- Estado para Rows e Max Results ---
-    const rowsPerPage = localStorage.getItem("rowsPerPage") || "10";
-    const maxResults = localStorage.getItem("maxResults") || "300";
-    console.log(rowsPerPage);
-    console.log(maxResults);
-    let url = `${API_URL}/search?q=${query}&start=0&rows=${rowsPerPage}&deep_search_limit=${maxResults}&wt=bibtex`;
-    if (source) {
-      url += `&source=${source}`;
-    }
+  async (payload: SearchRequestPayload) => {
+    const {
+      query,
+      source,
+      start = 0,
+      rows = 10,
+      wt = "bibtex",
+      apiList,
+      author,
+      venue,
+      exclude_author,
+      exclude_title,
+      exclude_venue,
+      year_start,
+      year_end,
+    } = payload;
 
-    const response = await axios.get(url, {
+    const response = await axios.get(`${API_URL}/search`, {
+      params: {
+        q: query,
+        source,
+        start,
+        rows,
+        wt,
+        author,
+        venue,
+        exclude_author,
+        exclude_title,
+        exclude_venue,
+        year_start,
+        year_end,
+      },
       headers: {
         "X-API-KEYS": apiList,
       },
     });
+
     return response.data;
   }
 );

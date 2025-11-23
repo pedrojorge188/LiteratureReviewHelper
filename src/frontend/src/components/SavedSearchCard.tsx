@@ -14,87 +14,117 @@ export const SavedSearchCard = ({ search, onLoad, onEdit, onExport, onDelete }: 
 
     const formatQueryString = (queries: Array<{ value: string; operator?: string }>) => {
         return queries
-        .map((q, i) => (i === 0 ? q.value : `${q.operator} ${q.value}`))
-        .join(" ");
+            .map((q, i) => (i === 0 ? q.value : `${q.operator} ${q.value}`))
+            .join(" ");
     };
 
     const formatDate = (isoString: string) => {
         const date = new Date(isoString);
         return date.toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
         });
     };
+
+    const filterConfigs: {
+        key:
+        | "authors"
+        | "venues"
+        | "excludeAuthors"
+        | "excludeVenues"
+        | "excludeTitles";
+        label: string;
+    }[] = [
+            {
+                key: "authors",
+                label: t("savedsearchcard:authors") || "Authors",
+            },
+            {
+                key: "venues",
+                label: t("savedsearchcard:venues") || "Venues",
+            },
+            {
+                key: "excludeAuthors",
+                label: t("savedsearchcard:excluded_authors") || "Excluded Authors",
+            },
+            {
+                key: "excludeVenues",
+                label: t("savedsearchcard:excluded_venues") || "Excluded Venues",
+            },
+            {
+                key: "excludeTitles",
+                label: t("savedsearchcard:excluded_titles") || "Excluded Titles",
+            },
+        ];
 
     return (
         <div key={search.id} className="search-card">
             <div className="search-card-header">
-            <h3>{search.id}</h3>
-            <span className="search-date">{formatDate(search.timestamp)}</span>
+                <h3>{search.id}</h3>
+                <span className="search-date">{formatDate(search.timestamp)}</span>
             </div>
 
             <div className="search-card-body">
-            <div className="search-detail">
-                <strong>{t("savedsearchcard:query") || "Query"}:</strong>
-                <span>{formatQueryString(search.searchParameters.queries)}</span>
-            </div>
-
-            {(search.searchParameters.yearFrom || search.searchParameters.yearTo) && (
                 <div className="search-detail">
-                <strong>{t("savedsearchcard:years") || "Years"}:</strong>
-                <span>
-                    {search.searchParameters.yearFrom || "..."} - {search.searchParameters.yearTo || "..."}
-                </span>
+                    <strong>{t("savedsearchcard:query") || "Query"}:</strong>
+                    <span>{formatQueryString(search.searchParameters.queries)}</span>
                 </div>
-            )}
 
-            {search.searchParameters.libraries.length > 0 && (
-                <div className="search-detail">
-                <strong>{t("savedsearchcard:libraries") || "Libraries"}:</strong>
-                <span>{search.searchParameters.libraries.join(", ")}</span>
-                </div>
-            )}
+                {(search.searchParameters.yearFrom || search.searchParameters.yearTo) && (
+                    <div className="search-detail">
+                        <strong>{t("savedsearchcard:years") || "Years"}:</strong>
+                        <span>
+                            {search.searchParameters.yearFrom || "..."} - {search.searchParameters.yearTo || "..."}
+                        </span>
+                    </div>
+                )}
 
-            {search.searchParameters.excludeVenues && (
-                <div className="search-detail">
-                <strong>{t("savedsearchcard:excluded_venues") || "Excluded Venues"}:</strong>
-                <span className="truncate">{search.searchParameters.excludeVenues}</span>
-                </div>
-            )}
+                {search.searchParameters.libraries.length > 0 && (
+                    <div className="search-detail">
+                        <strong>{t("savedsearchcard:libraries") || "Libraries"}:</strong>
+                        <span>{search.searchParameters.libraries.join(", ")}</span>
+                    </div>
+                )}
 
-            {search.searchParameters.excludeTitles && (
-                <div className="search-detail">
-                <strong>{t("savedsearchcard:excluded_titles") || "Excluded Titles"}:</strong>
-                <span className="truncate">{search.searchParameters.excludeTitles}</span>
-                </div>
-            )}
+                {filterConfigs.map(({ key, label }) => {
+                    const values = search.searchParameters[key] as string[] | undefined;
+
+                    if (!values || values.length === 0) return null;
+
+                    return (
+                        <div key={key} className="search-detail">
+                            <strong>{label}:</strong>
+                            <span className="truncate">{values.join(", ")}</span>
+                        </div>
+                    );
+                })}
             </div>
 
             <div className="search-card-actions">
-            {onLoad && (
-                <button className="btn-primary" onClick={() => onLoad(search)}>
-                    {t("savedsearchcard:load") || "Load"}
-                </button>
-            )}
-            {/** TODO: Implement US: https://github.com/pedrojorge188/LiteratureReviewHelper/issues/21
+                {onLoad && (
+                    <button className="btn-primary" onClick={() => onLoad(search)}>
+                        {t("savedsearchcard:load") || "Load"}
+                    </button>
+                )}
+                {/** TODO: Implement US: https://github.com/pedrojorge188/LiteratureReviewHelper/issues/21
             {onEdit && (
                 <button className="btn-secondary" onClick={() => onEdit(search)}>
                     {t("savedsearchcard:edit") || "Edit"}
                 </button>
             )} */}
-            {onExport && (
-                <button className="btn-secondary" onClick={() => onExport(search)}>
-                    {t("savedsearchcard:export") || "Export"}
-                </button>
-            )}
-            {onDelete && (
-                <button className="btn-danger" onClick={() => onDelete(search.id)}>
-                    {t("savedsearchcard:delete") || "Delete"}
-                </button>
-            )}
+                {onExport && (
+                    <button className="btn-secondary" onClick={() => onExport(search)}>
+                        {t("savedsearchcard:export") || "Export"}
+                    </button>
+                )}
+                {onDelete && (
+                    <button className="btn-danger" onClick={() => onDelete(search.id)}>
+                        {t("savedsearchcard:delete") || "Delete"}
+                    </button>
+                )}
             </div>
         </div>
     );

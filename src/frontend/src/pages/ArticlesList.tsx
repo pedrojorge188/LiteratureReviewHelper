@@ -24,6 +24,60 @@ export const ArticlesList = ({ response, setShow }: ArtigosProps) => {
     }
   }, [response]);
 
+const downloadCSV = async () => {
+  if (!artigos || artigos.length === 0) return;
+
+  const header = ["title","authors","publicationYear","venue","link","source"];
+  const rows = artigos.map(a => [
+    `"${a.title ?? ""}"`,
+    `"${a.authors ?? ""}"`,
+    `"${a.publicationYear ?? ""}"`,
+    `"${a.venue ?? ""}"`,
+    `"${a.link ?? ""}"`,
+    `"${a.source ?? ""}"`,
+  ]);
+  const csvContent = [header, ...rows].map(row => row.join(",")).join("\n");
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+
+  if ('showSaveFilePicker' in window) {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: "articles.csv",
+        types: [{
+          description: "CSV File",
+          accept: { "text/csv": [".csv"] }
+        }]
+      });
+      const writable = await handle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+    } catch (err) {
+      console.error("Operation failed", err);
+    }
+  } else {
+    // Fallback: download padrão
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "articles.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+};
+
+useEffect(() => {
+  const link = document.querySelector(".download-btn[href='/download-csv']");
+  if (!link) return;
+  const handleClick = (event: Event) => {
+    event.preventDefault();
+    downloadCSV();
+  };
+  link.addEventListener("click", handleClick);
+  return () => link.removeEventListener("click", handleClick);
+}, [artigos]);
+
   const indexInicial = (paginaAtual - 1) * artigosPorPagina;
   const indexFinal = indexInicial + artigosPorPagina;
   const artigosVisiveis = artigos.slice(indexInicial, indexFinal);
@@ -31,7 +85,6 @@ export const ArticlesList = ({ response, setShow }: ArtigosProps) => {
 
   const gerarBotoesPaginacao = () => {
     const botoes: (number | string)[] = [];
-
     if (totalPaginas <= 7) {
       for (let i = 1; i <= totalPaginas; i++) botoes.push(i);
     } else {
@@ -86,7 +139,7 @@ export const ArticlesList = ({ response, setShow }: ArtigosProps) => {
 
         <div>
               <a
-              href="/api/download"
+              href="/download-csv"
               className="download-btn"
               target="_blank"
               rel="noopener noreferrer"
@@ -186,26 +239,3 @@ export const ArticlesList = ({ response, setShow }: ArtigosProps) => {
     </div>
   );
 };
-
-//Lista que vai receber
-
-// [
-//     {
-//         "title": "AI-Family Integration Index (AFII): Benchmarking a New Global Readiness for AI as Family",
-//         "publicationYear": "2025",
-//         "venue": "",
-//         "venueType": "Unpublished",
-//         "authors": "Mahajan, Prashant",
-//         "link": "https://hal.science/hal-05020569",
-//         "source": "HAL"
-//     },
-//     {
-//         "title": "REVIEWING THE RISKS OF AI TECHNICAL DEBT (TD) IN THE FINANCIAL SERVICES INDUSTRIES (FSIS)",
-//         "publicationYear": "2024",
-//         "venue": "",
-//         "venueType": "Unpublished",
-//         "authors": "Sankarapu, Vinay Kumar",
-//         "link": "https://hal.science/hal-04691168",
-//         "source": "HAL"
-//     }
-// ]

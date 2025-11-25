@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { getArticles } from "../store/ducks/home/thunks";
 import { useDispatch } from "react-redux";
-import { SearchRequestPayload, SearchResponseDto, SavedSearch } from "./types";
+import {SearchRequestPayload, SearchResponseDto, SavedSearch, SearchParameters} from "./types";
 import { ArticlesList } from "./ArticlesList";
 import { LoadingCircle } from "../components/shared";
 import { ChipInput } from "../components/shared/ChipInput";
@@ -13,14 +13,12 @@ import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Checkbox from "@mui/material/Checkbox";
 import ListItemText from "@mui/material/ListItemText";
-import DeleteIcon from "@mui/icons-material/Delete";
 
-import { SaveDialog } from "../components/SaveDialog";
-import { ImportDialog } from "../components/ImportDialog";
+import { SaveDialog } from "../components";
+import { ImportDialog } from "../components";
 import { saveSearch, saveHistoryEntry } from "../utils/localStorage";
 
 interface Query {
@@ -70,8 +68,6 @@ export const MainPage = () => {
   const [excludeAuthors, setExcludeAuthors] = useState<string[]>([]);
   const [excludeVenues, setExcludeVenues] = useState<string[]>([]);
   const [excludeTitles, setExcludeTitles] = useState<string[]>([]);
-
-  // Which filters are currently visible
   const [selectedFilters, setSelectedFilters] = useState<FilterKey[]>([]);
 
   const toParam = (values: string[]) =>
@@ -92,9 +88,7 @@ export const MainPage = () => {
   const availableLibraries = Object.keys(apiSettings).filter((key) => {
     const settings = apiSettings[key];
     if (!settings) return false;
-    return (
-      settings.noToken === true || (settings.token && settings.token.length > 0)
-    );
+    return (settings.noToken || (settings.token && settings.token.length > 0));
   });
 
   const normalizarQueries = (lista: Query[]): Query[] =>
@@ -179,7 +173,7 @@ export const MainPage = () => {
     setIsImportDialogOpen(true);
   };
 
-  const inferSelectedFilters = (params: any): FilterKey[] => {
+  const inferSelectedFilters = (params: SearchParameters): FilterKey[] => {
     const result: FilterKey[] = [];
     if ((params.authors || []).length) result.push("authors");
     if ((params.excludeAuthors || []).length) result.push("excludeAuthors");
@@ -243,30 +237,6 @@ export const MainPage = () => {
     setSelectedFilters(value);
   };
 
-  // Still keep a "remove" button on each row as a shortcut
-  const handleRemoveFilter = (key: FilterKey) => {
-    const newSelected = selectedFilters.filter((f) => f !== key);
-    // Clear values
-    switch (key) {
-      case "authors":
-        setAuthors([]);
-        break;
-      case "excludeAuthors":
-        setExcludeAuthors([]);
-        break;
-      case "venues":
-        setVenues([]);
-        break;
-      case "excludeVenues":
-        setExcludeVenues([]);
-        break;
-      case "excludeTitles":
-        setExcludeTitles([]);
-        break;
-    }
-    setSelectedFilters(newSelected);
-  };
-
   const pesquisar = async () => {
     if (bibliotecas.length === 0) {
       setApiError(true);
@@ -281,14 +251,19 @@ export const MainPage = () => {
       .join(" ")
       .trim();
 
+    // Build the source parameter from selected bibliotecas
     const sourceParam = bibliotecas.join(",");
 
+    // Constrói dinamicamente o parâmetro apiList
     const apiListParam = bibliotecas
       .filter((libName) => {
+        // 1. Encontra a configuração da biblioteca selecionada
         const settings = apiSettings[libName];
+        // 2. Filtra: Mantém apenas se a configuração existir E tiver um token
         return settings && settings.token && settings.token.length > 0;
       })
       .map((libNameWithToken) => {
+        // 3. Formata como "CHAVE=VALOR" (ex: "SPRINGER=0c2c2...")
         return `${libNameWithToken}=${apiSettings[libNameWithToken].token}`;
       })
       .join(",");

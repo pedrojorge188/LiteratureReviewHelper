@@ -9,7 +9,7 @@ interface SavedSearchCardProps {
     onDelete?: (id: string) => void;
 }
 
-export const SavedSearchCard = ({ search, onLoad, onEdit, onExport, onDelete }: SavedSearchCardProps) => {
+export const SavedSearchCard = ({ search, onLoad, /*onEdit,*/ onExport, onDelete }: SavedSearchCardProps) => {
     const { t } = useTranslation();
 
     const formatQueryString = (queries: Array<{ value: string; operator?: string }>) => {
@@ -40,23 +40,23 @@ export const SavedSearchCard = ({ search, onLoad, onEdit, onExport, onDelete }: 
     }[] = [
             {
                 key: "authors",
-                label: t("savedsearchcard:authors") || "Authors",
+                label: t("savedsearchcard:authors"),
             },
             {
                 key: "venues",
-                label: t("savedsearchcard:venues") || "Venues",
+                label: t("savedsearchcard:venues"),
             },
             {
                 key: "excludeAuthors",
-                label: t("savedsearchcard:excluded_authors") || "Excluded Authors",
+                label: t("savedsearchcard:excluded_authors"),
             },
             {
                 key: "excludeVenues",
-                label: t("savedsearchcard:excluded_venues") || "Excluded Venues",
+                label: t("savedsearchcard:excluded_venues"),
             },
             {
                 key: "excludeTitles",
-                label: t("savedsearchcard:excluded_titles") || "Excluded Titles",
+                label: t("savedsearchcard:excluded_titles"),
             },
         ];
 

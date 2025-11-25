@@ -34,12 +34,16 @@ export const getArticles = createAsyncThunk(
       year_end,
     } = payload;
 
+    const rowsPerPage = localStorage.getItem("rowsPerPage") || rows;
+    const maxResults = localStorage.getItem("maxResults") || "300";
+
     const response = await axios.get(`${API_URL}/search`, {
       params: {
         q: query,
         source,
         start,
-        rows,
+        rows: rowsPerPage,
+        deep_search_limit: maxResults,
         wt,
         author,
         venue,

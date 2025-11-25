@@ -9,6 +9,8 @@ interface ArtigosProps {
   setShow: Dispatch<SetStateAction<boolean>>;
 }
 
+const w = window as any;
+
 export const ArticlesList = ({ response, setShow }: ArtigosProps) => {
   const { t } = useTranslation();
   const [artigos, setArtigos] = useState<Artigo[]>([]);
@@ -38,10 +40,10 @@ const downloadCSV = async () => {
   ]);
   const csvContent = [header, ...rows].map(row => row.join(",")).join("\n");
   const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-
+  
   if ('showSaveFilePicker' in window) {
     try {
-      const handle = await window.showSaveFilePicker({
+      const handle = await w.showSaveFilePicker({
         suggestedName: "articles.csv",
         types: [{
           description: "CSV File",

@@ -9,8 +9,8 @@
     "librarySettingsSaved": "Definições para {{libName}} guardadas!"
   },
   "labels": {
-    "rowsPerPage": "Nº Elementos por pagina",
-    "maxResults": "Max de Pesquisas por Biblioteca",
+    "rowsPerPage": "Rows",
+    "maxResults": "Limite de Profundidade",
     "noTokenNeeded": "Não precisa de token"
   },
   "buttons": {

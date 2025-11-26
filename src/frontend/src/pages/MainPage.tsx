@@ -9,6 +9,7 @@ import { SaveDialog } from "../components/SaveDialog";
 import { ImportDialog } from "../components/ImportDialog";
 import { saveSearch, saveHistoryEntry } from "../utils/localStorage";
 import { SavedSearch } from "./types";
+import { SnackbarToast } from "../components";
 
 interface Query {
   valor: string;
@@ -44,6 +45,11 @@ export const MainPage = () => {
   const [apiError, setApiError] = useState(false);
   const SETTINGS_KEY = "librarySettings";
   const [apiSettings, setApiSettings] = useState<ApiSettings>({});
+  const [openToast, setOpenToast] = useState(false);
+  const [openToastB, setOpenToastB] = useState(false);
+  const [openToastC, setOpenToastC] = useState(false);
+  const [openToastD, setOpenToastD] = useState(false);
+  const [openToastE, setOpenToastE] = useState(false);
 
   useEffect(() => {
     const savedSettings = localStorage.getItem(SETTINGS_KEY);
@@ -134,16 +140,20 @@ export const MainPage = () => {
       saveSearch(customLabel, searchParameters);
       setIsSaveDialogOpen(false);
       setSaveError("");
+      setOpenToastC(true);
     } catch (error) {
       console.error("Error saving search:", error);
+      setOpenToastD(false);
       // Set error message to be displayed in the dialog
       if (error instanceof Error) {
         setSaveError(error.message);
+        setOpenToastD(false);
       } else {
         setSaveError(
           t("home:search_save_error") ||
             "Error saving search. Please try again."
         );
+        setOpenToastD(false);
       }
     }
   };
@@ -169,12 +179,14 @@ export const MainPage = () => {
     setExcluirTitulos(params.excludeTitles || "");
     setBibliotecas(params.libraries || []);
     setIsImportDialogOpen(false);
+    setOpenToastE(true);
   };
 
   const pesquisar = async () => {
     // Validate that at least one API is selected
     if (bibliotecas.length === 0) {
       setApiError(true);
+      setOpenToast(true);
       return;
     }
 
@@ -228,6 +240,7 @@ export const MainPage = () => {
         setResponse(resultAction.payload as SearchResponseDto);
         setShowList(true);
       } else {
+        setOpenToastB(true);
         console.error("Erro na pesquisa:", resultAction.error);
       }
     } catch (error) {
@@ -250,6 +263,7 @@ export const MainPage = () => {
         setExcluirTitulos(params.excluirTitulos || "");
         setBibliotecas(params.bibliotecas || []);
         sessionStorage.removeItem("loadedSearch");
+        setOpenToastE(true);
       } catch (error) {
         console.error("Error loading search from history:", error);
       }
@@ -260,6 +274,38 @@ export const MainPage = () => {
     <>
       {isLoading && <LoadingCircle />}
 
+      <SnackbarToast
+        open={openToastE}
+        setOpen={setOpenToastE}
+        messageStr={t("warnings:success")}
+        type="success"
+      />
+
+      <SnackbarToast
+        open={openToastD}
+        setOpen={setOpenToastD}
+        messageStr={t("warnings:error")}
+        type="error"
+      />
+      <SnackbarToast
+        open={openToastC}
+        setOpen={setOpenToastC}
+        messageStr={t("warnings:save")}
+        type="success"
+      />
+
+      <SnackbarToast
+        open={openToast}
+        setOpen={setOpenToast}
+        messageStr={t("warnings:noLibs")}
+        type="error"
+      />
+      <SnackbarToast
+        open={openToastB}
+        setOpen={setOpenToastB}
+        messageStr={t("warnings:noQuery")}
+        type="warning"
+      />
       <SaveDialog
         isOpen={isSaveDialogOpen}
         onClose={() => setIsSaveDialogOpen(false)}

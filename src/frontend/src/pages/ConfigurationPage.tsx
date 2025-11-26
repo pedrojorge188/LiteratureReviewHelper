@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
-import { InfoDialog } from "../components";
+import { InfoDialog, SnackbarToast } from "../components";
 
 // Chave para guardar as definições das bibliotecas no localStorage
 const SETTINGS_KEY = "librarySettings";
@@ -93,12 +93,11 @@ export const ConfigurationPage = () => {
 
   return (
     <>
-      <InfoDialog
-        isOpen={isInfoOpen}
-        title={t("configurations:titleModalSuccess")}
-        message={t("configurations:messageModalSuccess")}
-        onClose={() => setIsInfoOpen(false)}
-        duration={1300}
+      <SnackbarToast
+        messageStr={t("configurations:messageModalSuccess")}
+        open={isInfoOpen}
+        setOpen={setIsInfoOpen}
+        type="success"
       />
       <div className="pagina-bibliotecas">
         <h3>{t("configurations:title")}</h3>

@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { SaveDialog } from "../components/SaveDialog";
-import { updateSearch } from "../utils/localStorage";
+import { SavedSearch } from "../pages/types";
 
 interface Query {
   valor: string;
@@ -17,23 +16,41 @@ interface ApiSettings {
   [key: string]: ApiSetting;
 }
 
-export const EditSearchPage = () => {
+interface EditSearchDialogProps {
+  isOpen: boolean;
+  search: SavedSearch | null;
+  onClose: () => void;
+  onSave: (id: string, newLabel: string, searchParameters: {
+    queries: Query[];
+    anoDe: string;
+    anoAte: string;
+    excluirVenues: string;
+    excluirTitulos: string;
+    bibliotecas: string[];
+  }) => void;
+}
+
+export const EditSearchDialog = ({
+  isOpen,
+  search,
+  onClose,
+  onSave,
+}: EditSearchDialogProps) => {
   const { t } = useTranslation();
+  const SETTINGS_KEY = "librarySettings";
+
+  const [label, setLabel] = useState("");
   const [queries, setQueries] = useState<Query[]>([{ valor: "" }]);
   const [anoDe, setAnoDe] = useState<string>("");
   const [anoAte, setAnoAte] = useState<string>("");
   const [excluirVenues, setExcluirVenues] = useState<string>("");
   const [excluirTitulos, setExcluirTitulos] = useState<string>("");
-  const [bibliotecaSelecionada, setBibliotecaSelecionada] =
-    useState<string>("");
+  const [bibliotecaSelecionada, setBibliotecaSelecionada] = useState<string>("");
   const [bibliotecas, setBibliotecas] = useState<string[]>([]);
-  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
-  const [saveError, setSaveError] = useState<string>("");
-  const [apiError, setApiError] = useState(false);
-  const SETTINGS_KEY = "librarySettings";
   const [apiSettings, setApiSettings] = useState<ApiSettings>({});
-  const [currentLabel, setCurrentLabel] = useState("");
+  const [error, setError] = useState("");
 
+  // Load API settings
   useEffect(() => {
     const savedSettings = localStorage.getItem(SETTINGS_KEY);
     if (savedSettings) {
@@ -41,18 +58,34 @@ export const EditSearchPage = () => {
         const parsedSettings = JSON.parse(savedSettings) as ApiSettings;
         setApiSettings(parsedSettings);
       } catch (error) {
-        console.error("Erro ao carregar configurações das APIs:", error);
+        console.error("Error loading API settings:", error);
       }
     }
   }, []);
 
+  // Load search data when dialog opens
+  useEffect(() => {
+    if (isOpen && search) {
+      setLabel(search.id);
+      setQueries(
+        search.searchParameters.queries.map((q) => ({
+          valor: q.value,
+          metadado: q.operator,
+        }))
+      );
+      setAnoDe(search.searchParameters.yearFrom);
+      setAnoAte(search.searchParameters.yearTo);
+      setExcluirVenues(search.searchParameters.excludeVenues);
+      setExcluirTitulos(search.searchParameters.excludeTitles);
+      setBibliotecas(search.searchParameters.libraries);
+      setError("");
+    }
+  }, [isOpen, search]);
+
   const availableLibraries = Object.keys(apiSettings).filter((key) => {
     const settings = apiSettings[key];
     if (!settings) return false;
-    // Filtra para incluir apenas se noToken=true OU se tiver um token
-    return (
-      settings.noToken === true || (settings.token && settings.token.length > 0)
-    );
+    return settings.noToken === true || (settings.token && settings.token.length > 0);
   });
 
   const normalizarQueries = (lista: Query[]): Query[] => {
@@ -95,7 +128,6 @@ export const EditSearchPage = () => {
     if (bibliotecaSelecionada && !bibliotecas.includes(bibliotecaSelecionada)) {
       setBibliotecas([...bibliotecas, bibliotecaSelecionada]);
       setBibliotecaSelecionada("");
-      setApiError(false);
     }
   };
 
@@ -103,80 +135,60 @@ export const EditSearchPage = () => {
     setBibliotecas(bibliotecas.filter((b) => b !== nome));
   };
 
-  const guardar = () => {
-    // Open the save dialog instead of just logging
-    setSaveError("");
-    setIsSaveDialogOpen(true);
+  const handleSave = () => {
+    if (!label.trim()) {
+      setError(t("saveDialog:error_empty_label") || "Please enter a label");
+      return;
+    }
+
+    if (!search) return;
+
+    onSave(search.id, label.trim(), {
+      queries,
+      anoDe,
+      anoAte,
+      excluirVenues,
+      excluirTitulos,
+      bibliotecas,
+    });
   };
 
-  const handleSaveSearch = (customLabel: string) => {
-    try {
-      const searchParameters = {
-        queries,
-        anoDe,
-        anoAte,
-        excluirVenues,
-        excluirTitulos,
-        bibliotecas,
-      };
-
-      updateSearch(currentLabel, customLabel, searchParameters);
-      setIsSaveDialogOpen(false);
-      setSaveError("");
-    } catch (error) {
-      console.error("Error saving search:", error);
-      // Set error message to be displayed in the dialog
-      if (error instanceof Error) {
-        setSaveError(error.message);
-      } else {
-        setSaveError(
-          t("home:search_save_error") ||
-            "Error saving search. Please try again."
-        );
-      }
-    }
+  const handleClose = () => {
+    setError("");
+    onClose();
   };
 
-  // Load search parameters from sessionStorage if coming from HistoryPage
-  useEffect(() => {
-    const loadedSearchLabel = sessionStorage.getItem("editableSearchLabel");
-    if (loadedSearchLabel) {
-      setCurrentLabel(loadedSearchLabel);
-      sessionStorage.removeItem("editableSearchLabel");
-    }
-    const loadedSearch = sessionStorage.getItem("editableSearch");
-    if (loadedSearch) {
-      try {
-        const params = JSON.parse(loadedSearch);
-        setQueries(params.queries || [{ valor: "" }]);
-        setAnoDe(params.anoDe || "");
-        setAnoAte(params.anoAte || "");
-        setExcluirVenues(params.excluirVenues || "");
-        setExcluirTitulos(params.excluirTitulos || "");
-        setBibliotecas(params.bibliotecas || []);
-        sessionStorage.removeItem("editableSearch");
-      } catch (error) {
-        console.error("Error loading search from history:", error);
-      }
-    }
-  }, []);
+  if (!isOpen || !search) return null;
 
   return (
-    <>
-      <SaveDialog
-        isOpen={isSaveDialogOpen}
-        onClose={() => setIsSaveDialogOpen(false)}
-        onSave={handleSaveSearch}
-        initialLabel={sessionStorage.getItem("editableSearchLabel") || ""}
-        externalError={saveError}
-      />
-
+    <div className="modal-overlay p-3" onClick={handleClose}>
       <div
-        className={`pesquisa-container`}
+        className="modal-content edit-search-modal"
+        onClick={(e) => e.stopPropagation()}
       >
-        <h2>{t("home:titulo_pesquisa")}</h2>
+        <div className="modal-header">
+          <h3>{t("editSearchDialog:title") || "Edit Search"}</h3>
+          <button className="modal-close-btn" onClick={handleClose}>
+            &times;
+          </button>
+        </div>
 
-        <div className="pesquisa-container__content">
+        <div className="modal-body edit-search-body">
+          {/* Search Name */}
+          <div className="section">
+            <label>{t("editSearchDialog:label_name") || "Search Name"}</label>
+            <input
+              type="text"
+              value={label}
+              onChange={(e) => {
+                setLabel(e.target.value);
+                setError("");
+              }}
+              placeholder={t("saveDialog:placeholder") || "e.g., AI usage"}
+            />
+            {error && <p className="error-message">{error}</p>}
+          </div>
+
           {/* Query Section */}
           <div className="section">
             <label>{t("home:label_query")}</label>
@@ -239,10 +251,9 @@ export const EditSearchPage = () => {
                 </div>
               </div>
             ))}
-
           </div>
 
-          {/* Ano de publicação */}
+          {/* Publication Year */}
           <div className="section">
             <label>{t("home:label_ano_publicacao")}</label>
             <div className="ano-row">
@@ -255,10 +266,7 @@ export const EditSearchPage = () => {
                 ))}
               </select>
 
-              <select
-                value={anoAte}
-                onChange={(e) => setAnoAte(e.target.value)}
-              >
+              <select value={anoAte} onChange={(e) => setAnoAte(e.target.value)}>
                 <option value="">{t("home:ano_ate")}</option>
                 {Array.from({ length: 30 }, (_, i) => 2025 - i).map((ano) => (
                   <option key={ano} value={ano}>
@@ -269,7 +277,7 @@ export const EditSearchPage = () => {
             </div>
           </div>
 
-          {/* Excluir venues */}
+          {/* Exclude Venues */}
           <div className="section">
             <label>{t("home:label_excluir_venues")}</label>
             <textarea
@@ -279,7 +287,7 @@ export const EditSearchPage = () => {
             ></textarea>
           </div>
 
-          {/* Excluir títulos */}
+          {/* Exclude Titles */}
           <div className="section">
             <label>{t("home:label_excluir_titulos")}</label>
             <textarea
@@ -289,7 +297,7 @@ export const EditSearchPage = () => {
             ></textarea>
           </div>
 
-          {/* Bibliotecas */}
+          {/* Libraries */}
           <div className="section">
             <label>{t("home:label_bibliotecas")}</label>
             <div className="biblioteca-row">
@@ -298,8 +306,6 @@ export const EditSearchPage = () => {
                 onChange={(e) => setBibliotecaSelecionada(e.target.value)}
               >
                 <option value="">{t("home:selecionar_biblioteca")}</option>
-
-                {/* Opções geradas dinamicamente */}
                 {availableLibraries.map((libName) => (
                   <option key={libName} value={libName}>
                     {libName}
@@ -310,46 +316,39 @@ export const EditSearchPage = () => {
                 {t("home:botao_adicionar")}
               </button>
             </div>
-            <div hidden={bibliotecas.length === 0}>
-              <h3 className="bibliotecas-lista-titulo">
-                {t("home:lista_bibliotecas")}
-              </h3>
-              <ul className="bibliotecas-lista">
-                {bibliotecas.map((b, i) => (
-                  <li key={i}>
-                    <span>{b}</span>
-                    <button
-                      type="button"
-                      className="remove-btn"
-                      onClick={() => removerBiblioteca(b)}
-                    >
-                      {t("home:botao_remover")}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-              {apiError && bibliotecas.length === 0 && (
-                <p
-                  style={{ color: "red", marginTop: "10px", fontSize: "14px" }}
-                >
-                  {t("home:erro_selecionar_api")}
-                </p>
-              )}
-            </div>
-          </div>
-
-          <hr hidden={bibliotecas.length > 0} />
-
-          {/* Botões principais */}
-          <div className="actions">
-            <div>
-              <button type="button" onClick={guardar}>
-                {t("home:botao_guardar")}
-              </button>
-            </div>
+            {bibliotecas.length > 0 && (
+              <>
+                <h4 className="bibliotecas-lista-titulo">
+                  {t("home:lista_bibliotecas")}
+                </h4>
+                <ul className="bibliotecas-lista">
+                  {bibliotecas.map((b, i) => (
+                    <li key={i}>
+                      <span>{b}</span>
+                      <button
+                        type="button"
+                        className="remove-btn"
+                        onClick={() => removerBiblioteca(b)}
+                      >
+                        {t("home:botao_remover")}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
           </div>
         </div>
+
+        <div className="modal-footer">
+          <button className="btn-secondary" onClick={handleClose}>
+            {t("saveDialog:cancel") || "Cancel"}
+          </button>
+          <button className="btn-primary" onClick={handleSave}>
+            {t("saveDialog:save") || "Save"}
+          </button>
+        </div>
       </div>
-    </>
+    </div>
   );
 };

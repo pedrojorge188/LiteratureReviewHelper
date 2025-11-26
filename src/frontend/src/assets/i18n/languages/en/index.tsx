@@ -9,6 +9,7 @@ import configurations from "./configurations.json";
 import history from "./history.json";
 import savedsearchcard from "./savedsearchcard.json";
 import savedsearchpageheader from "./savedsearchpageheader.json";
+import editSearchDialog from "./editSearchDialog.json";
 
 export const en = {
   general: general,
@@ -22,4 +23,5 @@ export const en = {
   history: history,
   savedsearchcard: savedsearchcard,
   savedsearchpageheader: savedsearchpageheader,
+  editSearchDialog: editSearchDialog,
 };

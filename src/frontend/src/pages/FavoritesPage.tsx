@@ -7,11 +7,13 @@ import {
   exportSearches,
   importSearches,
   clearAllSearches,
+  updateSearch,
 } from "../utils/localStorage";
 import { SavedSearch } from "./types";
 import { SavedSearchCard } from "../components/SavedSearchCard";
 import { SavedSearchPageHeader } from "../components/SavedSearchPageHeader";
 import { ConfirmDialog } from "../components/ConfirmDialog";
+import { EditSearchDialog } from "../components/EditSearchDialog";
 
 export const FavoritesPage = () => {
   const { t } = useTranslation();
@@ -19,6 +21,8 @@ export const FavoritesPage = () => {
   const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([]);
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editTargetSearch, setEditTargetSearch] = useState<SavedSearch | null>(null);
 
   // Load saved searches on component mount
   useEffect(() => {
@@ -50,20 +54,35 @@ export const FavoritesPage = () => {
   };
 
   const handleEdit = (search: SavedSearch) => {
-    const internalParams = {
-      queries: search.searchParameters.queries.map(q => ({
-        valor: q.value,
-        metadado: q.operator
-      })),
-      anoDe: search.searchParameters.yearFrom,
-      anoAte: search.searchParameters.yearTo,
-      excluirVenues: search.searchParameters.excludeVenues,
-      excluirTitulos: search.searchParameters.excludeTitles,
-      bibliotecas: search.searchParameters.libraries,
-    };
-    sessionStorage.setItem("editableSearchLabel", search.id);
-    sessionStorage.setItem("editableSearch", JSON.stringify(internalParams));
-    navigate("/editar");
+    setEditTargetSearch(search);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleEditSave = (
+    originalId: string,
+    newLabel: string,
+    searchParameters: {
+      queries: { valor: string; metadado?: string }[];
+      anoDe: string;
+      anoAte: string;
+      excluirVenues: string;
+      excluirTitulos: string;
+      bibliotecas: string[];
+    }
+  ) => {
+    try {
+      updateSearch(originalId, newLabel, searchParameters);
+      loadSearches();
+      setIsEditDialogOpen(false);
+      setEditTargetSearch(null);
+    } catch (error) {
+      console.error("Error updating search:", error);
+    }
+  };
+
+  const handleEditClose = () => {
+    setIsEditDialogOpen(false);
+    setEditTargetSearch(null);
   };
 
   const handleLoad = (search: SavedSearch) => {
@@ -152,6 +171,13 @@ export const FavoritesPage = () => {
         message={t("favorites:confirm_delete") || "Are you sure you want to delete this search?"}
         onConfirm={confirmDelete}
         onCancel={cancelDelete}
+      />
+
+      <EditSearchDialog
+        isOpen={isEditDialogOpen}
+        search={editTargetSearch}
+        onClose={handleEditClose}
+        onSave={handleEditSave}
       />
 
       <SavedSearchPageHeader

@@ -10,6 +10,7 @@ import history from "./history.json";
 import savedsearchcard from "./savedsearchcard.json";
 import savedsearchpageheader from "./savedsearchpageheader.json";
 import warnings from "./warnings.json";
+import editSearchDialog from "./editSearchDialog.json";
 
 export const en = {
   general: general,

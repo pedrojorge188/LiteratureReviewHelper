@@ -7,11 +7,13 @@ import {
   exportSearches,
   importSearches,
   clearAllSearches,
+  updateSearch,
 } from "../utils/localStorage";
 import { SavedSearch } from "./types";
 import { SavedSearchCard } from "../components/SavedSearchCard";
 import { SavedSearchPageHeader } from "../components/SavedSearchPageHeader";
 import { ConfirmDialog } from "../components/ConfirmDialog";
+import { EditSearchDialog } from "../components/EditSearchDialog";
 import { SnackbarToast } from "../components";
 
 export const FavoritesPage = () => {

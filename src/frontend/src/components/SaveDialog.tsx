@@ -55,7 +55,7 @@ export const SaveDialog = ({
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={handleClose}>
+    <div className="modal-overlay modal-overlay--padded" onClick={handleClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h3>{t("saveDialog:title") || "Save Search"}</h3>

@@ -1,14 +1,25 @@
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { getArticles } from "../store/ducks/home/thunks";
 import { useDispatch } from "react-redux";
-import { SearchResponseDto } from "./types";
+import {SearchRequestPayload, SearchResponseDto, SavedSearch, SearchParameters} from "./types";
 import { ArticlesList } from "./ArticlesList";
 import { LoadingCircle } from "../components/shared";
-import { SaveDialog } from "../components/SaveDialog";
-import { ImportDialog } from "../components/ImportDialog";
+import { ChipInput } from "../components/shared/ChipInput";
+
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import Stack from "@mui/material/Stack";
+import Checkbox from "@mui/material/Checkbox";
+import ListItemText from "@mui/material/ListItemText";
+
+import { SaveDialog } from "../components";
+import { ImportDialog } from "../components";
 import { saveSearch, saveHistoryEntry } from "../utils/localStorage";
-import { SavedSearch } from "./types";
 
 interface Query {
   valor: string;
@@ -24,14 +35,20 @@ interface ApiSettings {
   [key: string]: ApiSetting;
 }
 
+type FilterKey =
+  | "authors"
+  | "excludeAuthors"
+  | "venues"
+  | "excludeVenues"
+  | "excludeTitles";
+
 export const MainPage = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch<any>();
+
   const [queries, setQueries] = useState<Query[]>([{ valor: "" }]);
   const [anoDe, setAnoDe] = useState<string>("");
   const [anoAte, setAnoAte] = useState<string>("");
-  const [excluirVenues, setExcluirVenues] = useState<string>("");
-  const [excluirTitulos, setExcluirTitulos] = useState<string>("");
   const [bibliotecaSelecionada, setBibliotecaSelecionada] =
     useState<string>("");
   const [bibliotecas, setBibliotecas] = useState<string[]>([]);
@@ -44,6 +61,17 @@ export const MainPage = () => {
   const [apiError, setApiError] = useState(false);
   const SETTINGS_KEY = "librarySettings";
   const [apiSettings, setApiSettings] = useState<ApiSettings>({});
+
+  // Filter values
+  const [authors, setAuthors] = useState<string[]>([]);
+  const [venues, setVenues] = useState<string[]>([]);
+  const [excludeAuthors, setExcludeAuthors] = useState<string[]>([]);
+  const [excludeVenues, setExcludeVenues] = useState<string[]>([]);
+  const [excludeTitles, setExcludeTitles] = useState<string[]>([]);
+  const [selectedFilters, setSelectedFilters] = useState<FilterKey[]>([]);
+
+  const toParam = (values: string[]) =>
+    values.length ? values.join(";") : undefined;
 
   useEffect(() => {
     const savedSettings = localStorage.getItem(SETTINGS_KEY);
@@ -60,21 +88,13 @@ export const MainPage = () => {
   const availableLibraries = Object.keys(apiSettings).filter((key) => {
     const settings = apiSettings[key];
     if (!settings) return false;
-    // Filtra para incluir apenas se noToken=true OU se tiver um token
-    return (
-      settings.noToken === true || (settings.token && settings.token.length > 0)
-    );
+    return (settings.noToken || (settings.token && settings.token.length > 0));
   });
 
-  const normalizarQueries = (lista: Query[]): Query[] => {
-    return lista.map((q, i) => {
-      if (i === 0) {
-        const { valor } = q;
-        return { valor };
-      }
-      return { valor: q.valor, metadado: q.metadado || "AND" };
-    });
-  };
+  const normalizarQueries = (lista: Query[]): Query[] =>
+    lista.map((q, i) =>
+      i === 0 ? { valor: q.valor } : { valor: q.valor, metadado: q.metadado || "AND" }
+    );
 
   const adicionarQuery = () => {
     const nova = [...queries, { valor: "", metadado: "AND" }];
@@ -115,7 +135,6 @@ export const MainPage = () => {
   };
 
   const guardar = () => {
-    // Open the save dialog instead of just logging
     setSaveError("");
     setIsSaveDialogOpen(true);
   };
@@ -126,8 +145,11 @@ export const MainPage = () => {
         queries,
         anoDe,
         anoAte,
-        excluirVenues,
-        excluirTitulos,
+        authors,
+        venues,
+        excludeAuthors,
+        excludeVenues,
+        excludeTitles,
         bibliotecas,
       };
 
@@ -136,7 +158,6 @@ export const MainPage = () => {
       setSaveError("");
     } catch (error) {
       console.error("Error saving search:", error);
-      // Set error message to be displayed in the dialog
       if (error instanceof Error) {
         setSaveError(error.message);
       } else {
@@ -152,27 +173,71 @@ export const MainPage = () => {
     setIsImportDialogOpen(true);
   };
 
+  const inferSelectedFilters = (params: SearchParameters): FilterKey[] => {
+    const result: FilterKey[] = [];
+    if ((params.authors || []).length) result.push("authors");
+    if ((params.excludeAuthors || []).length) result.push("excludeAuthors");
+    if ((params.venues || []).length) result.push("venues");
+    if ((params.excludeVenues || []).length) result.push("excludeVenues");
+    if ((params.excludeTitles || []).length) result.push("excludeTitles");
+    return result;
+  };
+
   const handleLoadSearch = (search: SavedSearch) => {
     const params = search.searchParameters;
-    // Convert from English storage format to Portuguese UI format
-    const convertedQueries = params.queries.map((q, i) => {
-      if (i === 0) {
-        return { valor: q.value };
-      }
-      return { valor: q.value, metadado: q.operator };
-    });
+
+    const convertedQueries = params.queries.map((q, i) =>
+      i === 0 ? { valor: q.value } : { valor: q.value, metadado: q.operator }
+    );
 
     setQueries(convertedQueries);
     setAnoDe(params.yearFrom || "");
     setAnoAte(params.yearTo || "");
-    setExcluirVenues(params.excludeVenues || "");
-    setExcluirTitulos(params.excludeTitles || "");
+    setAuthors(params.authors || []);
+    setVenues(params.venues || []);
+    setExcludeAuthors(params.excludeAuthors || []);
+    setExcludeTitles(params.excludeTitles || []);
+    setExcludeVenues(params.excludeVenues || []);
     setBibliotecas(params.libraries || []);
+    setSelectedFilters(inferSelectedFilters(params));
+
     setIsImportDialogOpen(false);
   };
 
+  const isFilterActive = (key: FilterKey) => selectedFilters.includes(key);
+
+  // MULTI-SELECT: update selected filters and clear values for deselected ones
+  const handleFilterMultiChange = (
+    event: SelectChangeEvent<FilterKey[]>
+  ) => {
+    const value = event.target.value as FilterKey[]; // new selection
+    const removed = selectedFilters.filter((f) => !value.includes(f));
+
+    // Clear values for filters that were removed
+    removed.forEach((key) => {
+      switch (key) {
+        case "authors":
+          setAuthors([]);
+          break;
+        case "excludeAuthors":
+          setExcludeAuthors([]);
+          break;
+        case "venues":
+          setVenues([]);
+          break;
+        case "excludeVenues":
+          setExcludeVenues([]);
+          break;
+        case "excludeTitles":
+          setExcludeTitles([]);
+          break;
+      }
+    });
+
+    setSelectedFilters(value);
+  };
+
   const pesquisar = async () => {
-    // Validate that at least one API is selected
     if (bibliotecas.length === 0) {
       setApiError(true);
       return;
@@ -180,9 +245,11 @@ export const MainPage = () => {
 
     setApiError(false);
     setIsLoading(true);
+
     const queryString = queries
       .map((q, i) => (i === 0 ? q.valor : `${q.metadado} ${q.valor}`))
-      .join(" ");
+      .join(" ")
+      .trim();
 
     // Build the source parameter from selected bibliotecas
     const sourceParam = bibliotecas.join(",");
@@ -199,15 +266,18 @@ export const MainPage = () => {
         // 3. Formata como "CHAVE=VALOR" (ex: "SPRINGER=0c2c2...")
         return `${libNameWithToken}=${apiSettings[libNameWithToken].token}`;
       })
-      .join(","); // 4. Junta tudo com vírgulas
+      .join(",");
 
     try {
       const internalParams = {
         queries: normalizarQueries(queries),
         anoDe,
         anoAte,
-        excluirVenues,
-        excluirTitulos,
+        authors,
+        venues,
+        excludeAuthors,
+        excludeTitles,
+        excludeVenues,
         bibliotecas,
       };
       saveHistoryEntry(internalParams);
@@ -216,13 +286,26 @@ export const MainPage = () => {
     }
 
     try {
-      const resultAction = await dispatch(
-        getArticles({
-          query: queryString,
-          apiList: apiListParam,
-          source: sourceParam,
-        })
-      );
+      const payload: SearchRequestPayload = {
+        query: queryString || undefined,
+        apiList: apiListParam,
+        source: sourceParam,
+        author: isFilterActive("authors") ? toParam(authors) : undefined,
+        venue: isFilterActive("venues") ? toParam(venues) : undefined,
+        exclude_author: isFilterActive("excludeAuthors")
+          ? toParam(excludeAuthors)
+          : undefined,
+        exclude_title: isFilterActive("excludeTitles")
+          ? toParam(excludeTitles)
+          : undefined,
+        exclude_venue: isFilterActive("excludeVenues")
+          ? toParam(excludeVenues)
+          : undefined,
+        year_start: anoDe || undefined,
+        year_end: anoAte || undefined,
+      };
+
+      const resultAction = await dispatch(getArticles(payload));
 
       if (getArticles.fulfilled.match(resultAction)) {
         setResponse(resultAction.payload as SearchResponseDto);
@@ -246,15 +329,87 @@ export const MainPage = () => {
         setQueries(params.queries || [{ valor: "" }]);
         setAnoDe(params.anoDe || "");
         setAnoAte(params.anoAte || "");
-        setExcluirVenues(params.excluirVenues || "");
-        setExcluirTitulos(params.excluirTitulos || "");
+        setAuthors(params.authors || []);
+        setVenues(params.venues || []);
+        setExcludeAuthors(params.excludeAuthors || []);
+        setExcludeTitles(params.excludeTitles || []);
+        setExcludeVenues(params.excludeVenues || []);
         setBibliotecas(params.bibliotecas || []);
+        setSelectedFilters(inferSelectedFilters(params));
         sessionStorage.removeItem("loadedSearch");
       } catch (error) {
         console.error("Error loading search from history:", error);
       }
     }
   }, []);
+
+  const renderFilterRow = (key: FilterKey) => {
+    switch (key) {
+      case "authors":
+        return (
+          <ChipInput
+            label={t("home:label_authors")}
+            placeholder={t("home:placeholder_authors")}
+            values={authors}
+            setValues={setAuthors}
+          />
+        );
+      case "excludeAuthors":
+        return (
+          <ChipInput
+            label={t("home:label_exclude_authors")}
+            placeholder={t("home:placeholder_exclude_authors")}
+            values={excludeAuthors}
+            setValues={setExcludeAuthors}
+          />
+        );
+      case "venues":
+        return (
+          <ChipInput
+            label={t("home:label_venues")}
+            placeholder={t("home:placeholder_venues")}
+            values={venues}
+            setValues={setVenues}
+          />
+        );
+      case "excludeVenues":
+        return (
+          <ChipInput
+            label={t("home:label_exclude_venues")}
+            placeholder={t("home:placeholder_exclude_venues")}
+            values={excludeVenues}
+            setValues={setExcludeVenues}
+          />
+        );
+      case "excludeTitles":
+        return (
+          <ChipInput
+            label={t("home:label_exclude_titles")}
+            placeholder={t("home:placeholder_exclude_titles")}
+            values={excludeTitles}
+            setValues={setExcludeTitles}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
+  const filterOptions: { key: FilterKey; label: string }[] = [
+    { key: "authors", label: t("home:label_authors") },
+    { key: "excludeAuthors", label: t("home:label_exclude_authors") },
+    { key: "venues", label: t("home:label_venues") },
+    { key: "excludeVenues", label: t("home:label_exclude_venues") },
+    { key: "excludeTitles", label: t("home:label_exclude_titles") },
+  ];
+
+  const filterLabelsMap = filterOptions.reduce<Record<FilterKey, string>>(
+    (acc, item) => {
+      acc[item.key] = item.label;
+      return acc;
+    },
+    {} as Record<FilterKey, string>
+  );
 
   return (
     <>
@@ -274,9 +429,7 @@ export const MainPage = () => {
       />
 
       <div
-        className={`container-article ${
-          showList && response ? "show" : "hide"
-        }`}
+        className={`container-article ${showList && response ? "show" : "hide"}`}
       >
         {response && <ArticlesList response={response} setShow={setShowList} />}
       </div>
@@ -351,13 +504,6 @@ export const MainPage = () => {
                 </div>
               </div>
             ))}
-
-            {/* Import Button below queries */}
-            {/* <div className="import-button-container">
-              <button type="button" onClick={handleImport}>
-                {t("home:importar") || "Import"}
-              </button>
-            </div> */}
           </div>
 
           {/* Ano de publicação */}
@@ -387,24 +533,71 @@ export const MainPage = () => {
             </div>
           </div>
 
-          {/* Excluir venues */}
+          {/* Filters */}
           <div className="section">
-            <label>{t("home:label_excluir_venues")}</label>
-            <textarea
-              value={excluirVenues}
-              onChange={(e) => setExcluirVenues(e.target.value)}
-              placeholder={t("home:placeholder_excluir_venues") ?? ""}
-            ></textarea>
-          </div>
+            <Typography variant="body1" sx={{ mb: 1 }}>
+              <Trans
+                i18nKey="home:hint_press_enter"
+                components={{ bold: <b /> }}
+              />
+            </Typography>
 
-          {/* Excluir títulos */}
-          <div className="section">
-            <label>{t("home:label_excluir_titulos")}</label>
-            <textarea
-              value={excluirTitulos}
-              onChange={(e) => setExcluirTitulos(e.target.value)}
-              placeholder={t("home:placeholder_excluir_titulos") ?? ""}
-            ></textarea>
+            <Box sx={{ mb: 2 }}>
+              <FormControl fullWidth size="small">
+                <InputLabel id="filter-selector-label">
+                  {t("home:select_filters") || "Select filters"}
+                </InputLabel>
+                <Select
+                  labelId="filter-selector-label"
+                  id="filter-selector"
+                  multiple
+                  value={selectedFilters}
+                  onChange={handleFilterMultiChange}
+                  label={t("home:select_filters") || "Select filters"}
+                  renderValue={(selected) =>
+                    (selected as FilterKey[])
+                      .map((key) => filterLabelsMap[key])
+                      .join(", ")
+                  }
+                >
+                  {filterOptions.map((option) => (
+                    <MenuItem key={option.key} value={option.key}>
+                      <Checkbox
+                        checked={selectedFilters.indexOf(option.key) > -1}
+                      />
+                      <ListItemText primary={option.label} />
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "1fr",
+                gap: 2,
+              }}
+            >
+              {selectedFilters.map((key) => (
+                <Stack
+                  key={key}
+                  direction="row"
+                  alignItems="flex-start"
+                  spacing={1}
+                  sx={{ width: "100%" }}
+                >
+                  <Box sx={{ flex: 1 }}>{renderFilterRow(key)}</Box>
+                  {/* <IconButton
+                    aria-label={t("home:botao_remover") || "Remove filter"}
+                    size="small"
+                    onClick={() => handleRemoveFilter(key)}
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton> */}
+                </Stack>
+              ))}
+            </Box>
           </div>
 
           {/* Bibliotecas */}
@@ -416,8 +609,6 @@ export const MainPage = () => {
                 onChange={(e) => setBibliotecaSelecionada(e.target.value)}
               >
                 <option value="">{t("home:selecionar_biblioteca")}</option>
-
-                {/* Opções geradas dinamicamente */}
                 {availableLibraries.map((libName) => (
                   <option key={libName} value={libName}>
                     {libName}
@@ -458,7 +649,7 @@ export const MainPage = () => {
 
           <hr hidden={bibliotecas.length > 0} />
 
-          {/* Botões principais */}
+          {/* Actions */}
           <div className="actions">
             <div>
               <button type="button" onClick={handleImport}>

@@ -91,8 +91,11 @@ export const FavoritesPage = () => {
       })),
       anoDe: search.searchParameters.yearFrom,
       anoAte: search.searchParameters.yearTo,
-      excluirVenues: search.searchParameters.excludeVenues,
-      excluirTitulos: search.searchParameters.excludeTitles,
+      authors: search.searchParameters.authors,
+      venues: search.searchParameters.venues,
+      excludeAuthors: search.searchParameters.excludeAuthors,
+      excludeTitles: search.searchParameters.excludeTitles,
+      excludeVenues: search.searchParameters.excludeVenues,
       bibliotecas: search.searchParameters.libraries,
     };
     sessionStorage.setItem("loadedSearch", JSON.stringify(internalParams));

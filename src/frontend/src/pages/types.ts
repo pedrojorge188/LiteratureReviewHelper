@@ -35,12 +35,33 @@ export interface Query {
   operator?: string;
 }
 
+export interface SearchRequestPayload {
+  query: string | undefined;
+  start?: number;
+  rows?: number;
+  wt?: string;
+
+  apiList: string;
+  source: string;
+
+  author?: string;
+  venue?: string;
+  exclude_author?: string;
+  exclude_venue?: string;
+  exclude_title?: string;
+  year_start?: string;
+  year_end?: string;
+}
+
 export interface SearchParameters {
   queries: Query[];
   yearFrom: string;
   yearTo: string;
-  excludeVenues: string;
-  excludeTitles: string;
+  authors: string[];
+  venues: string[];
+  excludeAuthors: string[];
+  excludeVenues: string[];
+  excludeTitles: string[];
   libraries: string[];
 }
 

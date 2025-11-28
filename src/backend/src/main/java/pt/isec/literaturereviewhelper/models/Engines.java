@@ -4,5 +4,6 @@ public enum Engines {
     ACM,
     HAL,
     SPRINGER,
-    SCOPUS
+    SCOPUS,
+    ARXIV
 }

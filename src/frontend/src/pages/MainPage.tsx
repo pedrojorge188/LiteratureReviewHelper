@@ -255,6 +255,11 @@ export const MainPage = () => {
   };
 
   const pesquisar = async () => {
+    if (queries.length === 1 && queries[0].valor.trim() === "") {
+      setOpenToastB(true);
+      return
+    }
+
     if (bibliotecas.length === 0) {
       setApiError(true);
       setOpenToast(true);
@@ -265,7 +270,7 @@ export const MainPage = () => {
     setIsLoading(true);
 
     const queryString = queries
-      .map((q, i) => (i === 0 ? q.valor : `${q.metadado} ${q.valor}`))
+      .map((q, i) => (i === 0 ? `(${q.valor})` : `${q.metadado} (${q.valor})`))
       .join(" ")
       .trim();
 

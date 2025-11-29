@@ -8,8 +8,6 @@ import pt.isec.literaturereviewhelper.models.Engines;
 import pt.isec.literaturereviewhelper.models.ScopusResponse;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component("scopusResultMapper")
 public class ScopusMapper implements IResultMapper<ScopusResponse>{

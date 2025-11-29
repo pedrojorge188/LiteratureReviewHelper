@@ -6,7 +6,9 @@ import org.mockito.Mockito;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import pt.isec.literaturereviewhelper.engines.ACMEngine;
+import pt.isec.literaturereviewhelper.engines.ArxivEngine;
 import pt.isec.literaturereviewhelper.engines.HalEngine;
+import pt.isec.literaturereviewhelper.engines.ScopusEngine;
 import pt.isec.literaturereviewhelper.engines.SpringerEngine;
 import pt.isec.literaturereviewhelper.engines.EngineBase;
 import pt.isec.literaturereviewhelper.interfaces.IResultMapper;
@@ -71,6 +73,27 @@ class SearchEngineFactoryTest {
 
         assertSame(webClient, getPrivate(engine, "webClient"));
         assertSame(springerMapper, getPrivate(engine, "mapper"));
+    }
+
+
+    @Test
+    void testCreateSearchEngine_ReturnsScopusEngine_WiresDependencies() throws Exception {
+        ISearchEngine engine = factory.createSearchEngine(Engines.SCOPUS);
+        assertNotNull(engine);
+        assertInstanceOf(ScopusEngine.class, engine);
+
+        assertSame(webClient, getPrivate(engine, "webClient"));
+        assertSame(scopusMapper, getPrivate(engine, "mapper"));
+    }
+
+    @Test
+    void testCreateSearchEngine_ReturnsArxivEngine_WiresDependencies() throws Exception {
+        ISearchEngine engine = factory.createSearchEngine(Engines.ARXIV);
+        assertNotNull(engine);
+        assertInstanceOf(ArxivEngine.class, engine);
+
+        assertSame(webClient, getPrivate(engine, "webClient"));
+        assertSame(arxivMapper, getPrivate(engine, "mapper"));
     }
 
     private Object getPrivate(ISearchEngine engine, String fieldName) throws Exception {

@@ -28,10 +28,7 @@ import { ImportDialog } from "../components";
 import { saveSearch, saveHistoryEntry } from "../utils/localStorage";
 import { SnackbarToast } from "../components";
 
-interface Query {
-  valor: string;
-  metadado?: string;
-}
+import { Query } from "./types";
 
 interface ApiSetting {
   token: string;
@@ -53,7 +50,7 @@ export const MainPage = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch<any>();
 
-  const [queries, setQueries] = useState<Query[]>([{ valor: "" }]);
+  const [queries, setQueries] = useState<Query[]>([{ value: "" }]);
   const [anoDe, setAnoDe] = useState<string>("");
   const [anoAte, setAnoAte] = useState<string>("");
   const [bibliotecaSelecionada, setBibliotecaSelecionada] =
@@ -107,12 +104,12 @@ export const MainPage = () => {
   const normalizarQueries = (lista: Query[]): Query[] =>
     lista.map((q, i) =>
       i === 0
-        ? { valor: q.valor }
-        : { valor: q.valor, metadado: q.metadado || "AND" }
+        ? { value: q.value }
+        : { value: q.value, operator: q.operator || "AND" }
     );
 
   const adicionarQuery = () => {
-    const nova = [...queries, { valor: "", metadado: "AND" }];
+    const nova = [...queries, { value: "", operator: "AND" }];
     setQueries(normalizarQueries(nova));
   };
 
@@ -207,7 +204,7 @@ export const MainPage = () => {
     const params = search.searchParameters;
 
     const convertedQueries = params.queries.map((q, i) =>
-      i === 0 ? { valor: q.value } : { valor: q.value, metadado: q.operator }
+      i === 0 ? { value: q.value } : { value: q.value, operator: q.operator }
     );
 
     setQueries(convertedQueries);
@@ -258,13 +255,13 @@ export const MainPage = () => {
 
   const buildQueryString = () => {
     return queries
-        .map((q, i) => (i === 0 ? `(${q.valor})` : `${q.metadado} (${q.valor})`))
+        .map((q, i) => (i === 0 ? `(${q.value})` : `${q.operator} (${q.value})`))
         .join(" ")
         .trim();
   }
 
   const pesquisar = async () => {
-    if (queries.length === 1 && queries[0].valor.trim() === "") {
+    if (queries.length === 1 && queries[0].value.trim() === "") {
       setOpenToastB(true);
       return
     }
@@ -356,7 +353,7 @@ export const MainPage = () => {
     if (loadedSearch) {
       try {
         const params = JSON.parse(loadedSearch);
-        setQueries(params.queries || [{ valor: "" }]);
+        setQueries(params.queries || [{ value: "" }]);
         setAnoDe(params.anoDe || "");
         setAnoAte(params.anoAte || "");
         setAuthors(params.authors || []);
@@ -514,9 +511,9 @@ export const MainPage = () => {
               <div key={index} className="query-row">
                 {index > 0 && (
                   <select
-                    value={q.metadado}
+                    value={q.operator}
                     onChange={(e) =>
-                      atualizarQuery(index, "metadado", e.target.value)
+                      atualizarQuery(index, "operator", e.target.value)
                     }
                   >
                     <option value="AND">{t("home:operador_and")}</option>
@@ -528,10 +525,10 @@ export const MainPage = () => {
                 <input
                   className="query-row__input-text"
                   type="text"
-                  value={q.valor}
+                  value={q.value}
                   placeholder={t("home:placeholder_query") ?? ""}
                   onChange={(e) =>
-                    atualizarQuery(index, "valor", e.target.value)
+                    atualizarQuery(index, "value", e.target.value)
                   }
                 />
 

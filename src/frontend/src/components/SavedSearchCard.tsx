@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { SavedSearch } from "../pages/types";
+import { buildQueryString } from "../utils/queries";
 
 interface SavedSearchCardProps {
   search: SavedSearch;
@@ -16,14 +17,6 @@ export const SavedSearchCard = ({
   onDelete,
 }: SavedSearchCardProps) => {
   const { t } = useTranslation();
-
-  const formatQueryString = (
-    queries: Array<{ value: string; operator?: string }>
-  ) => {
-    return queries
-      .map((q, i) => (i === 0 ? q.value : `${q.operator} ${q.value}`))
-      .join(" ");
-  };
 
   const formatDate = (isoString: string) => {
     const date = new Date(isoString);
@@ -77,7 +70,7 @@ export const SavedSearchCard = ({
         <div className="search-card-body">
           <div className="search-detail">
             <strong>{t("savedsearchcard:query") || "Query"}:</strong>
-            <span>{formatQueryString(search.searchParameters.queries)}</span>
+            <span>{buildQueryString(search.searchParameters.queries)}</span>
           </div>
 
           {(search.searchParameters.yearFrom ||

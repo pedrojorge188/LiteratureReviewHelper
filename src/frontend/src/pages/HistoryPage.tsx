@@ -1,11 +1,16 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { getSearchHistory, clearAllSearchHistory, deleteHistoryEntry } from "../utils/localStorage";
+import {
+  getSearchHistory,
+  clearAllSearchHistory,
+  deleteHistoryEntry,
+} from "../utils/localStorage";
 import { SavedSearch } from "./types";
 import { SavedSearchCard } from "../components/SavedSearchCard";
 import { SavedSearchPageHeader } from "../components/SavedSearchPageHeader";
 import { ConfirmDialog } from "../components/ConfirmDialog";
+import { SnackbarToast } from "../components";
 
 export const HistoryPage = () => {
   const { t } = useTranslation();
@@ -13,6 +18,10 @@ export const HistoryPage = () => {
   const [historySearches, setHistorySearches] = useState<SavedSearch[]>([]);
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [isConfirmDeleteAllOpen, setIsConfirmDeleteAllOpen] = useState(false);
+  const [confirmDeleteAll, setConfirmDeleteAll] = useState(false);
+  const [openToastE, setOpenToastE] = useState(false);
+  const [openToastD, setOpenToastD] = useState(false);
 
   useEffect(() => {
     loadSearches();
@@ -32,6 +41,7 @@ export const HistoryPage = () => {
     if (deleteTargetId) {
       deleteHistoryEntry(deleteTargetId);
       loadSearches();
+      setOpenToastE(true);
     }
     setIsConfirmDeleteOpen(false);
     setDeleteTargetId(null);
@@ -44,9 +54,9 @@ export const HistoryPage = () => {
 
   const handleLoad = (search: SavedSearch) => {
     const internalParams = {
-      queries: search.searchParameters.queries.map(q => ({
+      queries: search.searchParameters.queries.map((q) => ({
         valor: q.value,
-        metadado: q.operator
+        metadado: q.operator,
       })),
       anoDe: search.searchParameters.yearFrom,
       anoAte: search.searchParameters.yearTo,
@@ -58,16 +68,55 @@ export const HistoryPage = () => {
     navigate("/");
   };
 
-    const handleClearAll = () => {
+  const handleClearAll = () => {
+    setIsConfirmDeleteAllOpen(true);
+  };
+
+  useEffect(() => {
+    if (confirmDeleteAll) {
       clearAllSearchHistory();
       loadSearches();
-    };
+      setConfirmDeleteAll(false);
+      setIsConfirmDeleteAllOpen(false);
+      setOpenToastE(true);
+    }
+  }, [confirmDeleteAll]);
 
   return (
     <div className="history-page">
+      <SnackbarToast
+        open={openToastD}
+        setOpen={setOpenToastD}
+        messageStr={t("warnings:error")}
+        type="error"
+      />
+
+      <SnackbarToast
+        open={openToastE}
+        setOpen={setOpenToastE}
+        messageStr={t("warnings:success")}
+        type="success"
+      />
+      <ConfirmDialog
+        isOpen={isConfirmDeleteAllOpen}
+        message={
+          t("favorites:confirm_clear_all") ||
+          "Are you sure you want to delete this search?"
+        }
+        onConfirm={() => {
+          setConfirmDeleteAll(true);
+        }}
+        onCancel={() => {
+          setIsConfirmDeleteAllOpen(false);
+        }}
+      />
+
       <ConfirmDialog
         isOpen={isConfirmDeleteOpen}
-        message={t("history:confirm_delete") || "Are you sure you want to delete this search?"}
+        message={
+          t("history:confirm_delete") ||
+          "Are you sure you want to delete this search?"
+        }
         onConfirm={confirmDelete}
         onCancel={cancelDelete}
       />
@@ -89,7 +138,7 @@ export const HistoryPage = () => {
               search={search}
               onLoad={handleLoad}
               onDelete={handleDelete}
-              />
+            />
           ))}
         </div>
       )}

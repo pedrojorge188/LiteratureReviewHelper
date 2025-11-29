@@ -1,6 +1,10 @@
 import { useEffect, useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { getSavedSearches, deleteSearch, importSearches } from "../utils/localStorage";
+import {
+  getSavedSearches,
+  deleteSearch,
+  importSearches,
+} from "../utils/localStorage";
 import { SavedSearch } from "../pages/types";
 
 interface ImportDialogProps {
@@ -9,7 +13,11 @@ interface ImportDialogProps {
   onLoad: (search: SavedSearch) => void;
 }
 
-export const ImportDialog = ({ isOpen, onClose, onLoad }: ImportDialogProps) => {
+export const ImportDialog = ({
+  isOpen,
+  onClose,
+  onLoad,
+}: ImportDialogProps) => {
   const { t } = useTranslation();
   const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -56,14 +64,16 @@ export const ImportDialog = ({ isOpen, onClose, onLoad }: ImportDialogProps) => 
       }
     };
     reader.readAsText(file);
-    
+
     // Reset the input so the same file can be selected again
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
 
-  const formatQueryString = (queries: Array<{ value: string; operator?: string }>) => {
+  const formatQueryString = (
+    queries: Array<{ value: string; operator?: string }>
+  ) => {
     return queries
       .map((q, i) => (i === 0 ? q.value : `${q.operator} ${q.value}`))
       .join(" ");
@@ -84,7 +94,10 @@ export const ImportDialog = ({ isOpen, onClose, onLoad }: ImportDialogProps) => 
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="import-modal-content" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="import-modal-content"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="modal-header">
           <h3>{t("import:title") || "Import"}</h3>
           <button className="modal-close-btn" onClick={onClose}>
@@ -108,25 +121,39 @@ export const ImportDialog = ({ isOpen, onClose, onLoad }: ImportDialogProps) => 
           </div>
 
           <div className="divider">
-            <span>{t("import:or_load_from_saved") || "Or load from saved searches"}</span>
+            <span>
+              {t("import:or_load_from_saved") || "Or load from saved searches"}
+            </span>
           </div>
 
           {savedSearches.length === 0 ? (
-            <p className="no-searches">{t("import:no_searches") || "No saved searches found."}</p>
+            <p className="no-searches">
+              {t("import:no_searches") || "No saved searches found."}
+            </p>
           ) : (
             <div className="searches-list">
               {savedSearches.map((search) => (
                 <div key={search.id} className="search-item">
                   <div className="search-item-header">
                     <h4>{search.id}</h4>
-                    <span className="search-date">{formatDate(search.timestamp)}</span>
+                    <span className="search-date">
+                      {formatDate(search.timestamp)}
+                    </span>
                   </div>
-                  <p className="search-query">{formatQueryString(search.searchParameters.queries)}</p>
+                  <p className="search-query">
+                    {formatQueryString(search.searchParameters.queries)}
+                  </p>
                   <div className="search-item-actions">
-                    <button className="btn-load" onClick={() => handleLoad(search)}>
+                    <button
+                      className="btn-load"
+                      onClick={() => handleLoad(search)}
+                    >
                       {t("import:load") || "Load"}
                     </button>
-                    <button className="btn-delete" onClick={() => handleDelete(search.id)}>
+                    <button
+                      className="btn-delete"
+                      onClick={() => handleDelete(search.id)}
+                    >
                       {t("import:delete") || "Delete"}
                     </button>
                   </div>
@@ -134,12 +161,6 @@ export const ImportDialog = ({ isOpen, onClose, onLoad }: ImportDialogProps) => 
               ))}
             </div>
           )}
-        </div>
-
-        <div className="modal-footer">
-          <button className="btn-secondary" onClick={onClose}>
-            {t("import:close") || "Close"}
-          </button>
         </div>
       </div>
     </div>

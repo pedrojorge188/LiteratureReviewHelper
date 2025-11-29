@@ -1,6 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
-import { InfoDialog } from "../components";
+import { InfoDialog, SnackbarToast } from "../components";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import Tooltip from "@mui/material/Tooltip";
 
 // Chave para guardar as definições das bibliotecas no localStorage
 const SETTINGS_KEY = "librarySettings";
@@ -93,12 +95,11 @@ export const ConfigurationPage = () => {
 
   return (
     <>
-      <InfoDialog
-        isOpen={isInfoOpen}
-        title={t("configurations:titleModalSuccess")}
-        message={t("configurations:messageModalSuccess")}
-        onClose={() => setIsInfoOpen(false)}
-        duration={1300}
+      <SnackbarToast
+        messageStr={t("configurations:message")}
+        open={isInfoOpen}
+        setOpen={setIsInfoOpen}
+        type="success"
       />
       <div className="pagina-bibliotecas">
         <h3>{t("configurations:title")}</h3>
@@ -107,25 +108,41 @@ export const ConfigurationPage = () => {
         <section className="section__top">
           <div className="rows-container">
             <div className="rows-container__label">
-              {t("configurations:labels.rowsPerPage")}
+              <span className="rows-container__label__text">
+                {t("configurations:labels.rowsPerPage")}
+              </span>
+              <Tooltip title={t("warnings:rowsperpage")}>
+                <span className="rows-container__label__icon">
+                  <HelpOutlineIcon />
+                </span>
+              </Tooltip>
             </div>
             <div className="rows-container__input">
               <input
                 type="number"
                 value={rowsPerPage}
                 onChange={(e) => setRowsPerPage(e.target.value)}
+                placeholder="10"
               />
             </div>
           </div>
           <div className="deep-container">
             <div className="deep-container__label">
-              {t("configurations:labels.maxResults")}
+              <span className="deep-container__label__text">
+                {t("configurations:labels.maxResults")}
+              </span>
+              <Tooltip title={t("warnings:deepSearch")}>
+                <span className="deep-container__label__icon">
+                  <HelpOutlineIcon />
+                </span>
+              </Tooltip>
             </div>
             <div className="deep-container__input">
               <input
                 type="number"
                 value={maxResults}
                 onChange={(e) => setMaxResults(e.target.value)}
+                placeholder="300"
               />
             </div>
           </div>

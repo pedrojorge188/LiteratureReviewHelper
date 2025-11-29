@@ -20,6 +20,15 @@
     flex-direction: column;
     gap: 4px;
     &__label {
+      display: flex;
+      gap: 8px;
+      &__icon {
+        cursor: pointer;
+        svg {
+          width: 16px;
+          height: 16px;
+        }
+      }
     }
     &__input {
       min-height: 30px;
@@ -34,6 +43,15 @@
     flex-direction: column;
     gap: 4px;
     &__label {
+      display: flex;
+      gap: 8px;
+      &__icon {
+        cursor: pointer;
+        svg {
+          width: 16px;
+          height: 16px;
+        }
+      }
     }
     &__input {
       min-height: 30px;
@@ -106,18 +124,21 @@
         width: 100%;
       }
       .details-btn {
-        background: none;
+        background: vars.$color-gray-2;
+        color: vars.$color-white;
         border: none;
-        color: vars.$color-black;
-        max-width: 105px;
-        width: 105px;
+        padding: 0.6rem 1.2rem;
+        border-radius: 3px;
+        cursor: pointer;
+        transition: 0.2s;
         cursor: pointer;
         &__text {
           display: flex;
           justify-content: flex-end;
         }
         &:hover {
-          font-weight: 700;
+          color: vars.$color-gray-2;
+          background-color: vars.$color-white;
         }
       }
     }

@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { getArticles } from "../store/ducks/home/thunks";
 import { useDispatch } from "react-redux";
-import {SearchRequestPayload, SearchResponseDto, SavedSearch, SearchParameters} from "./types";
+import {
+  SearchRequestPayload,
+  SearchResponseDto,
+  SavedSearch,
+  SearchParameters,
+} from "./types";
 import { ArticlesList } from "./ArticlesList";
 import { LoadingCircle } from "../components/shared";
 import { ChipInput } from "../components/shared/ChipInput";
@@ -20,6 +25,7 @@ import ListItemText from "@mui/material/ListItemText";
 import { SaveDialog } from "../components";
 import { ImportDialog } from "../components";
 import { saveSearch, saveHistoryEntry } from "../utils/localStorage";
+import { SnackbarToast } from "../components";
 
 interface Query {
   valor: string;
@@ -61,6 +67,11 @@ export const MainPage = () => {
   const [apiError, setApiError] = useState(false);
   const SETTINGS_KEY = "librarySettings";
   const [apiSettings, setApiSettings] = useState<ApiSettings>({});
+  const [openToast, setOpenToast] = useState(false);
+  const [openToastB, setOpenToastB] = useState(false);
+  const [openToastC, setOpenToastC] = useState(false);
+  const [openToastD, setOpenToastD] = useState(false);
+  const [openToastE, setOpenToastE] = useState(false);
 
   // Filter values
   const [authors, setAuthors] = useState<string[]>([]);
@@ -88,12 +99,14 @@ export const MainPage = () => {
   const availableLibraries = Object.keys(apiSettings).filter((key) => {
     const settings = apiSettings[key];
     if (!settings) return false;
-    return (settings.noToken || (settings.token && settings.token.length > 0));
+    return settings.noToken || (settings.token && settings.token.length > 0);
   });
 
   const normalizarQueries = (lista: Query[]): Query[] =>
     lista.map((q, i) =>
-      i === 0 ? { valor: q.valor } : { valor: q.valor, metadado: q.metadado || "AND" }
+      i === 0
+        ? { valor: q.valor }
+        : { valor: q.valor, metadado: q.metadado || "AND" }
     );
 
   const adicionarQuery = () => {
@@ -156,15 +169,20 @@ export const MainPage = () => {
       saveSearch(customLabel, searchParameters);
       setIsSaveDialogOpen(false);
       setSaveError("");
+      setOpenToastC(true);
     } catch (error) {
       console.error("Error saving search:", error);
+      setOpenToastD(false);
+      // Set error message to be displayed in the dialog
       if (error instanceof Error) {
         setSaveError(error.message);
+        setOpenToastD(false);
       } else {
         setSaveError(
           t("home:search_save_error") ||
             "Error saving search. Please try again."
         );
+        setOpenToastD(false);
       }
     }
   };
@@ -202,14 +220,13 @@ export const MainPage = () => {
     setSelectedFilters(inferSelectedFilters(params));
 
     setIsImportDialogOpen(false);
+    setOpenToastE(true);
   };
 
   const isFilterActive = (key: FilterKey) => selectedFilters.includes(key);
 
   // MULTI-SELECT: update selected filters and clear values for deselected ones
-  const handleFilterMultiChange = (
-    event: SelectChangeEvent<FilterKey[]>
-  ) => {
+  const handleFilterMultiChange = (event: SelectChangeEvent<FilterKey[]>) => {
     const value = event.target.value as FilterKey[]; // new selection
     const removed = selectedFilters.filter((f) => !value.includes(f));
 
@@ -240,6 +257,7 @@ export const MainPage = () => {
   const pesquisar = async () => {
     if (bibliotecas.length === 0) {
       setApiError(true);
+      setOpenToast(true);
       return;
     }
 
@@ -311,6 +329,7 @@ export const MainPage = () => {
         setResponse(resultAction.payload as SearchResponseDto);
         setShowList(true);
       } else {
+        setOpenToastB(true);
         console.error("Erro na pesquisa:", resultAction.error);
       }
     } catch (error) {
@@ -337,6 +356,7 @@ export const MainPage = () => {
         setBibliotecas(params.bibliotecas || []);
         setSelectedFilters(inferSelectedFilters(params));
         sessionStorage.removeItem("loadedSearch");
+        setOpenToastE(true);
       } catch (error) {
         console.error("Error loading search from history:", error);
       }
@@ -415,6 +435,38 @@ export const MainPage = () => {
     <>
       {isLoading && <LoadingCircle />}
 
+      <SnackbarToast
+        open={openToastE}
+        setOpen={setOpenToastE}
+        messageStr={t("warnings:success")}
+        type="success"
+      />
+
+      <SnackbarToast
+        open={openToastD}
+        setOpen={setOpenToastD}
+        messageStr={t("warnings:error")}
+        type="error"
+      />
+      <SnackbarToast
+        open={openToastC}
+        setOpen={setOpenToastC}
+        messageStr={t("warnings:save")}
+        type="success"
+      />
+
+      <SnackbarToast
+        open={openToast}
+        setOpen={setOpenToast}
+        messageStr={t("warnings:noLibs")}
+        type="error"
+      />
+      <SnackbarToast
+        open={openToastB}
+        setOpen={setOpenToastB}
+        messageStr={t("warnings:noQuery")}
+        type="warning"
+      />
       <SaveDialog
         isOpen={isSaveDialogOpen}
         onClose={() => setIsSaveDialogOpen(false)}
@@ -429,7 +481,9 @@ export const MainPage = () => {
       />
 
       <div
-        className={`container-article ${showList && response ? "show" : "hide"}`}
+        className={`container-article ${
+          showList && response ? "show" : "hide"
+        }`}
       >
         {response && <ArticlesList response={response} setShow={setShowList} />}
       </div>
@@ -577,6 +631,7 @@ export const MainPage = () => {
                 display: "grid",
                 gridTemplateColumns: "1fr",
                 gap: 2,
+                backgroundColor: "#fff !important",
               }}
             >
               {selectedFilters.map((key) => (
@@ -585,16 +640,11 @@ export const MainPage = () => {
                   direction="row"
                   alignItems="flex-start"
                   spacing={1}
-                  sx={{ width: "100%" }}
+                  sx={{ width: "100%", bgcolor: "#fff" }}
                 >
-                  <Box sx={{ flex: 1 }}>{renderFilterRow(key)}</Box>
-                  {/* <IconButton
-                    aria-label={t("home:botao_remover") || "Remove filter"}
-                    size="small"
-                    onClick={() => handleRemoveFilter(key)}
-                  >
-                    <DeleteIcon fontSize="small" />
-                  </IconButton> */}
+                  <Box sx={{ flex: 1, bgcolor: "#fff" }}>
+                    {renderFilterRow(key)}
+                  </Box>
                 </Stack>
               ))}
             </Box>

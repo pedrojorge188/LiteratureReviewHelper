@@ -1,5 +1,7 @@
 {
   "title": "Configurations",
+  "titleModalSuccess": "Sucess",
+  "message": "Saved!",
   "errors": {
     "loadSettings": "Error reading library settings:"
   },
@@ -9,8 +11,8 @@
     "librarySettingsSaved": "Settings for {{libName}} saved!"
   },
   "labels": {
-    "rowsPerPage": "Elements per page",
-    "maxResults": "Max Searches per Library",
+    "rowsPerPage": "Rows",
+    "maxResults": "Deep Search Limit",
     "noTokenNeeded": "No token needed"
   },
   "buttons": {

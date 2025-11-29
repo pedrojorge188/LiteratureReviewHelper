@@ -165,6 +165,7 @@ public abstract class EngineBase<R> implements ISearchEngine {
                 String fullURL = buildURL(mapParams(pagedParams));
 
                 log.info("Fetching {} from cache...", fullURL);
+
                 List<Article> pageArticles = upstreamCache.getIfPresent(fullURL);
                 if (pageArticles == null) {
                     log.info("Cache miss for {}, fetching from upstream...", fullURL);

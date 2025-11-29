@@ -11,7 +11,9 @@ export interface Artigo {
 export enum Engines {
   ACM = 'ACM',
   HAL = 'HAL',
-  SPRINGER = 'SPRINGER'
+  SPRINGER = 'SPRINGER',
+  SCOPUS = 'SCOPUS',
+  ARXIV = 'ARXIV'
 }
 
 export enum Statistic {

@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { InfoDialog, SnackbarToast } from "../components";
+import { Engines } from "./types";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import Tooltip from "@mui/material/Tooltip";
 
@@ -9,7 +10,7 @@ const SETTINGS_KEY = "librarySettings";
 
 export const ConfigurationPage = () => {
   const { t } = useTranslation();
-  const bibliotecas = ["HAL", "ACM", "SPRINGER"];
+  const bibliotecas = Object.values(Engines);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
 
   const mostrarAviso = () => {

@@ -20,6 +20,15 @@
     flex-direction: column;
     gap: 4px;
     &__label {
+      display: flex;
+      gap: 8px;
+      &__icon {
+        cursor: pointer;
+        svg {
+          width: 16px;
+          height: 16px;
+        }
+      }
     }
     &__input {
       min-height: 30px;
@@ -34,6 +43,15 @@
     flex-direction: column;
     gap: 4px;
     &__label {
+      display: flex;
+      gap: 8px;
+      &__icon {
+        cursor: pointer;
+        svg {
+          width: 16px;
+          height: 16px;
+        }
+      }
     }
     &__input {
       min-height: 30px;

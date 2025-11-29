@@ -1,5 +1,7 @@
 {
   "title": "Configurações",
+  "titleModalSuccess": "Sucesso",
+  "message": "A sua ação foi gravada com sucesso!",
   "errors": {
     "loadSettings": "Erro ao ler definições das bibliotecas:"
   },
@@ -18,7 +20,5 @@
   },
   "placeholders": {
     "insertToken": "Inserir token"
-  },
-  "titleModalSuccess": "Sucesso",
-  "messageModalSuccess": "A sua ação foi gravada com sucesso!"
+  }
 }

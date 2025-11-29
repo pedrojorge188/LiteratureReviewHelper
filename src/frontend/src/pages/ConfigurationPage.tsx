@@ -1,6 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { InfoDialog, SnackbarToast } from "../components";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import Tooltip from "@mui/material/Tooltip";
 
 // Chave para guardar as definições das bibliotecas no localStorage
 const SETTINGS_KEY = "librarySettings";
@@ -94,7 +96,7 @@ export const ConfigurationPage = () => {
   return (
     <>
       <SnackbarToast
-        messageStr={t("configurations:messageModalSuccess")}
+        messageStr={t("configurations:message")}
         open={isInfoOpen}
         setOpen={setIsInfoOpen}
         type="success"
@@ -106,7 +108,14 @@ export const ConfigurationPage = () => {
         <section className="section__top">
           <div className="rows-container">
             <div className="rows-container__label">
-              {t("configurations:labels.rowsPerPage")}
+              <span className="rows-container__label__text">
+                {t("configurations:labels.rowsPerPage")}
+              </span>
+              <Tooltip title={t("warnings:rowsperpage")}>
+                <span className="rows-container__label__icon">
+                  <HelpOutlineIcon />
+                </span>
+              </Tooltip>
             </div>
             <div className="rows-container__input">
               <input
@@ -118,7 +127,14 @@ export const ConfigurationPage = () => {
           </div>
           <div className="deep-container">
             <div className="deep-container__label">
-              {t("configurations:labels.maxResults")}
+              <span className="deep-container__label__text">
+                {t("configurations:labels.maxResults")}
+              </span>
+              <Tooltip title={t("warnings:deepSearch")}>
+                <span className="deep-container__label__icon">
+                  <HelpOutlineIcon />
+                </span>
+              </Tooltip>
             </div>
             <div className="deep-container__input">
               <input

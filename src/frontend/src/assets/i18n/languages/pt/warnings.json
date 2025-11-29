@@ -3,5 +3,7 @@
   "noQuery": "Ajuste a sua Querie por favor!",
   "save": "Guardado com sucesso!",
   "error": "Ocorreu um erro!",
-  "success": "Sucesso"
+  "success": "Sucesso",
+  "deepSearch": "Não é obrigatório preencher a API tem valores por defeito. O valor da profundidade máxima de pesquisa (deep_search_limit ou maxResults) define o limite de resultados que o sistema tentará recolher nas bases de dados externas (HAL, ACM, Springer) para o seu pedido. O sistema irá fazer várias chamadas (paginação) às APIs das bibliotecas até atingir este número, garantindo que a sua pesquisa não sobrecarrega os servidores externos nem excede os limites de utilização. É recomendado um valor maior se a pesquisa for genérica e precisar de uma visão mais abrangente, e um valor menor se for específica. Este número representa o limite máximo de tentativas de agregação de resultados pelo servidor, não o número de artigos que verá numa única página.",
+  "rowsperpage": "Não é obrigatório preencher a API tem valores por defeito. O valor do numero por lote em cada pedido que é feito a cada api, se for 10 serão 10 resultados por lote a multiplicar pelo maximo de vezes (deepsearch) que o pedido será feito às bibliotecas."
 }

@@ -4,3 +4,4 @@ export { SideMenu } from "./SideMenu";
 export { SaveDialog } from "./SaveDialog";
 export { ImportDialog } from "./ImportDialog";
 export { InfoDialog } from "./InfoDialog";
+export { SnackbarToast } from "./SnackbarToast";

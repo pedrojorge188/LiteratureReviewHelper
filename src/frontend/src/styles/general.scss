@@ -58,10 +58,13 @@ a {
   color: inherit !important; /* herda a cor do elemento pai */
   text-decoration: none !important; /* remove o sublinhado */
 }
-
+body {
+  background-color: #ffffff; /* Garante que o fundo não é transparente */
+  color: #000000; /* Garante que o texto base é preto */
+}
 #root {
   font-family: vars.$font-primary;
-
+  color-scheme: light;
   &.get-started-event {
     &::after {
       position: fixed;

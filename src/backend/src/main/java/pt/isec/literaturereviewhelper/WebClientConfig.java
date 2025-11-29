@@ -1,16 +1,11 @@
 package pt.isec.literaturereviewhelper;
 
 import io.netty.channel.ChannelOption;
-import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
-import io.netty.resolver.dns.DnsAddressResolverGroup;
-import io.netty.resolver.dns.DnsNameResolverBuilder;
-import io.netty.resolver.dns.SingletonDnsServerAddressStreamProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
@@ -28,17 +23,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 import javax.net.ssl.SSLException;
-import java.net.InetSocketAddress;
-import java.util.Objects;
+
 
 
 @Configuration
 public class WebClientConfig {
-    private final Environment environment;
-
-    public WebClientConfig(Environment environment) {
-        this.environment = environment;
-    }
 
     @Bean
     public WebClient webClient() throws SSLException {

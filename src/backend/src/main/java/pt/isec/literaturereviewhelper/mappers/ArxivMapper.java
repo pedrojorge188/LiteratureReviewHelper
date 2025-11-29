@@ -33,6 +33,7 @@ public class ArxivMapper implements IResultMapper<ArxivResponse> {
                         .map(ArxivResponse.Author::getName)
                         .filter(Objects::nonNull)
                         .map(String::trim)
+                        .filter(s -> !s.isEmpty())
                         .toList()
                     : Collections.emptyList();
 

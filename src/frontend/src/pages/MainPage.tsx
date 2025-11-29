@@ -631,6 +631,7 @@ export const MainPage = () => {
                 display: "grid",
                 gridTemplateColumns: "1fr",
                 gap: 2,
+                backgroundColor: "#fff !important",
               }}
             >
               {selectedFilters.map((key) => (
@@ -639,16 +640,11 @@ export const MainPage = () => {
                   direction="row"
                   alignItems="flex-start"
                   spacing={1}
-                  sx={{ width: "100%" }}
+                  sx={{ width: "100%", bgcolor: "#fff" }}
                 >
-                  <Box sx={{ flex: 1 }}>{renderFilterRow(key)}</Box>
-                  {/* <IconButton
-                    aria-label={t("home:botao_remover") || "Remove filter"}
-                    size="small"
-                    onClick={() => handleRemoveFilter(key)}
-                  >
-                    <DeleteIcon fontSize="small" />
-                  </IconButton> */}
+                  <Box sx={{ flex: 1, bgcolor: "#fff" }}>
+                    {renderFilterRow(key)}
+                  </Box>
                 </Stack>
               ))}
             </Box>

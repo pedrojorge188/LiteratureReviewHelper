@@ -122,6 +122,7 @@ export const ConfigurationPage = () => {
                 type="number"
                 value={rowsPerPage}
                 onChange={(e) => setRowsPerPage(e.target.value)}
+                placeholder="10"
               />
             </div>
           </div>
@@ -141,6 +142,7 @@ export const ConfigurationPage = () => {
                 type="number"
                 value={maxResults}
                 onChange={(e) => setMaxResults(e.target.value)}
+                placeholder="300"
               />
             </div>
           </div>

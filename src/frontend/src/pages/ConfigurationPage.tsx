@@ -1,13 +1,14 @@
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { InfoDialog } from "../components";
+import { Engines } from "./types";
 
 // Chave para guardar as definições das bibliotecas no localStorage
 const SETTINGS_KEY = "librarySettings";
 
 export const ConfigurationPage = () => {
   const { t } = useTranslation();
-  const bibliotecas = ["HAL", "ACM", "SPRINGER"];
+  const bibliotecas = Object.values(Engines);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
 
   const mostrarAviso = () => {

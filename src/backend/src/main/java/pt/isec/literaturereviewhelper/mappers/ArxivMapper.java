@@ -9,44 +9,44 @@ import pt.isec.literaturereviewhelper.models.Engines;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Component("arxivResultMapper")
 public class ArxivMapper implements IResultMapper<ArxivResponse> {
 
     @Override
     public List<Article> map(ArxivResponse response) {
-        if (response == null || response.getEntries() == null) {
+
+        if (response == null || response.getEntries() == null)
             return Collections.emptyList();
-        }
 
-        return response.getEntries().stream()
-                .filter(Objects::nonNull)
-                .map(entry -> {
-                    String title = Optional.ofNullable(entry.getTitle()).orElse("").trim();
-                    String dateStr = Optional.ofNullable(entry.getPublished()).orElse(entry.getUpdated());
-                    String year = (dateStr != null && dateStr.length() >= 4) ? dateStr.substring(0, 4) : "";
+        return response.getEntries().stream().map(entry -> {
 
-                    List<String> authors = Optional.ofNullable(entry.getAuthors())
-                            .map(list -> list.stream()
-                                    .map(ArxivResponse.Author::getName)
-                                    .filter(Objects::nonNull)
-                                    .map(String::trim)
-                                    .toList())
-                            .orElse(Collections.emptyList());
+            String title = entry.getTitle() != null ? entry.getTitle().trim() : "";
 
-                    String link = Optional.ofNullable(entry.getId()).orElse("");
+            String year = "";
+            if (entry.getPublished() != null && entry.getPublished().length() >= 4) {
+                year = entry.getPublished().substring(0, 4);
+            }
 
-                    return new Article(
-                            title,
-                            year,
-                            "arXiv",
-                            "Preprint",
-                            authors,
-                            link,
-                            Engines.ARXIV
-                    );
-                })
-                .toList();
+            List<String> authors = entry.getAuthors() != null
+                    ? entry.getAuthors().stream()
+                        .map(ArxivResponse.Author::getName)
+                        .filter(Objects::nonNull)
+                        .map(String::trim)
+                        .toList()
+                    : Collections.emptyList();
+
+            return new Article(
+                    title,
+                    year,
+                    "arXiv",
+                    "Preprint",
+                    authors,
+                    entry.getId(),
+                    Engines.ARXIV
+            );
+
+        }).toList();
     }
 }
+

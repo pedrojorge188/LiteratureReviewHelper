@@ -25,10 +25,12 @@ import ListItemText from "@mui/material/ListItemText";
 
 import { SaveDialog } from "../components";
 import { ImportDialog } from "../components";
-import { saveSearch, saveHistoryEntry } from "../utils/localStorage";
 import { SnackbarToast } from "../components";
 
 import { Query } from "./types";
+
+import { saveSearch, saveHistoryEntry } from "../utils/localStorage";
+import { buildQueryString } from "../utils/queries";
 
 interface ApiSetting {
   token: string;
@@ -253,13 +255,6 @@ export const MainPage = () => {
     setSelectedFilters(value);
   };
 
-  const buildQueryString = () => {
-    return queries
-        .map((q, i) => (i === 0 ? `(${q.value})` : `${q.operator} (${q.value})`))
-        .join(" ")
-        .trim();
-  }
-
   const pesquisar = async () => {
     if (queries.length === 1 && queries[0].value.trim() === "") {
       setOpenToastB(true);
@@ -275,7 +270,7 @@ export const MainPage = () => {
     setApiError(false);
     setIsLoading(true);
 
-    const queryString = buildQueryString();
+    const queryString = buildQueryString(queries);
 
     // Build the source parameter from selected bibliotecas
     const sourceParam = bibliotecas.join(",");
@@ -577,7 +572,7 @@ export const MainPage = () => {
             />
             {showBuiltQuery && (
               <textarea
-                value={buildQueryString()}
+                value={buildQueryString(queries)}
                 readOnly
               />
             )}

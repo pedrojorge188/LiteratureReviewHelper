@@ -1,11 +1,17 @@
 package pt.isec.literaturereviewhelper;
 
 import io.netty.channel.ChannelOption;
+import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import io.netty.resolver.dns.DnsAddressResolverGroup;
+import io.netty.resolver.dns.DnsNameResolverBuilder;
+import io.netty.resolver.dns.SingletonDnsServerAddressStreamProvider;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
@@ -22,21 +28,38 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
+import java.net.InetSocketAddress;
+import java.util.Objects;
+
 import javax.net.ssl.SSLException;
-
-
 
 @Configuration
 public class WebClientConfig {
+    private final Environment environment;
+
+    public WebClientConfig(Environment environment) {
+        this.environment = environment;
+    }
 
     @Bean
     public WebClient webClient() throws SSLException {
-
+        String dnsServer = environment.getProperty("custom.dns.server");
+        int dnsPort = Integer.parseInt(Objects.requireNonNull(environment.getProperty("custom.dns.port")));
+        
         // Build SSL context that trusts all certificates
         SslContext sslContext = SslContextBuilder
-                .forClient()
-                .trustManager(InsecureTrustManagerFactory.INSTANCE)
-                .build();
+            .forClient()
+            .trustManager(InsecureTrustManagerFactory.INSTANCE)
+            .build();
+        
+        // Build DNS resolver with NIO transport
+        DnsAddressResolverGroup resolverGroup = new DnsAddressResolverGroup(
+            new DnsNameResolverBuilder()
+                .channelType(NioDatagramChannel.class)
+                .nameServerProvider(new SingletonDnsServerAddressStreamProvider(
+                    new InetSocketAddress(dnsServer, dnsPort)
+                ))
+        );
 
         // JSON mapper for most engines
         ObjectMapper jsonMapper = new ObjectMapper();
@@ -66,9 +89,11 @@ public class WebClientConfig {
                 })
                 .build();
 
+        // Create HttpClient with custom DNS resolver and SSL context
         HttpClient httpClient = HttpClient.create()
-                .secure(t -> t.sslContext(sslContext))
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 30000);
+            .resolver(resolverGroup)
+            .secure(t -> t.sslContext(sslContext))
+            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 30000);
 
         WebClient client = WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))

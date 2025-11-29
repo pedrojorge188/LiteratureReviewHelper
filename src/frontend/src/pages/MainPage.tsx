@@ -15,6 +15,7 @@ import { ChipInput } from "../components/shared/ChipInput";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import InputLabel from "@mui/material/InputLabel";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
@@ -72,6 +73,7 @@ export const MainPage = () => {
   const [openToastC, setOpenToastC] = useState(false);
   const [openToastD, setOpenToastD] = useState(false);
   const [openToastE, setOpenToastE] = useState(false);
+  const [showBuiltQuery, setShowBuiltQuery] = useState(false);
 
   // Filter values
   const [authors, setAuthors] = useState<string[]>([]);
@@ -254,6 +256,13 @@ export const MainPage = () => {
     setSelectedFilters(value);
   };
 
+  const buildQueryString = () => {
+    return queries
+        .map((q, i) => (i === 0 ? `(${q.valor})` : `${q.metadado} (${q.valor})`))
+        .join(" ")
+        .trim();
+  }
+
   const pesquisar = async () => {
     if (queries.length === 1 && queries[0].valor.trim() === "") {
       setOpenToastB(true);
@@ -269,10 +278,7 @@ export const MainPage = () => {
     setApiError(false);
     setIsLoading(true);
 
-    const queryString = queries
-      .map((q, i) => (i === 0 ? `(${q.valor})` : `${q.metadado} (${q.valor})`))
-      .join(" ")
-      .trim();
+    const queryString = buildQueryString();
 
     // Build the source parameter from selected bibliotecas
     const sourceParam = bibliotecas.join(",");
@@ -563,6 +569,21 @@ export const MainPage = () => {
                 </div>
               </div>
             ))}
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={showBuiltQuery}
+                  onChange={(e) => setShowBuiltQuery(e.target.checked)}
+                />
+              }
+              label={t("home:label_show_built_query")}
+            />
+            {showBuiltQuery && (
+              <textarea
+                value={buildQueryString()}
+                readOnly
+              />
+            )}
           </div>
 
           {/* Ano de publicação */}

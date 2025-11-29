@@ -2,6 +2,7 @@
   "title": "Search",
   "titulo_pesquisa": "Search",
   "label_query": "Query",
+  "label_show_built_query": "Show built query",
   "operador_and": "AND",
   "operador_or": "OR",
   "operador_not": "NOT",

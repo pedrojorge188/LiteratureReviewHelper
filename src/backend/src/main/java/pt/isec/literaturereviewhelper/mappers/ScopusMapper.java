@@ -9,6 +9,7 @@ import pt.isec.literaturereviewhelper.models.ScopusResponse;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component("scopusResultMapper")
 public class ScopusMapper implements IResultMapper<ScopusResponse>{
@@ -41,11 +42,11 @@ public class ScopusMapper implements IResultMapper<ScopusResponse>{
 
                     // Authors: dc:creator is a single string that may contain multiple authors separated by ; or ,
                     List<String> authors = Optional.ofNullable(entry.getAuthors())
-                            .map(a -> Arrays.stream(a.split("[;,]"))
-                                    .map(String::trim)
-                                    .filter(s -> !s.isBlank())
-                                    .collect(Collectors.toList()))
-                            .orElse(Collections.emptyList());
+                                .map(a -> Arrays.stream(a.split("[;,]"))
+                                .map(String::trim)
+                                .filter(s -> !s.isBlank())
+                                .toList())
+                                .orElse(List.of());
 
                     // Link: find link with ref="scopus"
                     String link = "";

@@ -88,12 +88,10 @@ public class WebClientConfig {
             .secure(t -> t.sslContext(sslContext))
             .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 30000);
 
-        WebClient client = WebClient.builder()
+        return WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .exchangeStrategies(strategies)
                 .build();
-
-        return client;
     }
 
 

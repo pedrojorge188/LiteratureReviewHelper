@@ -6,7 +6,6 @@ import pt.isec.literaturereviewhelper.models.Article;
 import pt.isec.literaturereviewhelper.models.Engines;
 
 import java.util.List;
-import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -61,7 +60,7 @@ class ArxivMapperTest {
         assertEquals("2024", a.publicationYear());
         assertEquals("arXiv", a.venue());
         assertEquals("Preprint", a.venueType());
-        assertEquals(List.of("John Doe", "Jane Smith"), a.authors());
+        assertEquals(List.of("John Doe, Jane Smith"), a.authors());
         assertEquals("https://arxiv.org/abs/1234.5678", a.link());
         assertEquals(Engines.ARXIV, a.source());
     }
@@ -92,29 +91,30 @@ class ArxivMapperTest {
         assertEquals("", a.publicationYear());
         assertEquals("arXiv", a.venue());
         assertEquals("Preprint", a.venueType());
-        assertEquals(Collections.emptyList(), a.authors());
+        assertEquals(1, a.authors().size());
         assertEquals("https://arxiv.org/abs/0000.0000", a.link());
         assertEquals(Engines.ARXIV, a.source());
     }
 
     @Test
-    void testAuthorsWithNullOrBlankAreSkipped() {
+    void testAuthorsWithNullOrBlankAreSkippedAndConcatenated() {
         ArxivResponse.Author a1 = author(null);
         ArxivResponse.Author a2 = author("  ");
         ArxivResponse.Author a3 = author("Alice Doe");
+        ArxivResponse.Author a4 = author("Bob Smith");
 
         ArxivResponse response = makeResponse(
                 entry(
                         "https://arxiv.org/abs/9999.9999",
                         "Title",
                         "2023-05-01",
-                        a1, a2, a3
+                        a1, a2, a3, a4
                 )
         );
 
         List<Article> out = mapper.map(response);
         assertEquals(1, out.size());
-        assertEquals(List.of("Alice Doe"), out.get(0).authors());
+        assertEquals(List.of("Alice Doe, Bob Smith"), out.get(0).authors());
     }
 
     @Test

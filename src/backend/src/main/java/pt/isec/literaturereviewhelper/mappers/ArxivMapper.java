@@ -28,21 +28,23 @@ public class ArxivMapper implements IResultMapper<ArxivResponse> {
                 year = entry.getPublished().substring(0, 4);
             }
 
-            List<String> authors = entry.getAuthors() != null
-                    ? entry.getAuthors().stream()
-                        .map(ArxivResponse.Author::getName)
-                        .filter(Objects::nonNull)
-                        .map(String::trim)
-                        .filter(s -> !s.isEmpty())
-                        .toList()
-                    : Collections.emptyList();
+            String authorsStr = "";
+            if (entry.getAuthors() != null) {
+            authorsStr = entry.getAuthors().stream()
+                .map(ArxivResponse.Author::getName)
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .reduce((a, b) -> a + ", " + b) // junta com vírgula
+                .orElse("");
+}
 
             return new Article(
                     title,
                     year,
                     "arXiv",
                     "Preprint",
-                    authors,
+                    List.of(authorsStr),
                     entry.getId(),
                     Engines.ARXIV
             );

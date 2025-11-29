@@ -26,7 +26,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 import java.net.InetSocketAddress;
 import java.util.Objects;
@@ -64,12 +63,6 @@ public class WebClientConfig {
         // JSON mapper for most engines
         ObjectMapper jsonMapper = new ObjectMapper();
         jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-        // XML mapper for ArXiv
-        XmlMapper xmlMapper = new XmlMapper();
-        xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        xmlMapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
-        xmlMapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
 
         ExchangeStrategies strategies = ExchangeStrategies.builder()
                 .codecs(configurer -> {

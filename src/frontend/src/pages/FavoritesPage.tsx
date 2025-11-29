@@ -264,13 +264,14 @@ export const FavoritesPage = () => {
         </div>
       ) : (
         <div className="searches-list">
-          {savedSearches.map((search) => (
+          {savedSearches.map((search, key) => (
             <SavedSearchCard
               search={search}
               onLoad={handleLoad}
               onEdit={handleEdit}
               onExport={handleExportSingle}
               onDelete={handleDelete}
+              key={key}
             />
           ))}
         </div>

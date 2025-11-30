@@ -28,6 +28,7 @@ interface EditSearchDialogProps {
     excluirTitulos: string;
     bibliotecas: string[];
   }) => void;
+  externalError?: string;
 }
 
 export const EditSearchDialog = ({
@@ -35,6 +36,7 @@ export const EditSearchDialog = ({
   search,
   onClose,
   onSave,
+  externalError = "",
 }: EditSearchDialogProps) => {
   const { t } = useTranslation();
   const SETTINGS_KEY = "librarySettings";
@@ -49,6 +51,13 @@ export const EditSearchDialog = ({
   const [bibliotecas, setBibliotecas] = useState<string[]>([]);
   const [apiSettings, setApiSettings] = useState<ApiSettings>({});
   const [error, setError] = useState("");
+
+  // Update error when external error changes
+  useEffect(() => {
+    if (externalError) {
+      setError(externalError);
+    }
+  }, [externalError]);
 
   // Load API settings
   useEffect(() => {
@@ -75,8 +84,18 @@ export const EditSearchDialog = ({
       );
       setAnoDe(search.searchParameters.yearFrom);
       setAnoAte(search.searchParameters.yearTo);
-      setExcluirVenues(search.searchParameters.excludeVenues);
-      setExcluirTitulos(search.searchParameters.excludeTitles);
+
+      
+      setExcluirVenues(
+        Array.isArray(search.searchParameters.excludeVenues)
+          ? search.searchParameters.excludeVenues.join(", ")
+          : search.searchParameters.excludeVenues || ""
+      );
+      setExcluirTitulos(
+        Array.isArray(search.searchParameters.excludeTitles)
+          ? search.searchParameters.excludeTitles.join(", ")
+          : search.searchParameters.excludeTitles || ""
+      );
       setBibliotecas(search.searchParameters.libraries);
       setError("");
     }
@@ -279,21 +298,21 @@ export const EditSearchDialog = ({
 
           {/* Exclude Venues */}
           <div className="section">
-            <label>{t("home:label_excluir_venues")}</label>
+            <label>{t("home:label_exclude_venues")}</label>
             <textarea
               value={excluirVenues}
               onChange={(e) => setExcluirVenues(e.target.value)}
-              placeholder={t("home:placeholder_excluir_venues") ?? ""}
+              placeholder={t("home:placeholder_exclude_venues") ?? ""}
             ></textarea>
           </div>
 
           {/* Exclude Titles */}
           <div className="section">
-            <label>{t("home:label_excluir_titulos")}</label>
+            <label>{t("home:label_exclude_titles")}</label>
             <textarea
               value={excluirTitulos}
               onChange={(e) => setExcluirTitulos(e.target.value)}
-              placeholder={t("home:placeholder_excluir_titulos") ?? ""}
+              placeholder={t("home:placeholder_exclude_titles") ?? ""}
             ></textarea>
           </div>
 
@@ -342,10 +361,10 @@ export const EditSearchDialog = ({
 
         <div className="modal-footer">
           <button className="btn-secondary" onClick={handleClose}>
-            {t("saveDialog:cancel") || "Cancel"}
+            {t("editSearchDialog:cancel") || "Cancel"}
           </button>
           <button className="btn-primary" onClick={handleSave}>
-            {t("saveDialog:save") || "Save"}
+            {t("editSearchDialog:save") || "Save"}
           </button>
         </div>
       </div>

@@ -25,4 +25,5 @@ export const en = {
   savedsearchcard: savedsearchcard,
   savedsearchpageheader: savedsearchpageheader,
   warnings: warnings,
+  editSearchDialog: editSearchDialog,
 };

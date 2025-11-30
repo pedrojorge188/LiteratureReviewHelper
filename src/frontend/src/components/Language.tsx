@@ -26,30 +26,25 @@ export const Language = () => {
       {links?.map((linkItem: ILanguageLink, index: number) => {
         const { language } = linkItem;
         return (
-          <button
-            type="button"
-            title={language === "pt" ? "Portugues" : "Ingles"}
-            className={`lang-item ${language === lang ? "selected" : ""}`}
-            onClick={() => changeLanguage(language)}
-            key={index}
-            style={{ 
-              background: 'none', 
-              border: 'none', 
-              cursor: 'pointer', 
-              padding: 0,
-              color: 'inherit',
-              font: 'inherit'
-            }}
-          >
-            {index > 0 ? (
-              <>
-                <span> | </span>
-                <span>{language}</span>
-              </>
-            ) : (
+          <span key={index}>
+            {index > 0 && <span className="lang-separator"> | </span>}
+            <button
+              type="button"
+              title={language === "pt" ? "Portugues" : "Ingles"}
+              className={`lang-item ${language === lang ? "selected" : ""}`}
+              onClick={() => changeLanguage(language)}
+              style={{ 
+                background: 'none', 
+                border: 'none', 
+                cursor: 'pointer', 
+                padding: 0,
+                color: 'inherit',
+                font: 'inherit'
+              }}
+            >
               <span>{language}</span>
-            )}
-          </button>
+            </button>
+          </span>
         );
       })}
     </div>

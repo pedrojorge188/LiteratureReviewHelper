@@ -26,6 +26,9 @@ export const FavoritesPage = () => {
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [openToastE, setOpenToastE] = useState(false);
   const [openToastD, setOpenToastD] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingSearch, setEditingSearch] = useState<SavedSearch | null>(null);
+  const [editError, setEditError] = useState("");
 
   // Load saved searches on component mount
   useEffect(() => {
@@ -58,33 +61,59 @@ export const FavoritesPage = () => {
   };
 
   const handleEdit = (search: SavedSearch) => {
-    setEditingId(search.id);
-    setCurrentLabel(search.id);
+    setEditingSearch(search);
     setEditError("");
     setIsEditDialogOpen(true);
   };
 
-  const handleUpdateLabel = (newLabel: string) => {
-    if (editingId) {
-      try {
-        updateSearchLabel(editingId, newLabel);
-        setIsEditDialogOpen(false);
-        setEditingId(null);
-        setCurrentLabel("");
-        setEditError("");
-        loadSearches();
-        setOpenToastE(true);
-      } catch (error) {
+  const handleSaveEdit = (
+    id: string,
+    newLabel: string,
+    searchParameters: {
+      queries: { valor: string; metadado?: string }[];
+      anoDe: string;
+      anoAte: string;
+      excluirVenues: string;
+      excluirTitulos: string;
+      bibliotecas: string[];
+    }
+  ) => {
+    try {
+      // Convert internal format to storage format
+      const storageParams = {
+        queries: searchParameters.queries.map((q) => ({
+          value: q.valor,
+          operator: q.metadado,
+        })),
+        yearFrom: searchParameters.anoDe,
+        yearTo: searchParameters.anoAte,
+        authors: editingSearch?.searchParameters.authors || [],
+        venues: editingSearch?.searchParameters.venues || [],
+        excludeAuthors: editingSearch?.searchParameters.excludeAuthors || [],
+        excludeVenues: searchParameters.excluirVenues
+          ? searchParameters.excluirVenues.split(",").map((s) => s.trim())
+          : [],
+        excludeTitles: searchParameters.excluirTitulos
+          ? searchParameters.excluirTitulos.split(",").map((s) => s.trim())
+          : [],
+        libraries: searchParameters.bibliotecas,
+      };
+
+      updateSearch(id, newLabel, storageParams);
+      setIsEditDialogOpen(false);
+      setEditingSearch(null);
+      setEditError("");
+      loadSearches();
+      setOpenToastE(true);
+    } catch (error) {
+      console.error("Error updating search:", error);
+      if (error instanceof Error && error.message.includes("already exists")) {
+        setEditError(
+          t("saveDialog:error_duplicate_name") ||
+            "A search with this name already exists. Please choose a different name."
+        );
+      } else {
         setOpenToastD(true);
-        console.error("Error updating label:", error);
-        if (error instanceof Error) {
-          setEditError(error.message);
-        } else {
-          setEditError(
-            t("favorites:update_error") ||
-              "Error updating search name. Please try again."
-          );
-        }
       }
     }
   };
@@ -189,16 +218,15 @@ export const FavoritesPage = () => {
 
   return (
     <div className="history-page">
-      <SaveDialog
+      <EditSearchDialog
         isOpen={isEditDialogOpen}
+        search={editingSearch}
         onClose={() => {
           setIsEditDialogOpen(false);
-          setEditingId(null);
-          setCurrentLabel("");
+          setEditingSearch(null);
           setEditError("");
         }}
-        onSave={handleUpdateLabel}
-        initialLabel={currentLabel}
+        onSave={handleSaveEdit}
         externalError={editError}
       />
 

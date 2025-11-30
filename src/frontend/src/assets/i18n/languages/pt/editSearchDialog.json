@@ -1,4 +1,6 @@
 {
   "title": "Editar Pesquisa",
-  "label_name": "Nome da Pesquisa"
+  "label_name": "Nome da Pesquisa",
+  "save": "Guardar",
+  "cancel": "Cancelar"
 }

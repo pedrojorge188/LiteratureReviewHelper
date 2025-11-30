@@ -31,6 +31,8 @@ import { Query } from "./types";
 
 import { saveSearch, saveHistoryEntry } from "../utils/localStorage";
 import { buildQueryString } from "../utils/queries";
+import Tooltip from "@mui/material/Tooltip";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 
 interface ApiSetting {
   token: string;
@@ -501,7 +503,14 @@ export const MainPage = () => {
         <div className="pesquisa-container__content">
           {/* Query Section */}
           <div className="section">
-            <label>{t("home:label_query")}</label>
+            <label>
+              {t("home:label_query")}
+              <Tooltip title={t("warnings:advancedquery")}>
+                <span className="rows-container__label__icon">
+                  <HelpOutlineIcon />
+                </span>
+              </Tooltip>
+            </label>
             {queries.map((q, index) => (
               <div key={index} className="query-row">
                 {index > 0 && (

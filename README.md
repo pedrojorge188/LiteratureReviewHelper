@@ -71,5 +71,6 @@ The MVP will include:
 
 | Day | Time |
 |:----|:-----|
-| **Monday** | 18:30 – 19:15 |
+| **Monday** | 18:30 – 18.45 |
+| **Saturday** | 14:00 – 14:15 |
 

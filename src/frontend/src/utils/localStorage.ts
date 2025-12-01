@@ -1,11 +1,11 @@
-import { SavedSearch, SavedSearchesStorage, SearchParameters } from "../pages/types";
+import { Query, SavedSearch, SavedSearchesStorage, SearchParameters } from "../pages/types";
 
 const STORAGE_FAVORITES_KEY = "literatureReviewHelper_savedSearches";
 const STORAGE_HISTORY_KEY = "literatureReviewHelper_searchHistory";
 
 // Type for internal app usage (Portuguese field names)
 interface InternalSearchParameters {
-  queries: Array<{ valor: string; metadado?: string }>;
+  queries: Query[];
   anoDe: string;
   anoAte: string;
   authors: string[],
@@ -21,10 +21,7 @@ interface InternalSearchParameters {
  */
 const toStorageFormat = (params: InternalSearchParameters): SearchParameters => {
   return {
-    queries: params.queries.map(q => ({
-      value: q.valor,
-      operator: q.metadado
-    })),
+    queries: params.queries,
     yearFrom: params.anoDe,
     yearTo: params.anoAte,
     authors: params.authors,
@@ -41,10 +38,7 @@ const toStorageFormat = (params: InternalSearchParameters): SearchParameters => 
  */
 const fromStorageFormat = (params: SearchParameters): InternalSearchParameters => {
   return {
-    queries: params.queries.map(q => ({
-      valor: q.value,
-      metadado: q.operator
-    })),
+    queries: params.queries,
     anoDe: params.yearFrom,
     anoAte: params.yearTo,
     authors: params.authors,

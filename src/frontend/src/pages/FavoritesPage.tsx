@@ -96,10 +96,7 @@ export const FavoritesPage = () => {
   const handleLoad = (search: SavedSearch) => {
     // Convert storage format to internal format and store in sessionStorage
     const internalParams = {
-      queries: search.searchParameters.queries.map((q) => ({
-        valor: q.value,
-        metadado: q.operator,
-      })),
+      queries: search.searchParameters.queries,
       anoDe: search.searchParameters.yearFrom,
       anoAte: search.searchParameters.yearTo,
       authors: search.searchParameters.authors,

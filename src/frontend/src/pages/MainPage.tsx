@@ -15,6 +15,7 @@ import { ChipInput } from "../components/shared/ChipInput";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import InputLabel from "@mui/material/InputLabel";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
@@ -24,13 +25,14 @@ import ListItemText from "@mui/material/ListItemText";
 
 import { SaveDialog } from "../components";
 import { ImportDialog } from "../components";
-import { saveSearch, saveHistoryEntry } from "../utils/localStorage";
 import { SnackbarToast } from "../components";
 
-interface Query {
-  valor: string;
-  metadado?: string;
-}
+import { Query } from "./types";
+
+import { saveSearch, saveHistoryEntry } from "../utils/localStorage";
+import { buildQueryString } from "../utils/queries";
+import Tooltip from "@mui/material/Tooltip";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 
 interface ApiSetting {
   token: string;
@@ -52,7 +54,7 @@ export const MainPage = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch<any>();
 
-  const [queries, setQueries] = useState<Query[]>([{ valor: "" }]);
+  const [queries, setQueries] = useState<Query[]>([{ value: "" }]);
   const [anoDe, setAnoDe] = useState<string>("");
   const [anoAte, setAnoAte] = useState<string>("");
   const [bibliotecaSelecionada, setBibliotecaSelecionada] =
@@ -72,6 +74,7 @@ export const MainPage = () => {
   const [openToastC, setOpenToastC] = useState(false);
   const [openToastD, setOpenToastD] = useState(false);
   const [openToastE, setOpenToastE] = useState(false);
+  const [showBuiltQuery, setShowBuiltQuery] = useState(false);
 
   // Filter values
   const [authors, setAuthors] = useState<string[]>([]);
@@ -105,12 +108,12 @@ export const MainPage = () => {
   const normalizarQueries = (lista: Query[]): Query[] =>
     lista.map((q, i) =>
       i === 0
-        ? { valor: q.valor }
-        : { valor: q.valor, metadado: q.metadado || "AND" }
+        ? { value: q.value }
+        : { value: q.value, operator: q.operator || "AND" }
     );
 
   const adicionarQuery = () => {
-    const nova = [...queries, { valor: "", metadado: "AND" }];
+    const nova = [...queries, { value: "", operator: "AND" }];
     setQueries(normalizarQueries(nova));
   };
 
@@ -205,7 +208,7 @@ export const MainPage = () => {
     const params = search.searchParameters;
 
     const convertedQueries = params.queries.map((q, i) =>
-      i === 0 ? { valor: q.value } : { valor: q.value, metadado: q.operator }
+      i === 0 ? { value: q.value } : { value: q.value, operator: q.operator }
     );
 
     setQueries(convertedQueries);
@@ -255,6 +258,11 @@ export const MainPage = () => {
   };
 
   const pesquisar = async () => {
+    if (queries.length === 1 && queries[0].value.trim() === "") {
+      setOpenToastB(true);
+      return
+    }
+
     if (bibliotecas.length === 0) {
       setApiError(true);
       setOpenToast(true);
@@ -264,10 +272,7 @@ export const MainPage = () => {
     setApiError(false);
     setIsLoading(true);
 
-    const queryString = queries
-      .map((q, i) => (i === 0 ? q.valor : `${q.metadado} ${q.valor}`))
-      .join(" ")
-      .trim();
+    const queryString = buildQueryString(queries);
 
     // Build the source parameter from selected bibliotecas
     const sourceParam = bibliotecas.join(",");
@@ -345,7 +350,7 @@ export const MainPage = () => {
     if (loadedSearch) {
       try {
         const params = JSON.parse(loadedSearch);
-        setQueries(params.queries || [{ valor: "" }]);
+        setQueries(params.queries || [{ value: "" }]);
         setAnoDe(params.anoDe || "");
         setAnoAte(params.anoAte || "");
         setAuthors(params.authors || []);
@@ -498,14 +503,21 @@ export const MainPage = () => {
         <div className="pesquisa-container__content">
           {/* Query Section */}
           <div className="section">
-            <label>{t("home:label_query")}</label>
+            <label>
+              {t("home:label_query")}
+              <Tooltip title={t("warnings:advancedquery")}>
+                <span className="rows-container__label__icon">
+                  <HelpOutlineIcon />
+                </span>
+              </Tooltip>
+            </label>
             {queries.map((q, index) => (
               <div key={index} className="query-row">
                 {index > 0 && (
                   <select
-                    value={q.metadado}
+                    value={q.operator}
                     onChange={(e) =>
-                      atualizarQuery(index, "metadado", e.target.value)
+                      atualizarQuery(index, "operator", e.target.value)
                     }
                   >
                     <option value="AND">{t("home:operador_and")}</option>
@@ -517,10 +529,10 @@ export const MainPage = () => {
                 <input
                   className="query-row__input-text"
                   type="text"
-                  value={q.valor}
+                  value={q.value}
                   placeholder={t("home:placeholder_query") ?? ""}
                   onChange={(e) =>
-                    atualizarQuery(index, "valor", e.target.value)
+                    atualizarQuery(index, "value", e.target.value)
                   }
                 />
 
@@ -558,6 +570,21 @@ export const MainPage = () => {
                 </div>
               </div>
             ))}
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={showBuiltQuery}
+                  onChange={(e) => setShowBuiltQuery(e.target.checked)}
+                />
+              }
+              label={t("home:label_show_built_query")}
+            />
+            {showBuiltQuery && (
+              <textarea
+                value={buildQueryString(queries)}
+                readOnly
+              />
+            )}
           </div>
 
           {/* Ano de publicação */}

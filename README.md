@@ -58,6 +58,13 @@ The MVP will include:
 - **Backend:** Spring Boot (Java)  
 - **Build & Deployment:** Maven, GitHub Actions (CI/CD)
 
+## Usability Testing
+
+- **SEQ** (Single Ease Question)
+- **SUS** (System Usability Scale)
+
+
+
 ## Team by Role
 
 | Role              | Assignment |

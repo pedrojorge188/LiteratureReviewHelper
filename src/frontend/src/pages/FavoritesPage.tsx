@@ -79,9 +79,11 @@ export const FavoritesPage = () => {
     }
   ) => {
     try {
-      // Build internal format for updateSearch
       const internalParams = {
-        queries: searchParameters.queries,
+        queries: searchParameters.queries.map((q) => ({
+          value: q.valor,
+          operator: q.metadado,
+        })),
         anoDe: searchParameters.anoDe,
         anoAte: searchParameters.anoAte,
         authors: editingSearch?.searchParameters.authors || [],

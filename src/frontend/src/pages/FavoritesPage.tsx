@@ -79,14 +79,11 @@ export const FavoritesPage = () => {
     }
   ) => {
     try {
-      // Convert internal format to storage format
-      const storageParams = {
-        queries: searchParameters.queries.map((q) => ({
-          value: q.valor,
-          operator: q.metadado,
-        })),
-        yearFrom: searchParameters.anoDe,
-        yearTo: searchParameters.anoAte,
+      // Build internal format for updateSearch
+      const internalParams = {
+        queries: searchParameters.queries,
+        anoDe: searchParameters.anoDe,
+        anoAte: searchParameters.anoAte,
         authors: editingSearch?.searchParameters.authors || [],
         venues: editingSearch?.searchParameters.venues || [],
         excludeAuthors: editingSearch?.searchParameters.excludeAuthors || [],
@@ -96,10 +93,10 @@ export const FavoritesPage = () => {
         excludeTitles: searchParameters.excluirTitulos
           ? searchParameters.excluirTitulos.split(",").map((s) => s.trim())
           : [],
-        libraries: searchParameters.bibliotecas,
+        bibliotecas: searchParameters.bibliotecas,
       };
 
-      updateSearch(id, newLabel, storageParams);
+      updateSearch(id, newLabel, internalParams);
       setIsEditDialogOpen(false);
       setEditingSearch(null);
       setEditError("");

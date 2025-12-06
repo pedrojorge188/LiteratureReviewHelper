@@ -14,7 +14,7 @@ import { EditableNode } from "./EditableNode";
 import { mapApiToFlow } from "./mapApiToFlow";
 
 import "@xyflow/react/dist/style.css";
-import { SearchResponseDto } from "../../pages/types";
+import { FlowchartExportConfig, SearchResponseDto } from "../../pages/types";
 
 export const PrismaEditor = (apiData: SearchResponseDto) => {
   const { nodes: initialNodes, edges: initialEdges } = useMemo(
@@ -103,6 +103,44 @@ export const PrismaEditor = (apiData: SearchResponseDto) => {
     }));
   }, [nodes, handleNodeLabelChange, handleNodeDelete]);
 
+  const handleExportFlowchart = useCallback(() => {
+    const exportConfig: FlowchartExportConfig = {
+      exportDate: new Date().toISOString(),
+      searchData: {
+        query: apiData.query,
+        totalArticles: apiData.totalArticles,
+        articlesByEngine: apiData.articlesByEngine,
+        duplicatedResultsRemoved: apiData.duplicatedResultsRemoved,
+        filterImpactByEngine: apiData.filterImpactByEngine,
+      },
+      flowVisualization: {
+        nodes: nodes,
+        edges: edges,
+      },
+      articles: apiData.articles,
+    };
+
+    // blob
+    const jsonString = JSON.stringify(exportConfig, null, 2);
+    const blob = new Blob([jsonString], { type: "application/json" });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-").substring(0, 19);
+    const queryName = apiData.query?.substring(0, 30).replace(/[^a-zA-Z0-9]/g, "_") || "search";
+    link.download = `flowchart_${queryName}_${timestamp}.json`;
+
+    // Download
+    document.body.appendChild(link);
+    link.click();
+
+    // Cleanup
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }, [nodes, edges, apiData]);
+
   return (
     <div className="flow-wrapper">
       <div ref={reactFlowWrapper} className="react-flow-wrapper">
@@ -120,9 +158,14 @@ export const PrismaEditor = (apiData: SearchResponseDto) => {
         </ReactFlow>
       </div>
 
-      <button className="add-node-btn" onClick={handleAddNode}>
-        Add Step
-      </button>
+      <div className="flow-actions">
+        <button className="add-node-btn" onClick={handleAddNode}>
+          Add Step
+        </button>
+        <button className="export-flow-btn" onClick={handleExportFlowchart}>
+          Export Flowchart
+        </button>
+      </div>
     </div>
   );
 };

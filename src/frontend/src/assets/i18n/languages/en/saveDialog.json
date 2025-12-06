@@ -3,6 +3,7 @@
   "label_prompt": "Enter a name for this search:",
   "placeholder": "e.g., AI usage",
   "error_empty_label": "Please enter a label",
+  "error_duplicate_name": "A search with this name already exists. Please choose a different name.",
   "save": "Save",
   "cancel": "Cancel"
 }

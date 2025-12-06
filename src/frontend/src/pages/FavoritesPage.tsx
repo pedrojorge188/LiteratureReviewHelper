@@ -4,32 +4,31 @@ import { useNavigate } from "react-router-dom";
 import {
   getSavedSearches,
   deleteSearch,
-  updateSearchLabel,
   exportSearches,
   importSearches,
   clearAllSearches,
+  updateSearch,
 } from "../utils/localStorage";
-import { SavedSearch } from "./types";
-import { SaveDialog } from "../components/SaveDialog";
+import { SavedSearch, Query } from "./types";
 import { SavedSearchCard } from "../components/SavedSearchCard";
 import { SavedSearchPageHeader } from "../components/SavedSearchPageHeader";
 import { ConfirmDialog } from "../components/ConfirmDialog";
+import { EditSearchDialog } from "../components/EditSearchDialog";
 import { SnackbarToast } from "../components";
 
 export const FavoritesPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([]);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [currentLabel, setCurrentLabel] = useState("");
-  const [editError, setEditError] = useState<string>("");
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
   const [isConfirmDeleteAllOpen, setIsConfirmDeleteAllOpen] = useState(false);
   const [confirmDeleteAll, setConfirmDeleteAll] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [openToastE, setOpenToastE] = useState(false);
   const [openToastD, setOpenToastD] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingSearch, setEditingSearch] = useState<SavedSearch | null>(null);
+  const [editError, setEditError] = useState("");
 
   // Load saved searches on component mount
   useEffect(() => {
@@ -62,33 +61,55 @@ export const FavoritesPage = () => {
   };
 
   const handleEdit = (search: SavedSearch) => {
-    setEditingId(search.id);
-    setCurrentLabel(search.id);
+    setEditingSearch(search);
     setEditError("");
     setIsEditDialogOpen(true);
   };
 
-  const handleUpdateLabel = (newLabel: string) => {
-    if (editingId) {
-      try {
-        updateSearchLabel(editingId, newLabel);
-        setIsEditDialogOpen(false);
-        setEditingId(null);
-        setCurrentLabel("");
-        setEditError("");
-        loadSearches();
-        setOpenToastE(true);
-      } catch (error) {
+  const handleSaveEdit = (
+    id: string,
+    newLabel: string,
+    searchParameters: {
+      queries: Query[];
+      anoDe: string;
+      anoAte: string;
+      excluirVenues: string;
+      excluirTitulos: string;
+      bibliotecas: string[];
+    }
+  ) => {
+    try {
+      const internalParams = {
+        queries: searchParameters.queries,
+        anoDe: searchParameters.anoDe,
+        anoAte: searchParameters.anoAte,
+        authors: editingSearch?.searchParameters.authors || [],
+        venues: editingSearch?.searchParameters.venues || [],
+        excludeAuthors: editingSearch?.searchParameters.excludeAuthors || [],
+        excludeVenues: searchParameters.excluirVenues
+          ? searchParameters.excluirVenues.split(",").map((s) => s.trim())
+          : [],
+        excludeTitles: searchParameters.excluirTitulos
+          ? searchParameters.excluirTitulos.split(",").map((s) => s.trim())
+          : [],
+        bibliotecas: searchParameters.bibliotecas,
+      };
+
+      updateSearch(id, newLabel, internalParams);
+      setIsEditDialogOpen(false);
+      setEditingSearch(null);
+      setEditError("");
+      loadSearches();
+      setOpenToastE(true);
+    } catch (error) {
+      console.error("Error updating search:", error);
+      if (error instanceof Error && error.message.includes("already exists")) {
+        setEditError(
+          t("saveDialog:error_duplicate_name") ||
+            "A search with this name already exists. Please choose a different name."
+        );
+      } else {
         setOpenToastD(true);
-        console.error("Error updating label:", error);
-        if (error instanceof Error) {
-          setEditError(error.message);
-        } else {
-          setEditError(
-            t("favorites:update_error") ||
-              "Error updating search name. Please try again."
-          );
-        }
       }
     }
   };
@@ -193,16 +214,15 @@ export const FavoritesPage = () => {
 
   return (
     <div className="history-page">
-      <SaveDialog
+      <EditSearchDialog
         isOpen={isEditDialogOpen}
+        search={editingSearch}
         onClose={() => {
           setIsEditDialogOpen(false);
-          setEditingId(null);
-          setCurrentLabel("");
+          setEditingSearch(null);
           setEditError("");
         }}
-        onSave={handleUpdateLabel}
-        initialLabel={currentLabel}
+        onSave={handleSaveEdit}
         externalError={editError}
       />
 

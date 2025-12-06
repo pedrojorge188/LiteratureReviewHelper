@@ -11,7 +11,9 @@ export interface Artigo {
 export enum Engines {
   ACM = 'ACM',
   HAL = 'HAL',
-  SPRINGER = 'SPRINGER'
+  SPRINGER = 'SPRINGER',
+  SCOPUS = 'SCOPUS',
+  ARXIV = 'ARXIV'
 }
 
 export enum Statistic {
@@ -75,42 +77,12 @@ export interface SavedSearchesStorage {
   searches: SavedSearch[];
 }
 
-export interface FlowNode {
-  id: string;
-  type: string;
-  position: { x: number; y: number };
-  data: {
-    label: string;
-    title?: string;
-  };
+export interface ApiSetting {
+  token: string;
+  noToken: boolean;
 }
 
-export interface FlowEdge {
-  id: string;
-  source: string;
-  target: string;
-  animated?: boolean;
-  style?: {
-    strokeWidth?: number;
-    strokeDasharray?: string;
-    color?: string;
-  };
+export interface ApiSettings {
+  [key: string]: ApiSetting;
 }
-
-export interface FlowchartExportConfig {
-  exportDate: string;
-  searchData: {
-    query: string;
-    totalArticles: number;
-    articlesByEngine: Record<Engines, number>;
-    duplicatedResultsRemoved: number;
-    filterImpactByEngine: Record<Engines, Record<string, Record<Statistic, number>>>;
-  };
-  flowVisualization: {
-    nodes: FlowNode[];
-    edges: FlowEdge[];
-  };
-  articles: Artigo[];
-}
-
 

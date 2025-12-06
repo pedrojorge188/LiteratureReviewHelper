@@ -54,10 +54,7 @@ export const HistoryPage = () => {
 
   const handleLoad = (search: SavedSearch) => {
     const internalParams = {
-      queries: search.searchParameters.queries.map((q) => ({
-        valor: q.value,
-        metadado: q.operator,
-      })),
+      queries: search.searchParameters.queries,
       anoDe: search.searchParameters.yearFrom,
       anoAte: search.searchParameters.yearTo,
       excluirVenues: search.searchParameters.excludeVenues,

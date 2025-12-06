@@ -10,5 +10,7 @@ export { usePagination, DOTS } from "./usePagination";
 export { langs, langDefault, langDefaultRedirect } from "./lang";
 export { readLangPathname, getCurrentPathAllLangs } from "./location";
 export { formatDate } from "./formatDate";
+export { normalizeQueries, addQuery, removeQuery, moveQueryUp, updateQuery } from "./queryHelpers";
+export { loadApiSettings, getAvailableLibraries, SETTINGS_KEY } from "./apiSettings";
 
  

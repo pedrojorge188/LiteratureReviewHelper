@@ -13,8 +13,8 @@ export const Paths = (): IRoute => ({
     element: <HistoryPage />,
   },
   savePage: { path: "favoritos", element: <FavoritesPage /> },
-  libListPage: { path: "configuracoes", element: <ConfigurationPage /> },
-  // articlePage: { path: "listaartigos", element: <ArticlesList /> },
+  libListPage: { path: "configuracoes", element: <ConfigurationPage /> }
+
 });
 
 // Return the root path (ex: / or /en)

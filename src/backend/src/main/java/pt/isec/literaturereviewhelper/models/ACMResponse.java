@@ -61,6 +61,8 @@ public class ACMResponse {
         @JsonProperty("date-parts")
         private List<List<Integer>> dateParts;
 
+        public PublishedDate() {}
+
         public PublishedDate(List<List<Integer>> dateParts) { this.dateParts = dateParts; }
 
         public List<List<Integer>> getDateParts() { return dateParts; }

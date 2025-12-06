@@ -8,19 +8,29 @@ import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import io.netty.resolver.dns.DnsAddressResolverGroup;
 import io.netty.resolver.dns.DnsNameResolverBuilder;
 import io.netty.resolver.dns.SingletonDnsServerAddressStreamProvider;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.http.codec.json.Jackson2JsonDecoder;
+import org.springframework.http.codec.json.Jackson2JsonEncoder;
+import org.springframework.http.codec.xml.Jaxb2XmlDecoder;
+import org.springframework.http.codec.xml.Jaxb2XmlEncoder;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import javax.net.ssl.SSLException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.net.InetSocketAddress;
 import java.util.Objects;
 
+import javax.net.ssl.SSLException;
 
 @Configuration
 public class WebClientConfig {
@@ -50,6 +60,28 @@ public class WebClientConfig {
                 ))
         );
 
+        // JSON mapper for most engines
+        ObjectMapper jsonMapper = new ObjectMapper();
+        jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        ExchangeStrategies strategies = ExchangeStrategies.builder()
+                .codecs(configurer -> {
+                    configurer.defaultCodecs().maxInMemorySize(16 * 1024 * 1024); // 16MB
+
+                    // JSON codecs for other engines
+                    configurer.defaultCodecs().jackson2JsonDecoder(
+                            new Jackson2JsonDecoder(jsonMapper, MediaType.APPLICATION_JSON)
+                    );
+                    configurer.defaultCodecs().jackson2JsonEncoder(
+                            new Jackson2JsonEncoder(jsonMapper, MediaType.APPLICATION_JSON)
+                    );
+
+                    // XML codecs specifically for ArXiv
+                    configurer.defaultCodecs().jaxb2Decoder(new Jaxb2XmlDecoder());
+                    configurer.defaultCodecs().jaxb2Encoder(new Jaxb2XmlEncoder());
+                })
+                .build();
+
         // Create HttpClient with custom DNS resolver and SSL context
         HttpClient httpClient = HttpClient.create()
             .resolver(resolverGroup)
@@ -57,9 +89,11 @@ public class WebClientConfig {
             .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 30000);
 
         return WebClient.builder()
-            .clientConnector(new ReactorClientHttpConnector(httpClient))
-            .build();
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .exchangeStrategies(strategies)
+                .build();
     }
+
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {

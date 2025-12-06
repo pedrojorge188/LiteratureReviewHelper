@@ -89,6 +89,7 @@ export const SearchResultTitlesVerification = () => {
         const updatedTitles = titlesToExclude.concat(newTitles);
         setTitlesToExclude(updatedTitles);
         localStorage.setItem("titlesToExclude", JSON.stringify(updatedTitles));
+        loadTitles();
     }
 
     const deleteTitle = (titleId: string) => {
@@ -103,6 +104,9 @@ export const SearchResultTitlesVerification = () => {
 
         localStorage.setItem("titlesToExclude", JSON.stringify(updatedTitles));
         localStorage.setItem("titlesGroups", JSON.stringify(updatedGroups));
+
+        loadTitles();
+        loadGroups();
     }
 
 
@@ -115,6 +119,8 @@ export const SearchResultTitlesVerification = () => {
         localStorage.setItem("titlesToExclude", JSON.stringify(updatedTitles));
         setEditTitles({});
         setRowEditMode("");
+
+        loadTitles();
     };
 
     const updateGroup = () => {
@@ -126,6 +132,8 @@ export const SearchResultTitlesVerification = () => {
         localStorage.setItem("titlesGroups", JSON.stringify(updatedGroups));
         setEditTitles({});
         setRowEditMode("");
+
+        loadGroups();
     };
 
     const saveGroups = (groupName: string) => {
@@ -139,12 +147,16 @@ export const SearchResultTitlesVerification = () => {
         const updatedGroups = [...titlesGroups, group];
         setTitlesGroups(updatedGroups);
         localStorage.setItem("titlesGroups", JSON.stringify(updatedGroups));
+
+        loadGroups();
     }
 
     const deleteGroup = (id: string) => {
         const updatedGroups = titlesGroups.filter(item => item.id !== id);
         setTitlesGroups(updatedGroups);
         localStorage.setItem("titlesGroups", JSON.stringify(updatedGroups));
+
+        loadGroups();
     }
 
     const handleSaveGroup = (groupName: string) => {
@@ -198,6 +210,7 @@ export const SearchResultTitlesVerification = () => {
     const saveGroupsLinksWithTitles = (updatedGroups: TitlesGroups[]) => {
         setTitlesGroups(updatedGroups);
         localStorage.setItem("titlesGroups", JSON.stringify(updatedGroups));
+        loadGroups();
     }
 
     const getTitlesGroups = (id: string) => {

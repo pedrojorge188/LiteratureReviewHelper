@@ -8,9 +8,9 @@ import {
   Edge,
   Node,
   ReactFlow,
-  ReactFlowInstance, 
-  getNodesBounds,    
-  getViewportForBounds 
+  ReactFlowInstance,
+  getNodesBounds,
+  getViewportForBounds
 } from "@xyflow/react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { toPng } from "html-to-image";
@@ -45,9 +45,9 @@ export const PrismaEditor = (apiData: SearchResponseDto) => {
   const [edges, setEdges] = useState(initialEdges);
 
   const defaultEdgeOptions = useMemo(() => ({
-    style: { 
-      stroke: '#b1b1b7', 
-      strokeWidth: 1 
+    style: {
+      stroke: '#b1b1b7',
+      strokeWidth: 1
     },
   }), []);
 
@@ -153,11 +153,11 @@ export const PrismaEditor = (apiData: SearchResponseDto) => {
                 height: String(imageHeight),
                 transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
             },
-            filter: (node) => {
+            filter: (node: HTMLElement) => {
               const exclusionClasses = ['react-flow__minimap', 'react-flow__controls'];
               return !exclusionClasses.some((classname) => node.classList?.contains(classname));
             }
-        }).then((dataUrl) => {
+        }).then((dataUrl: string) => {
             const link = document.createElement('a');
             const timestamp = new Date().toISOString().replace(/[:.]/g, "-").substring(0, 19);
             const queryName = apiData.query?.substring(0, 30).replace(/[^a-zA-Z0-9]/g, "_") || "search";
@@ -179,7 +179,7 @@ export const PrismaEditor = (apiData: SearchResponseDto) => {
           onConnect={onConnect}
           nodeTypes={{ editableNode: EditableNode }}
           fitView
-          onInit={setRfInstance} 
+          onInit={setRfInstance}
           defaultEdgeOptions={defaultEdgeOptions}
         >
           <Background variant={BackgroundVariant.Dots} />

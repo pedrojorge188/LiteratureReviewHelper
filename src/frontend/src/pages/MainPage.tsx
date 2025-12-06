@@ -244,7 +244,7 @@ export const MainPage = () => {
   };
 
   const pesquisar = async () => {
-    if (queries.length === 1 && queries[0].value.trim() === "") {
+    if (queries.length === 1 && (!queries[0].value || queries[0].value.trim() === "")) {
       setOpenToastB(true);
       return;
     }
@@ -319,6 +319,23 @@ export const MainPage = () => {
       if (getArticles.fulfilled.match(resultAction)) {
         setResponse(resultAction.payload as SearchResponseDto);
         setShowList(true);
+        
+        try {
+          const internalParams = {
+            queries: normalizarQueries(queries),
+            anoDe,
+            anoAte,
+            authors,
+            venues,
+            excludeAuthors,
+            excludeTitles,
+            excludeVenues,
+            bibliotecas,
+          };
+          saveHistoryEntry(internalParams);
+        } catch (err) {
+          console.error("Error saving search history:", err);
+        }
       } else {
         setOpenToastB(true);
         console.error("Erro na pesquisa:", resultAction.error);
@@ -330,7 +347,7 @@ export const MainPage = () => {
     }
   };
 
-  // Load search parameters from sessionStorage if coming from HistoryPage
+
   useEffect(() => {
     const loadedSearch = sessionStorage.getItem("loadedSearch");
 

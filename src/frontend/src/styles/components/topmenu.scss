@@ -22,7 +22,9 @@
               text-transform: capitalize;
             }
             &.selected {
-              font-weight: 700;
+              span {
+                font-weight: 700;
+              }
             }
           }
         }

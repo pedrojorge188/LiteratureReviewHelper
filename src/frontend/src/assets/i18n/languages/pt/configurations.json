@@ -20,5 +20,8 @@
   },
   "placeholders": {
     "insertToken": "Inserir token"
+  },
+  "sections": {
+    "verifyResults": "Titulos de Verificação"
   }
 }

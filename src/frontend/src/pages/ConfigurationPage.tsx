@@ -4,6 +4,7 @@ import { InfoDialog, SnackbarToast } from "../components";
 import { Engines } from "./types";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import Tooltip from "@mui/material/Tooltip";
+import { SearchResultTitlesVerification } from "../components/configuration/SearchResultTitlesVerification";
 
 // Chave para guardar as definições das bibliotecas no localStorage
 const SETTINGS_KEY = "librarySettings";
@@ -197,6 +198,10 @@ export const ConfigurationPage = () => {
               </li>
             ))}
           </ul>
+        </section>
+        {/* Secção para titulos */}
+        <section className="section">
+            <SearchResultTitlesVerification />
         </section>
       </div>
     </>

@@ -3,6 +3,10 @@
   height: 100vh;
   position: relative;
 
+  .react-flow__edge.selected .react-flow__edge-path {
+    stroke: #68686c !important;
+  }
+
   .react-flow-wrapper {
     width: 100%;
     height: 100%;

@@ -27,21 +27,21 @@ import { SaveDialog } from "../components";
 import { ImportDialog } from "../components";
 import { SnackbarToast } from "../components";
 
-import { Query } from "./types";
+import { Query, ApiSettings } from "./types";
 
 import { saveSearch, saveHistoryEntry } from "../utils/localStorage";
 import { buildQueryString } from "../utils/queries";
+import {
+  normalizeQueries,
+  addQuery,
+  removeQuery,
+  moveQueryUp,
+  updateQuery,
+  loadApiSettings,
+  getAvailableLibraries,
+} from "../utils";
 import Tooltip from "@mui/material/Tooltip";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-
-interface ApiSetting {
-  token: string;
-  noToken: boolean;
-}
-
-interface ApiSettings {
-  [key: string]: ApiSetting;
-}
 
 type FilterKey =
   | "authors"
@@ -67,7 +67,6 @@ export const MainPage = () => {
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [saveError, setSaveError] = useState<string>("");
   const [apiError, setApiError] = useState(false);
-  const SETTINGS_KEY = "librarySettings";
   const [apiSettings, setApiSettings] = useState<ApiSettings>({});
   const [openToast, setOpenToast] = useState(false);
   const [openToastB, setOpenToastB] = useState(false);
@@ -88,54 +87,25 @@ export const MainPage = () => {
     values.length ? values.join(";") : undefined;
 
   useEffect(() => {
-    const savedSettings = localStorage.getItem(SETTINGS_KEY);
-    if (savedSettings) {
-      try {
-        const parsedSettings = JSON.parse(savedSettings) as ApiSettings;
-        setApiSettings(parsedSettings);
-      } catch (error) {
-        console.error("Erro ao carregar configurações das APIs:", error);
-      }
-    }
+    setApiSettings(loadApiSettings());
   }, []);
 
-  const availableLibraries = Object.keys(apiSettings).filter((key) => {
-    const settings = apiSettings[key];
-    if (!settings) return false;
-    return settings.noToken || (settings.token && settings.token.length > 0);
-  });
-
-  const normalizarQueries = (lista: Query[]): Query[] =>
-    lista.map((q, i) =>
-      i === 0
-        ? { value: q.value }
-        : { value: q.value, operator: q.operator || "AND" }
-    );
+  const availableLibraries = getAvailableLibraries(apiSettings);
 
   const adicionarQuery = () => {
-    const nova = [...queries, { value: "", operator: "AND" }];
-    setQueries(normalizarQueries(nova));
+    setQueries(addQuery(queries));
   };
 
   const removerQuery = (index: number) => {
-    const nova = queries.filter((_, i) => i !== index);
-    setQueries(normalizarQueries(nova));
+    setQueries(removeQuery(queries, index));
   };
 
   const moverQueryCima = (index: number) => {
-    if (index === 0) return;
-    const novaLista = [...queries];
-    [novaLista[index - 1], novaLista[index]] = [
-      novaLista[index],
-      novaLista[index - 1],
-    ];
-    setQueries(normalizarQueries(novaLista));
+    setQueries(moveQueryUp(queries, index));
   };
 
   const atualizarQuery = (index: number, campo: keyof Query, valor: string) => {
-    const novaLista = [...queries];
-    novaLista[index][campo] = valor;
-    setQueries(normalizarQueries(novaLista));
+    setQueries(updateQuery(queries, index, campo, valor));
   };
 
   const adicionarBiblioteca = () => {
@@ -293,7 +263,7 @@ export const MainPage = () => {
 
     try {
       const internalParams = {
-        queries: normalizarQueries(queries),
+        queries: normalizeQueries(queries),
         anoDe,
         anoAte,
         authors,

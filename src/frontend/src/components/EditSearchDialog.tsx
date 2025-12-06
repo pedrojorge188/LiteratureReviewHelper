@@ -1,20 +1,15 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { SavedSearch } from "../pages/types";
-
-interface Query {
-  valor: string;
-  metadado?: string;
-}
-
-interface ApiSetting {
-  token: string;
-  noToken: boolean;
-}
-
-interface ApiSettings {
-  [key: string]: ApiSetting;
-}
+import { SavedSearch, Query, ApiSettings } from "../pages/types";
+import {
+  normalizeQueries,
+  addQuery,
+  removeQuery,
+  moveQueryUp,
+  updateQuery,
+  loadApiSettings,
+  getAvailableLibraries,
+} from "../utils";
 
 interface EditSearchDialogProps {
   isOpen: boolean;
@@ -39,10 +34,9 @@ export const EditSearchDialog = ({
   externalError = "",
 }: EditSearchDialogProps) => {
   const { t } = useTranslation();
-  const SETTINGS_KEY = "librarySettings";
 
   const [label, setLabel] = useState("");
-  const [queries, setQueries] = useState<Query[]>([{ valor: "" }]);
+  const [queries, setQueries] = useState<Query[]>([{ value: "" }]);
   const [anoDe, setAnoDe] = useState<string>("");
   const [anoAte, setAnoAte] = useState<string>("");
   const [excluirVenues, setExcluirVenues] = useState<string>("");
@@ -61,27 +55,14 @@ export const EditSearchDialog = ({
 
   // Load API settings
   useEffect(() => {
-    const savedSettings = localStorage.getItem(SETTINGS_KEY);
-    if (savedSettings) {
-      try {
-        const parsedSettings = JSON.parse(savedSettings) as ApiSettings;
-        setApiSettings(parsedSettings);
-      } catch (error) {
-        console.error("Error loading API settings:", error);
-      }
-    }
+    setApiSettings(loadApiSettings());
   }, []);
 
   // Load search data when dialog opens
   useEffect(() => {
     if (isOpen && search) {
       setLabel(search.id);
-      setQueries(
-        search.searchParameters.queries.map((q) => ({
-          valor: q.value,
-          metadado: q.operator,
-        }))
-      );
+      setQueries(search.searchParameters.queries);
       setAnoDe(search.searchParameters.yearFrom);
       setAnoAte(search.searchParameters.yearTo);
 
@@ -101,46 +82,22 @@ export const EditSearchDialog = ({
     }
   }, [isOpen, search]);
 
-  const availableLibraries = Object.keys(apiSettings).filter((key) => {
-    const settings = apiSettings[key];
-    if (!settings) return false;
-    return settings.noToken === true || (settings.token && settings.token.length > 0);
-  });
-
-  const normalizarQueries = (lista: Query[]): Query[] => {
-    return lista.map((q, i) => {
-      if (i === 0) {
-        const { valor } = q;
-        return { valor };
-      }
-      return { valor: q.valor, metadado: q.metadado || "AND" };
-    });
-  };
+  const availableLibraries = getAvailableLibraries(apiSettings);
 
   const adicionarQuery = () => {
-    const nova = [...queries, { valor: "", metadado: "AND" }];
-    setQueries(normalizarQueries(nova));
+    setQueries(addQuery(queries));
   };
 
   const removerQuery = (index: number) => {
-    const nova = queries.filter((_, i) => i !== index);
-    setQueries(normalizarQueries(nova));
+    setQueries(removeQuery(queries, index));
   };
 
   const moverQueryCima = (index: number) => {
-    if (index === 0) return;
-    const novaLista = [...queries];
-    [novaLista[index - 1], novaLista[index]] = [
-      novaLista[index],
-      novaLista[index - 1],
-    ];
-    setQueries(normalizarQueries(novaLista));
+    setQueries(moveQueryUp(queries, index));
   };
 
   const atualizarQuery = (index: number, campo: keyof Query, valor: string) => {
-    const novaLista = [...queries];
-    novaLista[index][campo] = valor;
-    setQueries(normalizarQueries(novaLista));
+    setQueries(updateQuery(queries, index, campo, valor));
   };
 
   const adicionarBiblioteca = () => {
@@ -215,9 +172,9 @@ export const EditSearchDialog = ({
               <div key={index} className="query-row">
                 {index > 0 && (
                   <select
-                    value={q.metadado}
+                    value={q.operator}
                     onChange={(e) =>
-                      atualizarQuery(index, "metadado", e.target.value)
+                      atualizarQuery(index, "operator", e.target.value)
                     }
                   >
                     <option value="AND">{t("home:operador_and")}</option>
@@ -229,10 +186,10 @@ export const EditSearchDialog = ({
                 <input
                   className="query-row__input-text"
                   type="text"
-                  value={q.valor}
+                  value={q.value}
                   placeholder={t("home:placeholder_query") ?? ""}
                   onChange={(e) =>
-                    atualizarQuery(index, "valor", e.target.value)
+                    atualizarQuery(index, "value", e.target.value)
                   }
                 />
 

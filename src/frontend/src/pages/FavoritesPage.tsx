@@ -9,7 +9,7 @@ import {
   clearAllSearches,
   updateSearch,
 } from "../utils/localStorage";
-import { SavedSearch } from "./types";
+import { SavedSearch, Query } from "./types";
 import { SavedSearchCard } from "../components/SavedSearchCard";
 import { SavedSearchPageHeader } from "../components/SavedSearchPageHeader";
 import { ConfirmDialog } from "../components/ConfirmDialog";
@@ -70,7 +70,7 @@ export const FavoritesPage = () => {
     id: string,
     newLabel: string,
     searchParameters: {
-      queries: { valor: string; metadado?: string }[];
+      queries: Query[];
       anoDe: string;
       anoAte: string;
       excluirVenues: string;
@@ -80,10 +80,7 @@ export const FavoritesPage = () => {
   ) => {
     try {
       const internalParams = {
-        queries: searchParameters.queries.map((q) => ({
-          value: q.valor,
-          operator: q.metadado,
-        })),
+        queries: searchParameters.queries,
         anoDe: searchParameters.anoDe,
         anoAte: searchParameters.anoAte,
         authors: editingSearch?.searchParameters.authors || [],

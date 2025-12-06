@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Box, Button, IconButton, Typography, TextField } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
+import "../styles/components/saveDialogMultipleInputs.scss"
 
 interface SaveDialogProps {
   isOpen: boolean;
@@ -64,93 +65,63 @@ export const SaveDialogMultipleInputs = ({
     <Box
       className="modal-overlay"
       onClick={handleClose}
-      sx={{
-        position: "fixed",
-        inset: 0,
-        backgroundColor: "rgba(0,0,0,0.5)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 1000,
-      }}
     >
       <Box
         className="modal-content"
         onClick={(e) => e.stopPropagation()}
-        sx={{
-          backgroundColor: "#f9f9f9",
-          borderRadius: 2,
-          p: 3,
-          width: "100%",
-          maxWidth: 500,
-          boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-        }}
       >
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-          <Typography variant="h4" sx={{ color: "#333" }}>{"Add Titles"}</Typography>
-          <IconButton onClick={handleClose} size="small" sx={{ color: "#666" }}>
+        <Box className="modal-header">
+          <Typography variant="h4" className="modal-title">
+            {"Add Titles"}
+          </Typography>
+
+          <IconButton onClick={handleClose} size="small" className="btn-close">
             <CloseIcon />
           </IconButton>
         </Box>
 
-        <Typography variant="body1" sx={{ color: "#666", mb: 2 }}>
+        <Typography className="modal-description">
           {"Add multiple titles. Remove any title by clicking ×."}
         </Typography>
 
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+        <Box className="inputs-wrapper">
           {titles.map((title, index) => (
-            <Box key={index} sx={{ display: "flex", gap: 1 }}>
+            <Box key={index} className="input-row">
               <TextField
                 fullWidth
                 size="small"
                 variant="outlined"
+                className="input-field"
                 value={title}
                 onChange={(e) => handleTitleChange(index, e.target.value)}
-                placeholder={"Enter title"}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    backgroundColor: "#fff",
-                    color: "#333",
-                  },
-                }}
+                placeholder="Enter title"
               />
-              <IconButton onClick={() => removeInput(index)} sx={{ color: "#999" }} aria-label="Delete title">
+              <IconButton className="btn-delete" onClick={() => removeInput(index)}>
                 <CloseIcon />
               </IconButton>
             </Box>
           ))}
         </Box>
 
-        <Box sx={{ textAlign: "center", mt: 1 }}>
-          <IconButton
-            aria-label="Add title"
-            onClick={addInput}
-            sx={{ borderColor: "#ccc", color: "#333", textTransform: "none" }}
-          >
+        <Box className="add-button-wrapper">
+          <IconButton className="btn-add" onClick={addInput}>
             <AddIcon />
           </IconButton>
         </Box>
 
         {error && (
-          <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+          <Typography className="error-message">
             {error}
           </Typography>
         )}
 
-        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1, mt: 3 }}>
-          <Button
-            variant="outlined"
-            onClick={handleClose}
-            sx={{ borderColor: "#ccc", color: "#333", textTransform: "none" }}
-          >
-            {t("saveDialog:cancel") || "Cancel"}
+        <Box className="modal-footer">
+          <Button className="btn-secondary" onClick={handleClose}>
+            Cancel
           </Button>
-          <Button
-            variant="contained"
-            onClick={handleSave}
-            sx={{ backgroundColor: "#666", color: "#fff", textTransform: "none", '&:hover': { backgroundColor: "#555" } }}
-          >
-            {t("saveDialog:save") || "Save"}
+
+          <Button className="btn-primary" onClick={handleSave}>
+            Save
           </Button>
         </Box>
       </Box>

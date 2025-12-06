@@ -15,6 +15,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { TitlesGroups, TitleToExclude } from "../types";
 import { v4 as uuidv4 } from 'uuid';
+import "../../styles/components/manageGroupsModal.scss"
 
 interface DependenciesModalProps {
     titles: TitleToExclude[];
@@ -89,57 +90,25 @@ export const DependenciesModal = ({
     if (!isOpen) return null;
 
     return (
-        <Box
-            sx={{
-                position: "fixed",
-                inset: 0,
-                bgcolor: "rgba(0,0,0,0.4)",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "flex-start",
-                overflowY: "auto",
-                p: 3,
-                zIndex: 1000
-            }}
-            onClick={onClose}
-        >
-            <Box
-                sx={{
-                    bgcolor: "#f5f5f5",
-                    borderRadius: 2,
-                    width: "100%",
-                    maxWidth: 700,
-                    p: 4,
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 3
-                }}
-                onClick={(e) => e.stopPropagation()}
-            >
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                    <Typography variant="h6">Manage Groups</Typography>
-                    <IconButton onClick={onClose} sx={{ color: "#555" }}>
+        <Box className="mg-overlay" onClick={onClose}>
+            <Box className="mg-container" onClick={(e) => e.stopPropagation()}>
+
+                <Box className="mg-header">
+                    <Typography variant="h6" className="mg-title">Manage Groups</Typography>
+
+                    <IconButton onClick={onClose} className="mg-close-btn">
                         <CloseIcon />
                     </IconButton>
                 </Box>
 
                 {titlesGroups.map(group => (
-                    <Box
-                        key={group.id}
-                        sx={{
-                            bgcolor: "#fff",
-                            borderRadius: 1,
-                            p: 2,
-                            border: "1px solid #ddd",
-                            mb: 2,
-                            overflow: "visible"
-                        }}
-                    >
-                        <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                    <Box key={group.id} className="mg-group-card">
+
+                        <Typography variant="subtitle1" className="mg-group-name">
                             {group.name}
                         </Typography>
 
-                        <List dense>
+                        <List dense className="mg-titles-list">
                             {group.titles.map(titleId => {
                                 const titleObj = titles.find(t => t.id === titleId);
                                 if (!titleObj) return null;
@@ -147,11 +116,12 @@ export const DependenciesModal = ({
                                 return (
                                     <ListItem
                                         key={titleId}
-                                        sx={{ bgcolor: "#f0f0f0", borderRadius: 1, mb: 1 }}
+                                        className="mg-title-item"
                                         secondaryAction={
                                             <IconButton
                                                 edge="end"
                                                 onClick={() => removeTitleFromGroup(group.id, titleId)}
+                                                className="mg-delete-btn"
                                             >
                                                 <DeleteIcon fontSize="small" />
                                             </IconButton>
@@ -163,7 +133,7 @@ export const DependenciesModal = ({
                             })}
                         </List>
 
-                        <Box sx={{ display: "flex", gap: 1, mt: 2 }}>
+                        <Box className="mg-add-row">
                             <Autocomplete
                                 freeSolo
                                 multiple
@@ -175,46 +145,23 @@ export const DependenciesModal = ({
                                 renderInput={(params) => (
                                     <TextField {...params} size="small" placeholder="Add titles" />
                                 )}
-                                sx={{ flex: 1 }}
+                                className="mg-autocomplete"
                             />
+
                             <Button
                                 variant="outlined"
                                 onClick={() => addTitlesToGroup(group.id)}
-                                sx={
-                                    {
-                                        whiteSpace: "nowrap",
-                                        color: "#555",
-                                        borderColor: "#555",
-                                        "&:hover":
-                                        {
-                                            bgcolor: "grey.200",
-                                            borderColor: "grey.600"
-                                        }
-                                    }
-                                }
+                                className="mg-add-btn"
                             >
                                 <AddIcon fontSize="small" />
                             </Button>
                         </Box>
+
                     </Box>
                 ))}
 
-                <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                    <Button
-                        variant="outlined"
-                        onClick={onClose}
-                        sx={
-                            {
-                                color: "#555",
-                                borderColor: "#555",
-                                "&:hover":
-                                {
-                                    bgcolor: "grey.200",
-                                    borderColor: "grey.600"
-                                }
-                            }
-                        }
-                    >
+                <Box className="mg-footer">
+                    <Button variant="outlined" onClick={onClose} className="mg-close-footer-btn">
                         Close
                     </Button>
                 </Box>

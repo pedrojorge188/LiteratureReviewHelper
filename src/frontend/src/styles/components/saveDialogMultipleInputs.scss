@@ -1,0 +1,123 @@
+@use "../utilities" as *;
+@use "../variables" as vars;
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #f9f9f9;
+    border-radius: 12px;
+    padding: 24px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    .modal-title {
+        color: #333;
+        font-weight: 600;
+    }
+
+    .btn-close {
+        color: #666;
+
+        &:hover {
+            color: #444;
+        }
+    }
+}
+
+.modal-description {
+    color: #666;
+    margin-bottom: 16px;
+}
+
+.inputs-wrapper {
+    margin-top: 1em;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.input-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .input-field {
+        background: white;
+
+        .MuiOutlinedInput-root {
+            background: #fff;
+            color: #333;
+        }
+    }
+
+    .btn-delete {
+        color: #999;
+
+        &:hover {
+            color: #666;
+        }
+    }
+}
+
+.add-button-wrapper {
+    text-align: center;
+    margin-top: 0.8em;
+
+    .btn-add {
+        border: 1px solid #666;
+        color: #666;
+
+        &:hover {
+            background: #eee;
+        }
+    }
+}
+
+.error-message {
+    margin-top: 8px;
+    color: #d32f2f;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 24px;
+
+    .btn-secondary {
+        background-color: vars.$color-gray-4;
+        color: vars.$color-gray-2;
+
+        &:hover {
+            background-color: vars.$color-gray-3;
+            color: white;
+        }
+    }
+
+    .btn-primary {
+        background: vars.$color-gray-2;
+        color: vars.$color-white;
+
+        &:hover {
+            color: vars.$color-gray-2;
+            background-color: vars.$color-white;
+            border: 1px solid vars.$color-gray-2;
+        }
+    }
+}

@@ -7,6 +7,9 @@ interface SaveDialogProps {
   onSave: (label: string) => void;
   initialLabel?: string;
   externalError?: string;
+  dialogHeader?: string;
+  dialogPrompt?: string;
+  dialogPlaceholder?: string;
 }
 
 export const SaveDialog = ({
@@ -15,6 +18,9 @@ export const SaveDialog = ({
   onSave,
   initialLabel = "",
   externalError = "",
+  dialogHeader = "saveDialog:title",
+  dialogPrompt = "saveDialog:label_prompt",
+  dialogPlaceholder = "saveDialog:placeholder"
 }: SaveDialogProps) => {
   const { t } = useTranslation();
   const [label, setLabel] = useState(initialLabel);
@@ -58,7 +64,7 @@ export const SaveDialog = ({
     <div className="modal-overlay" onClick={handleClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h3>{t("saveDialog:title") || "Save Search"}</h3>
+          <h3>{t(dialogHeader) || "Save Search"}</h3>
           <button className="modal-close-btn" onClick={handleClose}>
             &times;
           </button>
@@ -66,7 +72,7 @@ export const SaveDialog = ({
 
         <div className="modal-body">
           <label htmlFor="search-label">
-            {t("saveDialog:label_prompt") || "Enter a name for this search:"}
+            {t(dialogPrompt) || "Enter a name for this search:"}
           </label>
           <input
             id="search-label"
@@ -78,7 +84,7 @@ export const SaveDialog = ({
             }}
             onKeyDown={handleKeyPress}
             placeholder={
-              t("saveDialog:placeholder") || "e.g., AI usage"
+              t(dialogPlaceholder) || "e.g., AI usage"
             }
             autoFocus
           />

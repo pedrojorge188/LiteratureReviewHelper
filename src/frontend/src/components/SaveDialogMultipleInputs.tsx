@@ -87,13 +87,13 @@ export const SaveDialogMultipleInputs = ({
         }}
       >
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-          <Typography variant="h6" sx={{ color: "#333" }}>{"Add Titles"}</Typography>
+          <Typography variant="h4" sx={{ color: "#333" }}>{"Add Titles"}</Typography>
           <IconButton onClick={handleClose} size="small" sx={{ color: "#666" }}>
             <CloseIcon />
           </IconButton>
         </Box>
 
-        <Typography variant="body2" sx={{ color: "#666", mb: 2 }}>
+        <Typography variant="body1" sx={{ color: "#666", mb: 2 }}>
           {"Add multiple titles. Remove any title by clicking ×."}
         </Typography>
 

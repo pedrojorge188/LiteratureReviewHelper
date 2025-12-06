@@ -17,7 +17,6 @@ import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import LabelIcon from "@mui/icons-material/Label";
 import Typography from "@mui/material/Typography";
 import { SaveDialog } from "../SaveDialog";
-import { t } from "i18next";
 import { v4 as uuidv4 } from 'uuid';
 import { SaveDialogMultipleInputs } from "../SaveDialogMultipleInputs";
 import AddLinkIcon from '@mui/icons-material/AddLink';
@@ -47,7 +46,6 @@ export const SearchResultTitlesVerification = () => {
 
     const loadGroups = (): TitlesGroups[] => {
         const raw = localStorage.getItem("titlesGroups");
-        console.log(raw)
         if (!raw) return [];
 
         try {
@@ -79,8 +77,6 @@ export const SearchResultTitlesVerification = () => {
 
 
     const saveTitles = (titles: string[]) => {
-        console.log(titles)
-
         const newTitles: TitleToExclude[] = titles.map(title => ({
             id: uuidv4(),
             title,
@@ -207,10 +203,17 @@ export const SearchResultTitlesVerification = () => {
         setisSaveDialogMultipleInputsOpen(true)
     }
 
-    const saveGroupsLinksWithTitles = (updatedGroups: TitlesGroups[]) => {
+    const saveGroupsLinksWithTitles = (updatedGroups: TitlesGroups[], newTitles?: TitleToExclude[]) => {
         setTitlesGroups(updatedGroups);
         localStorage.setItem("titlesGroups", JSON.stringify(updatedGroups));
         loadGroups();
+
+        if (newTitles) {
+            const updatedTitles = [...titlesToExclude, ...newTitles];
+            setTitlesToExclude(updatedTitles);
+            localStorage.setItem("titlesToExclude", JSON.stringify(updatedTitles));
+            loadTitles();
+        }
     }
 
     const getTitlesGroups = (id: string) => {
@@ -239,6 +242,9 @@ export const SearchResultTitlesVerification = () => {
                 onClose={() => setIsSaveDialogOpen(false)}
                 onSave={handleSaveGroup}
                 externalError={saveError}
+                dialogHeader="Create Group"
+                dialogPrompt="Enter the group name"
+                dialogPlaceholder="e.g., Aerospace"
             />
 
             <SaveDialogMultipleInputs
@@ -253,7 +259,7 @@ export const SearchResultTitlesVerification = () => {
                 onClose={() => setDependenciesModalOpen(false)}
                 titles={titlesToExclude}
                 groups={titlesGroups}
-                onGroupsUpdate={(updatedGroups) => { saveGroupsLinksWithTitles(updatedGroups) }}
+                onGroupsUpdate={(updatedGroups, createdTitles) => { saveGroupsLinksWithTitles(updatedGroups, createdTitles) }}
             />
 
             <h3 className="bibliotecas-lista-titulo">
@@ -349,9 +355,7 @@ export const SearchResultTitlesVerification = () => {
                                         :
                                         item.title}
                                 secondary={
-                                    <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-                                        <Typography component="div" variant="body2">{getTitlesGroups(item.id)}</Typography>
-                                    </Box>
+                                    <Typography component="div" variant="body2">{getTitlesGroups(item.id)}</Typography>
                                 }
                             />
                         </ListItem>,
@@ -360,7 +364,7 @@ export const SearchResultTitlesVerification = () => {
                 :
                 <List>
                     {titlesGroups.map((item) =>
-                        <Box>
+                        <Box key={item.id}>
                             <ListItem
                                 key={item.id}
                                 sx={{
@@ -425,9 +429,9 @@ export const SearchResultTitlesVerification = () => {
                             </ListItem>
                             <Collapse in={expandedRowsIds.includes(item.id)} timeout="auto" unmountOnExit>
                                 <List dense sx={{ pl: 6 }}>
-                                    {getGroupTitles(item.titles).map((item) => (
+                                    {getGroupTitles(item.titles).map((title) => (
                                         <ListItem
-                                            key={item.id}
+                                            key={`${item.id}-${title.id}`}
                                             component="div"
                                             disableGutters
                                             sx={{
@@ -442,7 +446,9 @@ export const SearchResultTitlesVerification = () => {
                                             <ListItemIcon sx={{ pl: 2 }}>
                                                 <LabelIcon />
                                             </ListItemIcon>
-                                            <ListItemText primary={item.title} />
+                                            <ListItemText primary={
+                                                <Typography component="div" variant="body2">{title.title}</Typography>
+                                            } />
                                         </ListItem>
                                     ))}
                                 </List>

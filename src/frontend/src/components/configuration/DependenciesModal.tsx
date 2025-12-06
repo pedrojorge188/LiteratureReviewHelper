@@ -14,13 +14,14 @@ import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { TitlesGroups, TitleToExclude } from "../types";
+import { v4 as uuidv4 } from 'uuid';
 
 interface DependenciesModalProps {
     titles: TitleToExclude[];
     groups: TitlesGroups[];
     isOpen: boolean;
     onClose: () => void;
-    onGroupsUpdate: (groups: TitlesGroups[]) => void;
+    onGroupsUpdate: (groups: TitlesGroups[], newTitles?: TitleToExclude[]) => void;
 }
 
 export const DependenciesModal = ({
@@ -44,16 +45,30 @@ export const DependenciesModal = ({
         const group = titlesGroups.find(g => g.id === groupId);
         if (!group) return;
 
-        const idsToAdd = titlesList
-            .map(titleText => titles.find(t => t.title === titleText)?.id)
-            .filter(Boolean) as string[];
+        const idsToAdd: string[] = [];
+        const createdTitles: TitleToExclude[] = [];
+
+        titlesList.map(item => {
+            const title = titles.find(t => t.title === item);
+            if (title) {
+                idsToAdd.push(title.id);
+            } else {
+                const t: TitleToExclude = {
+                    id: uuidv4(),
+                    title: item
+                }
+
+                createdTitles.push(t);
+                idsToAdd.push(t.id);
+            }
+        })
 
         const updatedGroups = titlesGroups.map(g =>
             g.id === groupId ? { ...g, titles: [...g.titles, ...idsToAdd] } : g
         );
 
         setTitlesGroups(updatedGroups);
-        onGroupsUpdate(updatedGroups);
+        onGroupsUpdate(updatedGroups, createdTitles);
 
         setNewTitles({ ...newTitles, [groupId]: [] });
     };
@@ -150,6 +165,7 @@ export const DependenciesModal = ({
 
                         <Box sx={{ display: "flex", gap: 1, mt: 2 }}>
                             <Autocomplete
+                                freeSolo
                                 multiple
                                 options={getAutocompleteOptions(group).map(t => t.title)}
                                 value={newTitles[group.id] ?? []}

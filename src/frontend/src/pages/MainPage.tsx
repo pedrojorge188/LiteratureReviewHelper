@@ -33,6 +33,11 @@ import { saveSearch, saveHistoryEntry } from "../utils/localStorage";
 import { buildQueryString } from "../utils/queries";
 import Tooltip from "@mui/material/Tooltip";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import { TitleOption, TitlesGroups, TitleToExclude } from "../components/types";
+import { loadGroups, loadTitles } from "../components/configuration/SearchResultTitlesVerification";
+import { Autocomplete, AutocompleteChangeReason, Chip, TextField } from "@mui/material";
+import FolderIcon from "@mui/icons-material/Folder";
+import LabelIcon from "@mui/icons-material/Label";
 
 interface ApiSetting {
   token: string;
@@ -84,6 +89,14 @@ export const MainPage = () => {
   const [excludeTitles, setExcludeTitles] = useState<string[]>([]);
   const [selectedFilters, setSelectedFilters] = useState<FilterKey[]>([]);
 
+  //Titles Verification
+  const [titlesToVerify, setTitlesToVerify] = useState<TitleToExclude[]>([]);
+  const [titlesGroups, setTitlesGroups] = useState<TitlesGroups[]>([]);
+  const [autoCompleteOptions, setAutoCompleteOptions] = useState<TitleOption[]>();
+  const [selectedOptions, setSelectedOptions] = useState<TitleOption[]>([]);
+  const [selectedTitlesForVerification, setSelectedTitlesForVerification] = useState<string[]>([]);
+
+
   const toParam = (values: string[]) =>
     values.length ? values.join(";") : undefined;
 
@@ -97,6 +110,18 @@ export const MainPage = () => {
         console.error("Erro ao carregar configurações das APIs:", error);
       }
     }
+
+    const titlesToVerify = loadTitles();
+    const titlesGroups = loadGroups().filter(g => g.titles.length > 0);
+
+    const allOptions: TitleOption[] = [
+      ...titlesToVerify,
+      ...titlesGroups
+    ];
+
+    setTitlesToVerify(titlesToVerify);
+    setTitlesGroups(titlesGroups);
+    setAutoCompleteOptions(allOptions);
   }, []);
 
   const availableLibraries = Object.keys(apiSettings).filter((key) => {
@@ -183,7 +208,7 @@ export const MainPage = () => {
       } else {
         setSaveError(
           t("home:search_save_error") ||
-            "Error saving search. Please try again."
+          "Error saving search. Please try again."
         );
         setOpenToastD(false);
       }
@@ -436,6 +461,121 @@ export const MainPage = () => {
     {} as Record<FilterKey, string>
   );
 
+  //Verificação de titulos
+  useEffect(() => {
+    const selectedTitles = selectedOptions
+      .filter((opt): opt is TitleToExclude => "title" in opt)
+      .map(t => t.title);
+
+    setSelectedTitlesForVerification(selectedTitles);
+  }, [selectedOptions]);
+
+  const addGroupTitlesToSelection = (group: TitlesGroups, currentSelection: TitleOption[]): TitleOption[] => {
+    const groupTitles = titlesToVerify.filter(t => group.titles.includes(t.id));
+    const newSelection = [...currentSelection];
+
+    groupTitles.forEach((t) => {
+      if (!newSelection.some((v) => "title" in v && v.id === t.id)) {
+        newSelection.push(t);
+      }
+    });
+
+    if (!newSelection.includes(group)) newSelection.push(group);
+
+    titlesGroups.forEach(otherGroup => {
+      if (
+        otherGroup.id !== group.id &&
+        !newSelection.some(v => "titles" in v && v.id === otherGroup.id) &&
+        otherGroup.titles.every(tId => group.titles.includes(tId))
+      ) {
+        newSelection.push(otherGroup);
+      }
+    });
+
+    return newSelection;
+  };
+
+  const addFullySelectedGroups = (currentSelection: TitleOption[]): TitleOption[] => {
+    const selectedTitlesIds = currentSelection
+      .filter((opt): opt is TitleToExclude => "title" in opt)
+      .map(t => t.id);
+
+    const groupsFullyMatchingSelectedTitles = titlesGroups.filter(group =>
+      group.titles.every(id => selectedTitlesIds.includes(id))
+    );
+
+    const groupsNotSelected = groupsFullyMatchingSelectedTitles.filter(
+      group => !currentSelection.some(opt => "titles" in opt && opt.id === group.id)
+    );
+
+    return [...currentSelection, ...groupsNotSelected];
+  };
+
+  const removeEmptyGroupsAfterTitleRemoval = (currentSelection: TitleOption[], removedTitle: TitleToExclude): TitleOption[] => {
+    let updatedSelection = [...currentSelection];
+
+    const affectedGroups = titlesGroups.filter(g => g.titles.includes(removedTitle.id));
+
+    affectedGroups.forEach(group => {
+      const hasOtherTitlesSelected = group.titles.some(id =>
+        updatedSelection.some(sel => "title" in sel && sel.id === id)
+      );
+
+      if (!hasOtherTitlesSelected && updatedSelection.find(opt => "titles" in opt && opt.id === group.id)) {
+        updatedSelection = updatedSelection.filter(sel => !("name" in sel && sel.id === group.id));
+      }
+    });
+
+    return updatedSelection;
+  };
+
+  const removeGroupsWithAllTitlesRemoved = (currentSelection: TitleOption[], titlesIdsToRemove: string[]): TitleOption[] => {
+    return currentSelection.filter(sel => {
+      if ("name" in sel) {
+        return !sel.titles.every(id => titlesIdsToRemove.includes(id));
+      }
+      return !titlesIdsToRemove.includes(sel.id);
+    });
+  };
+
+  const onTitlesSelectionChange = (_event: any, value: TitleOption[], reason: AutocompleteChangeReason, details?: { option: TitleOption }) => {
+    if (reason === "clear") {
+      setSelectedOptions([]);
+      return;
+    }
+
+    if (!value) return;
+
+    let newSelections: TitleOption[] = [...value];
+
+    if (reason === "selectOption" && details?.option) {
+      const option = details.option;
+
+      if ("title" in option) {
+        newSelections = addFullySelectedGroups(newSelections);
+      } else {
+        newSelections = addGroupTitlesToSelection(option, newSelections);
+      }
+
+      setSelectedOptions(newSelections);
+
+    } else if (reason === "removeOption" && details?.option) {
+      const removed = details.option;
+
+      if ("title" in removed) {
+        newSelections = removeEmptyGroupsAfterTitleRemoval(newSelections, removed);
+      } else {
+        const titlesIdsToRemove = removed.titles;
+        if (titlesIdsToRemove.length > 0) {
+          newSelections = removeGroupsWithAllTitlesRemoved(newSelections, titlesIdsToRemove);
+        }
+      }
+
+      setSelectedOptions(newSelections);
+    }
+  };
+
+
   return (
     <>
       {isLoading && <LoadingCircle />}
@@ -486,17 +626,15 @@ export const MainPage = () => {
       />
 
       <div
-        className={`container-article ${
-          showList && response ? "show" : "hide"
-        }`}
+        className={`container-article ${showList && response ? "show" : "hide"
+          }`}
       >
         {response && <ArticlesList response={response} setShow={setShowList} />}
       </div>
 
       <div
-        className={`pesquisa-container ${
-          (showList && response) || isLoading ? "hide-pesquisa" : ""
-        }`}
+        className={`pesquisa-container ${(showList && response) || isLoading ? "hide-pesquisa" : ""
+          }`}
       >
         <h2>{t("home:titulo_pesquisa")}</h2>
 
@@ -674,6 +812,57 @@ export const MainPage = () => {
                   </Box>
                 </Stack>
               ))}
+            </Box>
+          </div>
+
+          {/* Titulos */}
+          <div className="section">
+            <label>Titles used for query verification
+              <Tooltip title={t("warnings:advancedquery")}>
+                <span className="rows-container__label__icon">
+                  <HelpOutlineIcon />
+                </span>
+              </Tooltip>
+            </label>
+            <Box>
+              <Autocomplete
+                multiple
+                options={autoCompleteOptions || []}
+                value={selectedOptions}
+                onChange={onTitlesSelectionChange}
+                getOptionLabel={(option) => ("title" in option ? option.title : option.name)}
+                groupBy={(option) => ("title" in option ? "Titles" : "Groups")}
+                renderInput={(params) => <TextField {...params} size="small" label="Select titles or groups" />}
+                renderValue={(value, getTagProps) =>
+                  value.map((option, index) => {
+                    const label = "title" in option ? option.title : option.name;
+                    const tagProps = getTagProps({ index });
+
+                    const chipContent = (
+                      <Chip
+                        {...tagProps}
+                        icon={"title" in option ? <LabelIcon /> : <FolderIcon />}
+                        label={label}
+                        size="small"
+                        variant="outlined"
+                      />
+                    );
+
+                    if ("title" in option) return chipContent;
+
+                    const tooltipTitle = titlesToVerify
+                      .filter((t) => option.titles.includes(t.id))
+                      .map((t) => t.title)
+                      .join(", ");
+
+                    return (
+                      <Tooltip key={option.id} title={tooltipTitle} arrow>
+                        {chipContent}
+                      </Tooltip>
+                    );
+                  })
+                }
+              />
             </Box>
           </div>
 

@@ -22,3 +22,5 @@ export interface TitlesGroups {
 	creationDate: Date;
 	titles: string[];
 }
+
+export type TitleOption = TitleToExclude | TitlesGroups;

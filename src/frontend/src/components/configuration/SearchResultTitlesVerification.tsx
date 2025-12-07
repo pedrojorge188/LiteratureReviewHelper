@@ -27,45 +27,46 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { DependenciesModal } from "./DependenciesModal";
 import { useTranslation } from "react-i18next";
-import "../../styles/components/titleVerification.scss"
+import "../../styles/components/titleVerification.scss";
+
+export const loadTitles = (): TitleToExclude[] => {
+    const raw = localStorage.getItem("titlesToExclude");
+    if (!raw) return [];
+
+    try {
+        const parsedTitles = JSON.parse(raw) as TitleToExclude[];
+        return parsedTitles
+    } catch (error) {
+        console.error("Erro ao carregar os titulos a ser excluidos", error);
+    }
+
+    return [];
+}
+
+export const loadGroups = (): TitlesGroups[] => {
+    const raw = localStorage.getItem("titlesGroups");
+    if (!raw) return [];
+
+    try {
+        const parsed = JSON.parse(raw);
+
+        const parsedGroups = parsed.map((group: any) => ({
+            ...group,
+            creationDate: new Date(group.creationDate),
+        })) as TitlesGroups[];
+
+        return parsedGroups
+    } catch (error) {
+        console.error("Erro ao carregar os grupos de titulos a ser excluidos", error);
+    }
+
+    return [];
+}
 
 export const SearchResultTitlesVerification = () => {
     const { t } = useTranslation();
-    const loadTitles = (): TitleToExclude[] => {
-        const raw = localStorage.getItem("titlesToExclude");
-        if (!raw) return [];
 
-        try {
-            const parsedTitles = JSON.parse(raw) as TitleToExclude[];
-            return parsedTitles
-        } catch (error) {
-            console.error("Erro ao carregar os titulos a ser excluidos", error);
-        }
-
-        return [];
-    }
-
-    const loadGroups = (): TitlesGroups[] => {
-        const raw = localStorage.getItem("titlesGroups");
-        if (!raw) return [];
-
-        try {
-            const parsed = JSON.parse(raw);
-
-            const parsedGroups = parsed.map((group: any) => ({
-                ...group,
-                creationDate: new Date(group.creationDate),
-            })) as TitlesGroups[];
-
-            return parsedGroups
-        } catch (error) {
-            console.error("Erro ao carregar os grupos de titulos a ser excluidos", error);
-        }
-
-        return [];
-    }
-
-    const [titlesToExclude, setTitlesToExclude] = useState<TitleToExclude[]>(() => loadTitles());
+    const [titlesToVerify, setTitlesToVerify] = useState<TitleToExclude[]>(() => loadTitles());
     const [titlesGroups, setTitlesGroups] = useState<TitlesGroups[]>(() => loadGroups());
     const [isListView, setIsListView] = useState<boolean>(true);
     const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
@@ -83,9 +84,9 @@ export const SearchResultTitlesVerification = () => {
             title,
         }));
 
-        const updatedTitles = titlesToExclude.concat(newTitles);
-        setTitlesToExclude(updatedTitles);
-        localStorage.setItem("titlesToExclude", JSON.stringify(updatedTitles));
+        const updatedTitles = titlesToVerify.concat(newTitles);
+        setTitlesToVerify(updatedTitles);
+        localStorage.setItem("titlesToVerify", JSON.stringify(updatedTitles));
         loadTitles();
     }
 
@@ -95,11 +96,11 @@ export const SearchResultTitlesVerification = () => {
             titles: group.titles.filter(id => id !== titleId)
         }));
 
-        const updatedTitles = titlesToExclude.filter(item => item.id !== titleId);
-        setTitlesToExclude(updatedTitles);
+        const updatedTitles = titlesToVerify.filter(item => item.id !== titleId);
+        setTitlesToVerify(updatedTitles);
         setTitlesGroups(updatedGroups);
 
-        localStorage.setItem("titlesToExclude", JSON.stringify(updatedTitles));
+        localStorage.setItem("titlesToVerify", JSON.stringify(updatedTitles));
         localStorage.setItem("titlesGroups", JSON.stringify(updatedGroups));
 
         loadTitles();
@@ -108,12 +109,12 @@ export const SearchResultTitlesVerification = () => {
 
 
     const updateTitle = () => {
-        const updatedTitles = titlesToExclude.map(title => ({
+        const updatedTitles = titlesToVerify.map(title => ({
             ...title,
             title: editTitles[title.id] ?? title.title,
         }));
-        setTitlesToExclude(updatedTitles);
-        localStorage.setItem("titlesToExclude", JSON.stringify(updatedTitles));
+        setTitlesToVerify(updatedTitles);
+        localStorage.setItem("titlesToVerify", JSON.stringify(updatedTitles));
         setEditTitles({});
         setRowEditMode("");
 
@@ -210,9 +211,9 @@ export const SearchResultTitlesVerification = () => {
         loadGroups();
 
         if (newTitles) {
-            const updatedTitles = [...titlesToExclude, ...newTitles];
-            setTitlesToExclude(updatedTitles);
-            localStorage.setItem("titlesToExclude", JSON.stringify(updatedTitles));
+            const updatedTitles = [...titlesToVerify, ...newTitles];
+            setTitlesToVerify(updatedTitles);
+            localStorage.setItem("titlesToVerify", JSON.stringify(updatedTitles));
             loadTitles();
         }
     }
@@ -223,7 +224,7 @@ export const SearchResultTitlesVerification = () => {
     }
 
     const getGroupTitles = (titlesIds: string[]) => {
-        return titlesToExclude.filter(t => titlesIds.includes(t.id));
+        return titlesToVerify.filter(t => titlesIds.includes(t.id));
     }
 
     const changeRowState = (id: string) => {
@@ -258,7 +259,7 @@ export const SearchResultTitlesVerification = () => {
             <DependenciesModal
                 isOpen={isDependenciesModalOpen}
                 onClose={() => setDependenciesModalOpen(false)}
-                titles={titlesToExclude}
+                titles={titlesToVerify}
                 groups={titlesGroups}
                 onGroupsUpdate={(updatedGroups, createdTitles) => { saveGroupsLinksWithTitles(updatedGroups, createdTitles) }}
             />
@@ -304,7 +305,7 @@ export const SearchResultTitlesVerification = () => {
             </Box>
             {isListView ?
                 <List className="titles-list">
-                    {titlesToExclude.map((item) =>
+                    {titlesToVerify.map((item) =>
                         <ListItem
                             key={item.id}
                             className="title-item"

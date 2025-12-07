@@ -39,6 +39,7 @@
     "i18next": "^25.6.0",
     "lucide-react": "^0.553.0",
     "react": "^19.1.1",
+    "react-activation": "^0.13.4",
     "react-datepicker": "^8.8.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",

@@ -33,6 +33,8 @@ import { saveSearch, saveHistoryEntry } from "../utils/localStorage";
 import { buildQueryString } from "../utils/queries";
 import Tooltip from "@mui/material/Tooltip";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import { useSelector } from "react-redux";
+import { setMainPageState } from "../store/ducks/mainpage";
 
 interface ApiSetting {
   token: string;
@@ -53,6 +55,7 @@ type FilterKey =
 export const MainPage = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch<any>();
+  const mainState = useSelector((state: any) => state.MAIN_PAGE);
 
   const [queries, setQueries] = useState<Query[]>([{ value: "" }]);
   const [anoDe, setAnoDe] = useState<string>("");
@@ -83,6 +86,54 @@ export const MainPage = () => {
   const [excludeVenues, setExcludeVenues] = useState<string[]>([]);
   const [excludeTitles, setExcludeTitles] = useState<string[]>([]);
   const [selectedFilters, setSelectedFilters] = useState<FilterKey[]>([]);
+
+  //usar o estado redux para cache
+  useEffect(() => {
+    if (mainState) {
+      setQueries(mainState.queries);
+      setAnoDe(mainState.anoDe);
+      setAnoAte(mainState.anoAte);
+      setAuthors(mainState.authors);
+      setVenues(mainState.venues);
+      setExcludeAuthors(mainState.excludeAuthors);
+      setExcludeVenues(mainState.excludeVenues);
+      setExcludeTitles(mainState.excludeTitles);
+      setBibliotecas(mainState.bibliotecas);
+      setSelectedFilters(mainState.selectedFilters);
+      setResponse(mainState.response);
+    }
+  }, []);
+
+  useEffect(() => {
+    dispatch(
+      setMainPageState({
+        queries,
+        anoDe,
+        anoAte,
+        authors,
+        venues,
+        excludeAuthors,
+        excludeVenues,
+        excludeTitles,
+        bibliotecas,
+        selectedFilters,
+        response,
+      })
+    );
+  }, [
+    queries,
+    anoDe,
+    anoAte,
+    authors,
+    venues,
+    excludeAuthors,
+    excludeVenues,
+    excludeTitles,
+    bibliotecas,
+    selectedFilters,
+    response,
+  ]);
+  //fim usar estado redux
 
   const toParam = (values: string[]) =>
     values.length ? values.join(";") : undefined;
@@ -260,7 +311,7 @@ export const MainPage = () => {
   const pesquisar = async () => {
     if (queries.length === 1 && queries[0].value.trim() === "") {
       setOpenToastB(true);
-      return
+      return;
     }
 
     if (bibliotecas.length === 0) {
@@ -580,10 +631,7 @@ export const MainPage = () => {
               label={t("home:label_show_built_query")}
             />
             {showBuiltQuery && (
-              <textarea
-                value={buildQueryString(queries)}
-                readOnly
-              />
+              <textarea value={buildQueryString(queries)} readOnly />
             )}
           </div>
 

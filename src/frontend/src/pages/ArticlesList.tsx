@@ -26,59 +26,68 @@ export const ArticlesList = ({ response, setShow }: ArtigosProps) => {
     }
   }, [response]);
 
-const downloadCSV = async () => {
-  if (!artigos || artigos.length === 0) return;
+  const downloadCSV = async () => {
+    if (!artigos || artigos.length === 0) return;
 
-  const header = ["title","authors","publicationYear","venue","link","source"];
-  const rows = artigos.map(a => [
-    `"${a.title ?? ""}"`,
-    `"${a.authors ?? ""}"`,
-    `"${a.publicationYear ?? ""}"`,
-    `"${a.venue ?? ""}"`,
-    `"${a.link ?? ""}"`,
-    `"${a.source ?? ""}"`,
-  ]);
-  const csvContent = [header, ...rows].map(row => row.join(",")).join("\n");
-  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-  
-  if ('showSaveFilePicker' in window) {
-    try {
-      const handle = await w.showSaveFilePicker({
-        suggestedName: "articles.csv",
-        types: [{
-          description: "CSV File",
-          accept: { "text/csv": [".csv"] }
-        }]
-      });
-      const writable = await handle.createWritable();
-      await writable.write(blob);
-      await writable.close();
-    } catch (err) {
-      console.error("Operation failed", err);
+    const header = [
+      "title",
+      "authors",
+      "publicationYear",
+      "venue",
+      "link",
+      "source",
+    ];
+    const rows = artigos.map((a) => [
+      `"${a.title ?? ""}"`,
+      `"${a.authors ?? ""}"`,
+      `"${a.publicationYear ?? ""}"`,
+      `"${a.venue ?? ""}"`,
+      `"${a.link ?? ""}"`,
+      `"${a.source ?? ""}"`,
+    ]);
+    const csvContent = [header, ...rows].map((row) => row.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+
+    if ("showSaveFilePicker" in window) {
+      try {
+        const handle = await w.showSaveFilePicker({
+          suggestedName: "articles.csv",
+          types: [
+            {
+              description: "CSV File",
+              accept: { "text/csv": [".csv"] },
+            },
+          ],
+        });
+        const writable = await handle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+      } catch (err) {
+        console.error("Operation failed", err);
+      }
+    } else {
+      // Fallback: download padrão
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "articles.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     }
-  } else {
-    // Fallback: download padrão
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "articles.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  }
-};
-
-useEffect(() => {
-  const link = document.querySelector(".download-btn[href='/download-csv']");
-  if (!link) return;
-  const handleClick = (event: Event) => {
-    event.preventDefault();
-    downloadCSV();
   };
-  link.addEventListener("click", handleClick);
-  return () => link.removeEventListener("click", handleClick);
-}, [artigos]);
+
+  useEffect(() => {
+    const link = document.querySelector(".download-btn[href='/download-csv']");
+    if (!link) return;
+    const handleClick = (event: Event) => {
+      event.preventDefault();
+      downloadCSV();
+    };
+    link.addEventListener("click", handleClick);
+    return () => link.removeEventListener("click", handleClick);
+  }, [artigos]);
 
   const indexInicial = (paginaAtual - 1) * artigosPorPagina;
   const indexFinal = indexInicial + artigosPorPagina;
@@ -132,15 +141,21 @@ useEffect(() => {
             className="lista-artigos-card__rollback__btn"
             onClick={() => setShow(false)}
           >
-            <img src={ArrowIcon} alt="Voltar atrás" />
+            <img
+              className="lista-artigos-card__rollback__btn__img"
+              src={ArrowIcon}
+              alt="Voltar atrás"
+            />
+            <span className="lista-artigos-card__rollback__text">
+              {t("articles:sair")}
+            </span>
           </button>
         </div>
-
         <div className="header">
           <h2>{!moreInfo ? t("articles:titulo_lista") : "Metrics"}</h2>
 
-        <div>
-              <a
+          <div>
+            <a
               href="/download-csv"
               className="download-btn"
               target="_blank"
@@ -150,7 +165,7 @@ useEffect(() => {
             </a>
 
             <span
-              hidden= {artigos.length < 1 }
+              hidden={artigos.length < 1}
               className="download-btn"
               onClick={() => setMoreInfo(!moreInfo)}
             >
@@ -158,11 +173,11 @@ useEffect(() => {
             </span>
           </div>
         </div>
-
-      {moreInfo ? (<SearchStatisticsPage {... response}/>) : 
-        (
-        <>
-          <div className="results-container">
+        {moreInfo ? (
+          <SearchStatisticsPage {...response} />
+        ) : (
+          <>
+            <div className="results-container">
               <div className="results-container__text">
                 {response?.totalArticles ?? artigos.length} {t("home:results")}
                 <br />
@@ -173,46 +188,49 @@ useEffect(() => {
                   </>
                 )}
               </div>
-            </div><table>
-                <thead>
-                  <tr>
-                    <th>{t("articles:coluna_titulo")}</th>
-                    <th>{t("articles:coluna_autores")}</th>
-                    <th>{t("articles:coluna_ano")}</th>
-                    <th>{t("articles:coluna_venue")}</th>
-                    <th>{t("articles:coluna_link")}</th>
-                    <th>{t("articles:coluna_fonte")}</th>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>{t("articles:coluna_titulo")}</th>
+                  <th>{t("articles:coluna_autores")}</th>
+                  <th>{t("articles:coluna_ano")}</th>
+                  <th>{t("articles:coluna_venue")}</th>
+                  <th>{t("articles:coluna_link")}</th>
+                  <th>{t("articles:coluna_fonte")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {artigosVisiveis.map((artigo, index) => (
+                  <tr key={index}>
+                    <td>{artigo.title}</td>
+                    <td>{artigo.authors}</td>
+                    <td>{artigo.publicationYear}</td>
+                    <td>{artigo.venue}</td>
+                    <td>
+                      <a
+                        href={artigo.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {artigo.link}
+                      </a>
+                    </td>
+                    <td>{artigo.source}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {artigosVisiveis.map((artigo, index) => (
-                    <tr key={index}>
-                      <td>{artigo.title}</td>
-                      <td>{artigo.authors}</td>
-                      <td>{artigo.publicationYear}</td>
-                      <td>{artigo.venue}</td>
-                      <td>
-                        <a
-                          href={artigo.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          {artigo.link}
-                        </a>
-                      </td>
-                      <td>{artigo.source}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table><div className="pagination">
-                <button
-                  onClick={() => mudarPagina(paginaAtual - 1)}
-                  disabled={paginaAtual === 1}
-                >
-                  &lt;
-                </button>
+                ))}
+              </tbody>
+            </table>
+            <div className="pagination">
+              <button
+                onClick={() => mudarPagina(paginaAtual - 1)}
+                disabled={paginaAtual === 1}
+              >
+                &lt;
+              </button>
 
-                {gerarBotoesPaginacao().map((p, i) => p === "..." ? (
+              {gerarBotoesPaginacao().map((p, i) =>
+                p === "..." ? (
                   <span key={i} className="ellipsis">
                     ...
                   </span>
@@ -225,18 +243,18 @@ useEffect(() => {
                     {p}
                   </button>
                 )
-                )}
+              )}
 
-                <button
-                  onClick={() => mudarPagina(paginaAtual + 1)}
-                  disabled={paginaAtual === totalPaginas}
-                >
-                  &gt;
-                </button>
-              </div>
-            </>
-        )
-       };
+              <button
+                onClick={() => mudarPagina(paginaAtual + 1)}
+                disabled={paginaAtual === totalPaginas}
+              >
+                &gt;
+              </button>
+            </div>
+          </>
+        )}
+        ;
       </div>
     </div>
   );

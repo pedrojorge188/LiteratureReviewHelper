@@ -86,54 +86,6 @@ export const MainPage = () => {
   const [excludeTitles, setExcludeTitles] = useState<string[]>([]);
   const [selectedFilters, setSelectedFilters] = useState<FilterKey[]>([]);
 
-  //usar o estado redux para cache
-  useEffect(() => {
-    if (mainState) {
-      setQueries(mainState.queries);
-      setAnoDe(mainState.anoDe);
-      setAnoAte(mainState.anoAte);
-      setAuthors(mainState.authors);
-      setVenues(mainState.venues);
-      setExcludeAuthors(mainState.excludeAuthors);
-      setExcludeVenues(mainState.excludeVenues);
-      setExcludeTitles(mainState.excludeTitles);
-      setBibliotecas(mainState.bibliotecas);
-      setSelectedFilters(mainState.selectedFilters);
-      setResponse(mainState.response);
-    }
-  }, []);
-
-  useEffect(() => {
-    dispatch(
-      setMainPageState({
-        queries,
-        anoDe,
-        anoAte,
-        authors,
-        venues,
-        excludeAuthors,
-        excludeVenues,
-        excludeTitles,
-        bibliotecas,
-        selectedFilters,
-        response,
-      })
-    );
-  }, [
-    queries,
-    anoDe,
-    anoAte,
-    authors,
-    venues,
-    excludeAuthors,
-    excludeVenues,
-    excludeTitles,
-    bibliotecas,
-    selectedFilters,
-    response,
-  ]);
-  //fim usar estado redux
-
   const toParam = (values: string[]) =>
     values.length ? values.join(";") : undefined;
 
@@ -386,8 +338,53 @@ export const MainPage = () => {
       } catch (error) {
         console.error("Error loading search from history:", error);
       }
+    } else {
+      if (mainState) {
+        setQueries(mainState.queries);
+        setAnoDe(mainState.anoDe);
+        setAnoAte(mainState.anoAte);
+        setAuthors(mainState.authors);
+        setVenues(mainState.venues);
+        setExcludeAuthors(mainState.excludeAuthors);
+        setExcludeVenues(mainState.excludeVenues);
+        setExcludeTitles(mainState.excludeTitles);
+        setBibliotecas(mainState.bibliotecas);
+        setSelectedFilters(mainState.selectedFilters);
+        setResponse(mainState.response);
+      }
     }
   }, []);
+
+  useEffect(() => {
+    dispatch(
+      setMainPageState({
+        queries,
+        anoDe,
+        anoAte,
+        authors,
+        venues,
+        excludeAuthors,
+        excludeVenues,
+        excludeTitles,
+        bibliotecas,
+        selectedFilters,
+        response,
+      })
+    );
+  }, [
+    queries,
+    anoDe,
+    anoAte,
+    authors,
+    venues,
+    excludeAuthors,
+    excludeVenues,
+    excludeTitles,
+    bibliotecas,
+    selectedFilters,
+    response,
+  ]);
+  //fim usar estado redux
 
   const renderFilterRow = (key: FilterKey) => {
     switch (key) {

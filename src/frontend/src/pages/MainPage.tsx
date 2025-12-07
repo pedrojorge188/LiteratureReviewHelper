@@ -183,7 +183,6 @@ export const MainPage = () => {
     const convertedQueries = params.queries.map((q, i) =>
       i === 0 ? { value: q.value } : { value: q.value, operator: q.operator }
     );
-
     setQueries(convertedQueries);
     setAnoDe(params.yearFrom || "");
     setAnoAte(params.yearTo || "");
@@ -194,7 +193,6 @@ export const MainPage = () => {
     setExcludeVenues(params.excludeVenues || []);
     setBibliotecas(params.libraries || []);
     setSelectedFilters(inferSelectedFilters(params));
-
     setIsImportDialogOpen(false);
     setOpenToastE(true);
   };
@@ -320,6 +318,7 @@ export const MainPage = () => {
   // Load search parameters from sessionStorage if coming from HistoryPage
   useEffect(() => {
     const loadedSearch = sessionStorage.getItem("loadedSearch");
+
     if (loadedSearch) {
       try {
         const params = JSON.parse(loadedSearch);

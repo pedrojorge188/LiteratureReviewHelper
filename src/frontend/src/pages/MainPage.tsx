@@ -806,6 +806,7 @@ export const MainPage = () => {
                 multiple
                 options={autoCompleteOptions || []}
                 value={selectedOptions}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
                 onChange={onTitlesSelectionChange}
                 getOptionLabel={(option) => ("title" in option ? option.title : option.name)}
                 groupBy={(option) => ("title" in option ? "Titles" : "Groups")}

@@ -429,7 +429,7 @@ export const SearchResultTitlesVerification = () => {
                                                 {item.titles.length}
                                             </Typography>
                                             <Typography component="div" variant="body2" className="group-date">
-                                                Creation date: {item.creationDate.toLocaleDateString()}
+                                                Creation date: {item.creationDate.toLocaleString()}
                                             </Typography>
                                         </Box>
                                     }

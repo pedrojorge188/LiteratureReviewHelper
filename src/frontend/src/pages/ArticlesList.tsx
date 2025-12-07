@@ -3,82 +3,94 @@ import { useTranslation } from "react-i18next";
 import { Artigo, SearchResponseDto } from "./types";
 import ArrowIcon from "../assets/images/png/arrow.png";
 import { SearchStatisticsPage } from "./SearchStatisticsPage";
+import Alert from "@mui/material/Alert";
+import { AlertTitle } from "@mui/material";
 
 interface ArtigosProps {
   response: SearchResponseDto;
   setShow: Dispatch<SetStateAction<boolean>>;
+  titlesUsedForVerification: string[];
 }
 
 const w = window as any;
 
-export const ArticlesList = ({ response, setShow }: ArtigosProps) => {
+export const ArticlesList = ({ response, setShow, titlesUsedForVerification }: ArtigosProps) => {
   const { t } = useTranslation();
   const [artigos, setArtigos] = useState<Artigo[]>([]);
   const [paginaAtual, setPaginaAtual] = useState<number>(1);
   const [moreInfo, setMoreInfo] = useState<boolean>(false);
+  const [missingTitles, setMissingTitles] = useState<string[]>([]);
   const artigosPorPagina = 10;
 
   useEffect(() => {
     if (response && Array.isArray(response.articles)) {
       setArtigos(response.articles);
+
+      const updatedMissingTitles = titlesUsedForVerification.filter(
+        title => !response.articles.some(article => article.title === title)
+      );
+
+      setMissingTitles(updatedMissingTitles);
+
     } else {
       setArtigos([]);
+      setMissingTitles([]);
     }
   }, [response]);
 
-const downloadCSV = async () => {
-  if (!artigos || artigos.length === 0) return;
+  const downloadCSV = async () => {
+    if (!artigos || artigos.length === 0) return;
 
-  const header = ["title","authors","publicationYear","venue","link","source"];
-  const rows = artigos.map(a => [
-    `"${a.title ?? ""}"`,
-    `"${a.authors ?? ""}"`,
-    `"${a.publicationYear ?? ""}"`,
-    `"${a.venue ?? ""}"`,
-    `"${a.link ?? ""}"`,
-    `"${a.source ?? ""}"`,
-  ]);
-  const csvContent = [header, ...rows].map(row => row.join(",")).join("\n");
-  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-  
-  if ('showSaveFilePicker' in window) {
-    try {
-      const handle = await w.showSaveFilePicker({
-        suggestedName: "articles.csv",
-        types: [{
-          description: "CSV File",
-          accept: { "text/csv": [".csv"] }
-        }]
-      });
-      const writable = await handle.createWritable();
-      await writable.write(blob);
-      await writable.close();
-    } catch (err) {
-      console.error("Operation failed", err);
+    const header = ["title", "authors", "publicationYear", "venue", "link", "source"];
+    const rows = artigos.map(a => [
+      `"${a.title ?? ""}"`,
+      `"${a.authors ?? ""}"`,
+      `"${a.publicationYear ?? ""}"`,
+      `"${a.venue ?? ""}"`,
+      `"${a.link ?? ""}"`,
+      `"${a.source ?? ""}"`,
+    ]);
+    const csvContent = [header, ...rows].map(row => row.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+
+    if ('showSaveFilePicker' in window) {
+      try {
+        const handle = await w.showSaveFilePicker({
+          suggestedName: "articles.csv",
+          types: [{
+            description: "CSV File",
+            accept: { "text/csv": [".csv"] }
+          }]
+        });
+        const writable = await handle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+      } catch (err) {
+        console.error("Operation failed", err);
+      }
+    } else {
+      // Fallback: download padrão
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "articles.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     }
-  } else {
-    // Fallback: download padrão
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "articles.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  }
-};
-
-useEffect(() => {
-  const link = document.querySelector(".download-btn[href='/download-csv']");
-  if (!link) return;
-  const handleClick = (event: Event) => {
-    event.preventDefault();
-    downloadCSV();
   };
-  link.addEventListener("click", handleClick);
-  return () => link.removeEventListener("click", handleClick);
-}, [artigos]);
+
+  useEffect(() => {
+    const link = document.querySelector(".download-btn[href='/download-csv']");
+    if (!link) return;
+    const handleClick = (event: Event) => {
+      event.preventDefault();
+      downloadCSV();
+    };
+    link.addEventListener("click", handleClick);
+    return () => link.removeEventListener("click", handleClick);
+  }, [artigos]);
 
   const indexInicial = (paginaAtual - 1) * artigosPorPagina;
   const indexFinal = indexInicial + artigosPorPagina;
@@ -124,6 +136,8 @@ useEffect(() => {
     }
   };
 
+
+
   return (
     <div className="lista-artigos-page">
       <div className="lista-artigos-card">
@@ -139,8 +153,8 @@ useEffect(() => {
         <div className="header">
           <h2>{!moreInfo ? t("articles:titulo_lista") : "Metrics"}</h2>
 
-        <div>
-              <a
+          <div>
+            <a
               href="/download-csv"
               className="download-btn"
               target="_blank"
@@ -150,7 +164,7 @@ useEffect(() => {
             </a>
 
             <span
-              hidden= {artigos.length < 1 }
+              hidden={artigos.length < 1}
               className="download-btn"
               onClick={() => setMoreInfo(!moreInfo)}
             >
@@ -159,21 +173,30 @@ useEffect(() => {
           </div>
         </div>
 
-      {moreInfo ? (<SearchStatisticsPage {... response}/>) : 
-        (
-        <>
-          <div className="results-container">
-              <div className="results-container__text">
-                {response?.totalArticles ?? artigos.length} {t("home:results")}
-                <br />
-                {response?.duplicatedResultsRemoved > 0 && (
-                  <>
-                    {response.duplicatedResultsRemoved}{" "}
-                    {t("home:duplicatedResultsRemoved")}
-                  </>
-                )}
+        {moreInfo ? (<SearchStatisticsPage {...response} />) :
+          (
+            <>
+              <div className="results-container">
+                <div className="results-container__text">
+                  {response?.totalArticles ?? artigos.length} {t("home:results")}
+                  <br />
+                  {response?.duplicatedResultsRemoved > 0 && (
+                    <>
+                      {response.duplicatedResultsRemoved}{" "}
+                      {t("home:duplicatedResultsRemoved")}
+                    </>
+                  )}
+                </div>
+                <Alert hidden={missingTitles.length < 1} severity="warning" sx={{ mt: 2 }}>
+                  <AlertTitle>Titles missing</AlertTitle>
+                  <ul>
+                    {missingTitles.map((title) => (
+                      <li key={title}>{title}</li>
+                    ))}
+                  </ul>
+                </Alert>
               </div>
-            </div><table>
+              <table>
                 <thead>
                   <tr>
                     <th>{t("articles:coluna_titulo")}</th>
@@ -235,8 +258,8 @@ useEffect(() => {
                 </button>
               </div>
             </>
-        )
-       };
+          )
+        };
       </div>
     </div>
   );

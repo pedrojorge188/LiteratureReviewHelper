@@ -63,6 +63,9 @@ export const loadGroups = (): TitlesGroups[] => {
     return [];
 }
 
+const GROUPS_KEY = "titlesGroups";
+const TITLES_KEY = "titlesToExclude";
+
 export const SearchResultTitlesVerification = () => {
     const { t } = useTranslation();
 
@@ -86,7 +89,7 @@ export const SearchResultTitlesVerification = () => {
 
         const updatedTitles = titlesToVerify.concat(newTitles);
         setTitlesToVerify(updatedTitles);
-        localStorage.setItem("titlesToVerify", JSON.stringify(updatedTitles));
+        localStorage.setItem(TITLES_KEY, JSON.stringify(updatedTitles));
         loadTitles();
     }
 
@@ -100,8 +103,8 @@ export const SearchResultTitlesVerification = () => {
         setTitlesToVerify(updatedTitles);
         setTitlesGroups(updatedGroups);
 
-        localStorage.setItem("titlesToVerify", JSON.stringify(updatedTitles));
-        localStorage.setItem("titlesGroups", JSON.stringify(updatedGroups));
+        localStorage.setItem(TITLES_KEY, JSON.stringify(updatedTitles));
+        localStorage.setItem(GROUPS_KEY, JSON.stringify(updatedGroups));
 
         loadTitles();
         loadGroups();
@@ -114,7 +117,7 @@ export const SearchResultTitlesVerification = () => {
             title: editTitles[title.id] ?? title.title,
         }));
         setTitlesToVerify(updatedTitles);
-        localStorage.setItem("titlesToVerify", JSON.stringify(updatedTitles));
+        localStorage.setItem(TITLES_KEY, JSON.stringify(updatedTitles));
         setEditTitles({});
         setRowEditMode("");
 
@@ -127,7 +130,7 @@ export const SearchResultTitlesVerification = () => {
             name: editTitles[group.id] ?? group.name,
         }));
         setTitlesGroups(updatedGroups);
-        localStorage.setItem("titlesGroups", JSON.stringify(updatedGroups));
+        localStorage.setItem(GROUPS_KEY, JSON.stringify(updatedGroups));
         setEditTitles({});
         setRowEditMode("");
 
@@ -144,7 +147,7 @@ export const SearchResultTitlesVerification = () => {
 
         const updatedGroups = [...titlesGroups, group];
         setTitlesGroups(updatedGroups);
-        localStorage.setItem("titlesGroups", JSON.stringify(updatedGroups));
+        localStorage.setItem(GROUPS_KEY, JSON.stringify(updatedGroups));
 
         loadGroups();
     }
@@ -152,7 +155,7 @@ export const SearchResultTitlesVerification = () => {
     const deleteGroup = (id: string) => {
         const updatedGroups = titlesGroups.filter(item => item.id !== id);
         setTitlesGroups(updatedGroups);
-        localStorage.setItem("titlesGroups", JSON.stringify(updatedGroups));
+        localStorage.setItem(GROUPS_KEY, JSON.stringify(updatedGroups));
 
         loadGroups();
     }
@@ -207,13 +210,13 @@ export const SearchResultTitlesVerification = () => {
 
     const saveGroupsLinksWithTitles = (updatedGroups: TitlesGroups[], newTitles?: TitleToExclude[]) => {
         setTitlesGroups(updatedGroups);
-        localStorage.setItem("titlesGroups", JSON.stringify(updatedGroups));
+        localStorage.setItem(GROUPS_KEY, JSON.stringify(updatedGroups));
         loadGroups();
 
         if (newTitles) {
             const updatedTitles = [...titlesToVerify, ...newTitles];
             setTitlesToVerify(updatedTitles);
-            localStorage.setItem("titlesToVerify", JSON.stringify(updatedTitles));
+            localStorage.setItem(TITLES_KEY, JSON.stringify(updatedTitles));
             loadTitles();
         }
     }

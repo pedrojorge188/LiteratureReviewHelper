@@ -77,12 +77,15 @@
     display: flex;
     gap: 8px;
     margin-top: 16px;
+    width: 100%;
 
     .mg-autocomplete {
         flex: 1;
+        min-width: 0;
     }
 
     .mg-add-btn {
+        flex-shrink: 0;
         white-space: nowrap;
         color: #555;
         border-color: #555;

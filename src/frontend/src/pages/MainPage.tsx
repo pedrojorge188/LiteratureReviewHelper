@@ -116,7 +116,7 @@ export const MainPage = () => {
 
     const allOptions: TitleOption[] = [
       ...titlesToVerify,
-      ...titlesGroups
+      ...titlesGroups.filter(g => g.titles.length > 0)
     ];
 
     setTitlesToVerify(titlesToVerify);
@@ -629,7 +629,7 @@ export const MainPage = () => {
         className={`container-article ${showList && response ? "show" : "hide"
           }`}
       >
-        {response && <ArticlesList response={response} setShow={setShowList} />}
+        {response && <ArticlesList response={response} setShow={setShowList} titlesUsedForVerification={selectedTitlesForVerification} />}
       </div>
 
       <div

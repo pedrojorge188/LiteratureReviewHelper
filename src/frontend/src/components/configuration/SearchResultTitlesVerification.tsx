@@ -391,6 +391,7 @@ export const SearchResultTitlesVerification = () => {
                                         </IconButton>
 
                                         <IconButton
+                                            hidden={item.titles.length === 0}
                                             size="small"
                                             className="action-btn expand-btn"
                                             aria-label={expandedRowsIds.includes(item.id) ? "collapse" : "expand"}

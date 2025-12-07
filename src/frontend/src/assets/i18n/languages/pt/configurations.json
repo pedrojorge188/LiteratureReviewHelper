@@ -8,7 +8,8 @@
   "alerts": {
     "rowsSaved": "Nº de elementos guardado!",
     "maxResultsSaved": "Máximo de pesquisas guardado!",
-    "librarySettingsSaved": "Definições para {{libName}} guardadas!"
+    "librarySettingsSaved": "Definições para {{libName}} guardadas!",
+    "token_required_warning": "Esta biblioteca requer um token ou deve assinalar 'Não precisa de token'."
   },
   "labels": {
     "rowsPerPage": "Rows",
@@ -16,7 +17,10 @@
     "noTokenNeeded": "Não precisa de token"
   },
   "buttons": {
-    "save": "Guardar"
+    "save": "Guardar",
+    "select": "Selecionar",
+    "unselect": "Desselecionar",
+    "resetSettings": "Repor Configurações"
   },
   "placeholders": {
     "insertToken": "Inserir token"

@@ -33,6 +33,8 @@ export const ConfigurationPage = () => {
     localStorage.setItem("maxResults", maxResults);
   };
 
+  const [isWarningOpen, setIsWarningOpen] = useState(false);
+
   const handleSaveTop = () => {
     handleSaveMaxResults();
     handleSaveRows();
@@ -160,13 +162,31 @@ export const ConfigurationPage = () => {
         <hr />
         {/* Secção para a Lista de Bibliotecas */}
         <section className="section">
-          <h3 className="bibliotecas-lista-titulo">
-            {t("home:lista_bibliotecas")}
-          </h3>
+          <div
+            className="bibliotecas-titulo-wrapper"
+            style={{ display: "flex", alignItems: "center", gap: "6px" }}
+          >
+            <h3 className="bibliotecas-lista-titulo">
+              {t("home:lista_bibliotecas")}
+            </h3>
+
+            {/* Ícone Help com Tooltip */}
+            <Tooltip title={t("warnings:librariesTokensInfo")}>
+              <span
+                className="rows-container__label__icon"
+                style={{ cursor: "pointer" }}
+              >
+                <HelpOutlineIcon />
+              </span>
+            </Tooltip>
+          </div>
+
           <ul className="bibliotecas-lista">
             {bibliotecas.map((b, i) => (
               <li key={i}>
-                <span>{b}</span> {/* Nomes (HAL, ACM) mantidos como IDs */}
+                <span>{b}</span>
+
+                {/* Checkbox noToken */}
                 <label style={{ marginLeft: "10px" }}>
                   <input
                     type="checkbox"
@@ -175,6 +195,8 @@ export const ConfigurationPage = () => {
                   />{" "}
                   {t("configurations:labels.noTokenNeeded")}
                 </label>
+
+                {/* Input Token */}
                 <input
                   type="text"
                   placeholder={t("configurations:placeholders.insertToken")}
@@ -183,22 +205,77 @@ export const ConfigurationPage = () => {
                   onChange={(e) => handleTokenChange(b, e.target.value)}
                   disabled={settings[b]?.noToken}
                 />
+
+                {/* Botão Save */}
                 <div className="details">
                   <button
                     type="button"
                     className="details-btn"
-                    onClick={() => handleSaveSettings(b)}
+                    onClick={() => {
+                      const requiresToken = !settings[b]?.noToken;
+                      const missingToken =
+                        !settings[b]?.token || settings[b]?.token.trim() === "";
+
+                      if (requiresToken && missingToken) {
+                        setIsWarningOpen(true);
+                        return;
+                      }
+
+                      handleSaveSettings(b);
+                    }}
                   >
                     <span className="details-btn__text">
-                      {t("configurations:buttons.save")}
+                      {t("configurations:buttons.select")}
                     </span>
                   </button>
                 </div>
               </li>
             ))}
           </ul>
+          
+          {/* TOAST: Warning de token em falta */}
+          <SnackbarToast
+            messageStr={t("configurations:alerts:token_required_warning")}
+            open={isWarningOpen}
+            setOpen={setIsWarningOpen}
+            type="warning"
+          />
+
+          {/* Botão Reset Configurações*/}
+          <div
+            className="details"
+            style={{ marginTop: "20px", display: "flex", alignItems: "center" }}
+          >
+            <button
+              type="button"
+              className="reset-btn"
+              onClick={() => {
+                const resetSettings: any = {};
+                bibliotecas.forEach((lib) => {
+                  resetSettings[lib] = {
+                    token: "",
+                    noToken: false,
+                  };
+                });
+                setSettings(resetSettings);
+
+                localStorage.setItem(SETTINGS_KEY, JSON.stringify(resetSettings));
+
+                setRowsPerPage("");
+                setMaxResults("");
+                localStorage.removeItem("rowsPerPage");
+                localStorage.removeItem("maxResults");
+                
+                setIsInfoOpen(true);
+              }}
+            >
+              <span className="details-btn__text">
+                {t("configurations:buttons.resetSettings")}
+              </span>
+            </button>
+          </div>
         </section>
-      </div>
+        </div>
     </>
   );
 };

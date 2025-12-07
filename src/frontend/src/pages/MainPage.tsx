@@ -163,7 +163,8 @@ export const MainPage = () => {
         excludeVenues,
         excludeTitles,
         bibliotecas,
-        titlesToVerify: selectedOptions
+        titlesToVerify: selectedOptions,
+        selectedTitlesForVerification
       };
 
       saveSearch(customLabel, searchParameters);
@@ -300,7 +301,8 @@ export const MainPage = () => {
         excludeVenues,
         bibliotecas,
         selectedOptions,
-        titlesToVerify: selectedOptions
+        titlesToVerify: selectedOptions,
+        selectedTitlesForVerification
       };
       saveHistoryEntry(internalParams);
     } catch (err) {

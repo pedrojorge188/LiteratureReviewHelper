@@ -94,6 +94,7 @@ export const FavoritesPage = () => {
           : [],
         bibliotecas: searchParameters.bibliotecas,
         titlesToVerify: editingSearch?.searchParameters.titlesToVerify || [],
+        selectedTitlesForVerification: editingSearch?.searchParameters.selectedTitlesForVerification || []
       };
 
       updateSearch(id, newLabel, internalParams);

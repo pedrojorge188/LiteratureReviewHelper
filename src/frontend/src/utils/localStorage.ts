@@ -16,6 +16,7 @@ interface InternalSearchParameters {
   excludeTitles: string[],
   bibliotecas: string[];
   titlesToVerify: TitleOption[];
+  selectedTitlesForVerification: string[];
 }
 
 /**
@@ -32,7 +33,8 @@ const toStorageFormat = (params: InternalSearchParameters): SearchParameters => 
     excludeVenues: params.excludeVenues,
     excludeTitles: params.excludeTitles,
     libraries: params.bibliotecas,
-    titlesToVerify: params.titlesToVerify
+    titlesToVerify: params.titlesToVerify,
+    selectedTitlesForVerification: params.selectedTitlesForVerification
   };
 };
 
@@ -50,7 +52,8 @@ const fromStorageFormat = (params: SearchParameters): InternalSearchParameters =
     excludeVenues: params.excludeVenues,
     excludeTitles: params.excludeTitles,
     bibliotecas: params.libraries,
-    titlesToVerify: params.titlesToVerify
+    titlesToVerify: params.titlesToVerify,
+    selectedTitlesForVerification: params.selectedTitlesForVerification,
   };
 };
 
@@ -110,13 +113,13 @@ export const saveSearch = (
 export const updateSearch = (id: string, customLabel: string, searchParameters: InternalSearchParameters): void => {
   try {
     const searches = getSavedSearches();
-    
+
     // Check if new label already exists (and it's not the same search)
     const existingSearch = searches.find(s => s.id === customLabel && s.id !== id);
     if (existingSearch) {
       throw new Error("A search with this name already exists. Please choose a different name.");
     }
-    
+
     const searchIndex = searches.findIndex((s) => s.id === id);
 
     if (searchIndex === -1) {

@@ -68,6 +68,7 @@ export interface SearchParameters {
   excludeTitles: string[];
   libraries: string[];
   titlesToVerify: TitleOption[];
+  selectedTitlesForVerification: string[]
 }
 
 export interface SavedSearch {

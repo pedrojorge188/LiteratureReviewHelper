@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { SavedSearch } from "../pages/types";
 import { buildQueryString } from "../utils/queries";
+import { Stack, Typography } from "@mui/material";
 
 interface SavedSearchCardProps {
   search: SavedSearch;
@@ -32,34 +33,34 @@ export const SavedSearchCard = ({
 
   const filterConfigs: {
     key:
-      | "authors"
-      | "venues"
-      | "excludeAuthors"
-      | "excludeVenues"
-      | "excludeTitles";
+    | "authors"
+    | "venues"
+    | "excludeAuthors"
+    | "excludeVenues"
+    | "excludeTitles";
     label: string;
   }[] = [
-    {
-      key: "authors",
-      label: t("savedsearchcard:authors"),
-    },
-    {
-      key: "venues",
-      label: t("savedsearchcard:venues"),
-    },
-    {
-      key: "excludeAuthors",
-      label: t("savedsearchcard:excluded_authors"),
-    },
-    {
-      key: "excludeVenues",
-      label: t("savedsearchcard:excluded_venues"),
-    },
-    {
-      key: "excludeTitles",
-      label: t("savedsearchcard:excluded_titles"),
-    },
-  ];
+      {
+        key: "authors",
+        label: t("savedsearchcard:authors"),
+      },
+      {
+        key: "venues",
+        label: t("savedsearchcard:venues"),
+      },
+      {
+        key: "excludeAuthors",
+        label: t("savedsearchcard:excluded_authors"),
+      },
+      {
+        key: "excludeVenues",
+        label: t("savedsearchcard:excluded_venues"),
+      },
+      {
+        key: "excludeTitles",
+        label: t("savedsearchcard:excluded_titles"),
+      },
+    ];
 
   return (
     <div key={search.id} className="search-card">
@@ -76,14 +77,14 @@ export const SavedSearchCard = ({
 
           {(search.searchParameters.yearFrom ||
             search.searchParameters.yearTo) && (
-            <div className="search-detail">
-              <strong>{t("savedsearchcard:years") || "Years"}:</strong>
-              <span>
-                {search.searchParameters.yearFrom || "..."} -{" "}
-                {search.searchParameters.yearTo || "..."}
-              </span>
-            </div>
-          )}
+              <div className="search-detail">
+                <strong>{t("savedsearchcard:years") || "Years"}:</strong>
+                <span>
+                  {search.searchParameters.yearFrom || "..."} -{" "}
+                  {search.searchParameters.yearTo || "..."}
+                </span>
+              </div>
+            )}
 
           {search.searchParameters.libraries.length > 0 && (
             <div className="search-detail">
@@ -105,6 +106,25 @@ export const SavedSearchCard = ({
               </div>
             );
           })}
+
+
+          {search.searchParameters.selectedTitlesForVerification?.length > 0 && (
+            <div className="search-detail">
+              <strong>Query validation titles:</strong>
+
+              <Stack spacing={0.5}>
+                {search.searchParameters.selectedTitlesForVerification.map(title => (
+                  <Typography
+                    key={title}
+                    component="span"
+                    className="verify-titles-list"
+                  >
+                    {title}
+                  </Typography>
+                ))}
+              </Stack>
+            </div>
+          )}
         </div>
 
         <div className="search-card-actions">

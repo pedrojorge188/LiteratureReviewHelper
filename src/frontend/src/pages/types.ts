@@ -77,3 +77,12 @@ export interface SavedSearchesStorage {
   searches: SavedSearch[];
 }
 
+export interface ApiSetting {
+  token: string;
+  noToken: boolean;
+}
+
+export interface ApiSettings {
+  [key: string]: ApiSetting;
+}
+

@@ -103,6 +103,41 @@ export const saveSearch = (
   }
 };
 
+export const updateSearch = (id: string, customLabel: string, searchParameters: InternalSearchParameters): void => {
+  try {
+    const searches = getSavedSearches();
+    
+    // Check if new label already exists (and it's not the same search)
+    const existingSearch = searches.find(s => s.id === customLabel && s.id !== id);
+    if (existingSearch) {
+      throw new Error("A search with this name already exists. Please choose a different name.");
+    }
+    
+    const searchIndex = searches.findIndex((s) => s.id === id);
+
+    if (searchIndex === -1) {
+      throw new Error("Search not found");
+    }
+
+    const updatedSearch: SavedSearch = {
+      id: customLabel,
+      timestamp: new Date().toISOString(),
+      searchParameters: toStorageFormat(searchParameters),
+    };
+
+    searches[searchIndex] = updatedSearch;
+
+    const storage: SavedSearchesStorage = {
+      searches,
+    };
+
+    localStorage.setItem(STORAGE_FAVORITES_KEY, JSON.stringify(storage));
+  } catch (error) {
+    console.error("Error updating search label:", error);
+    throw error;
+  }
+};
+
 /**
  * Update the custom label of an existing search
  */

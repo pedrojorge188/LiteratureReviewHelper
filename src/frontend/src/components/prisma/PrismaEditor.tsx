@@ -8,24 +8,48 @@ import {
   Edge,
   Node,
   ReactFlow,
+  ReactFlowInstance,
+  getNodesBounds,
+  getViewportForBounds
 } from "@xyflow/react";
 import { useCallback, useMemo, useRef, useState } from "react";
+import { toPng } from "html-to-image";
 import { EditableNode } from "./EditableNode";
 import { mapApiToFlow } from "./mapApiToFlow";
 
 import "@xyflow/react/dist/style.css";
+
 import { SearchResponseDto } from "../../pages/types";
 
 export const PrismaEditor = (apiData: SearchResponseDto) => {
-  const { nodes: initialNodes, edges: initialEdges } = useMemo(
-    () => mapApiToFlow(apiData),
-    [apiData]
-  );
+  const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null);
+
+  const { nodes: initialNodes, edges: initialEdges } = useMemo(() => {
+    const data = mapApiToFlow(apiData);
+
+    const fixedEdges = data.edges.map((edge: Edge) => ({
+      ...edge,
+      style: {
+        stroke: "#b1b1b7",
+        strokeWidth: 1,
+        ...edge.style,
+      },
+    }));
+
+    return { nodes: data.nodes, edges: fixedEdges };
+  }, [apiData]);
 
   const reactFlowWrapper = useRef(null);
 
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
+
+  const defaultEdgeOptions = useMemo(() => ({
+    style: {
+      stroke: '#b1b1b7',
+      strokeWidth: 1
+    },
+  }), []);
 
   const handleNodeDelete = useCallback((id: string) => {
     setNodes((nds: any[]) => nds.filter((n: { id: string; }) => n.id !== id));
@@ -50,7 +74,7 @@ export const PrismaEditor = (apiData: SearchResponseDto) => {
     );
   }, []);
 
-    const handleNodeTitleChange = useCallback((id: string, value: string) => {
+  const handleNodeTitleChange = useCallback((id: string, value: string) => {
     setNodes((nds: any[]) =>
       nds.map((n) =>
         n.id === id
@@ -103,6 +127,47 @@ export const PrismaEditor = (apiData: SearchResponseDto) => {
     }));
   }, [nodes, handleNodeLabelChange, handleNodeDelete]);
 
+  const handleExportPng = useCallback(() => {
+    if (!rfInstance) return;
+
+    const imageWidth = 1024;
+    const imageHeight = 768;
+    const nodesBounds = getNodesBounds(rfInstance.getNodes());
+
+    const viewport = getViewportForBounds(
+      nodesBounds,
+      imageWidth,
+      imageHeight,
+      0.5, 2, 0.1
+    );
+
+    const viewportElement = document.querySelector('.react-flow__viewport') as HTMLElement;
+
+    if (viewportElement) {
+        toPng(viewportElement, {
+            backgroundColor: '#ffffff',
+            width: imageWidth,
+            height: imageHeight,
+            style: {
+                width: String(imageWidth),
+                height: String(imageHeight),
+                transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
+            },
+            filter: (node: HTMLElement) => {
+              const exclusionClasses = ['react-flow__minimap', 'react-flow__controls'];
+              return !exclusionClasses.some((classname) => node.classList?.contains(classname));
+            }
+        }).then((dataUrl: string) => {
+            const link = document.createElement('a');
+            const timestamp = new Date().toISOString().replace(/[:.]/g, "-").substring(0, 19);
+            const queryName = apiData.query?.substring(0, 30).replace(/[^a-zA-Z0-9]/g, "_") || "search";
+            link.download = `flowchart_${queryName}_${timestamp}.png`;
+            link.href = dataUrl;
+            link.click();
+        });
+    }
+  }, [rfInstance, apiData]);
+
   return (
     <div className="flow-wrapper">
       <div ref={reactFlowWrapper} className="react-flow-wrapper">
@@ -114,15 +179,22 @@ export const PrismaEditor = (apiData: SearchResponseDto) => {
           onConnect={onConnect}
           nodeTypes={{ editableNode: EditableNode }}
           fitView
+          onInit={setRfInstance}
+          defaultEdgeOptions={defaultEdgeOptions}
         >
           <Background variant={BackgroundVariant.Dots} />
           <Controls />
         </ReactFlow>
       </div>
 
-      <button className="add-node-btn" onClick={handleAddNode}>
-        Add Step
-      </button>
+      <div className="flow-actions">
+        <button className="add-node-btn" onClick={handleAddNode}>
+          Add Step
+        </button>
+        <button className="export-flow-btn" onClick={handleExportPng}>
+          Export Flowchart
+        </button>
+      </div>
     </div>
   );
 };

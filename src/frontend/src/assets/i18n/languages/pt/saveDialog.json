@@ -3,6 +3,7 @@
   "label_prompt": "Insira um nome para esta pesquisa:",
   "placeholder": "ex: uso de IA",
   "error_empty_label": "Por favor, insira um nome",
+  "error_duplicate_name": "Já existe uma pesquisa com este nome. Por favor, escolha um nome diferente.",
   "save": "Guardar",
   "cancel": "Cancelar"
 }

@@ -102,6 +102,7 @@ export const MainPage = () => {
 
   useEffect(() => {
     setApiSettings(loadApiSettings());
+
     const titlesToVerify = loadTitles();
     const titlesGroups = loadGroups().filter(g => g.titles.length > 0);
 

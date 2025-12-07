@@ -1,3 +1,4 @@
+import { TitleOption } from "../components/types";
 import { Query, SavedSearch, SavedSearchesStorage, SearchParameters } from "../pages/types";
 
 const STORAGE_FAVORITES_KEY = "literatureReviewHelper_savedSearches";
@@ -14,6 +15,7 @@ interface InternalSearchParameters {
   excludeVenues: string[],
   excludeTitles: string[],
   bibliotecas: string[];
+  titlesToVerify: TitleOption[];
 }
 
 /**
@@ -30,6 +32,7 @@ const toStorageFormat = (params: InternalSearchParameters): SearchParameters => 
     excludeVenues: params.excludeVenues,
     excludeTitles: params.excludeTitles,
     libraries: params.bibliotecas,
+    titlesToVerify: params.titlesToVerify
   };
 };
 
@@ -47,6 +50,7 @@ const fromStorageFormat = (params: SearchParameters): InternalSearchParameters =
     excludeVenues: params.excludeVenues,
     excludeTitles: params.excludeTitles,
     bibliotecas: params.libraries,
+    titlesToVerify: params.titlesToVerify
   };
 };
 
@@ -76,13 +80,13 @@ export const saveSearch = (
 ): SavedSearch => {
   try {
     const searches = getSavedSearches();
-    
+
     // Check if a search with this ID (customLabel) already exists
     const existingSearch = searches.find(s => s.id === customLabel);
     if (existingSearch) {
       throw new Error("A search with this name already exists. Please choose a different name.");
     }
-    
+
     const newSearch: SavedSearch = {
       id: customLabel,
       timestamp: new Date().toISOString(),
@@ -109,13 +113,13 @@ export const saveSearch = (
 export const updateSearchLabel = (id: string, newLabel: string): void => {
   try {
     const searches = getSavedSearches();
-    
+
     // Check if new label already exists (and it's not the same search)
     const existingSearch = searches.find(s => s.id === newLabel && s.id !== id);
     if (existingSearch) {
       throw new Error("A search with this name already exists. Please choose a different name.");
     }
-    
+
     const searchIndex = searches.findIndex((s) => s.id === id);
 
     if (searchIndex === -1) {

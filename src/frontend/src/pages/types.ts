@@ -1,3 +1,5 @@
+import { TitleOption } from "../components/types";
+
 export interface Artigo {
   title: string;
   authors: string[];
@@ -65,6 +67,7 @@ export interface SearchParameters {
   excludeVenues: string[];
   excludeTitles: string[];
   libraries: string[];
+  titlesToVerify: TitleOption[];
 }
 
 export interface SavedSearch {

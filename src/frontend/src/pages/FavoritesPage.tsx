@@ -86,7 +86,7 @@ export const FavoritesPage = () => {
         } else {
           setEditError(
             t("favorites:update_error") ||
-              "Error updating search name. Please try again."
+            "Error updating search name. Please try again."
           );
         }
       }
@@ -105,6 +105,7 @@ export const FavoritesPage = () => {
       excludeTitles: search.searchParameters.excludeTitles,
       excludeVenues: search.searchParameters.excludeVenues,
       bibliotecas: search.searchParameters.libraries,
+      titlesToVerify: search.searchParameters.titlesToVerify
     };
     sessionStorage.setItem("loadedSearch", JSON.stringify(internalParams));
     navigate("/");
@@ -117,9 +118,8 @@ export const FavoritesPage = () => {
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `saved-searches-${
-        new Date().toISOString().split("T")[0]
-      }.json`;
+      link.download = `saved-searches-${new Date().toISOString().split("T")[0]
+        }.json`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -141,9 +141,8 @@ export const FavoritesPage = () => {
       link.href = url;
       // Use the search name as the filename, sanitized for file systems
       const sanitizedName = search.id.replace(/[<>:"/\\|?*]/g, "-");
-      link.download = `${sanitizedName}-${
-        new Date().toISOString().split("T")[0]
-      }.json`;
+      link.download = `${sanitizedName}-${new Date().toISOString().split("T")[0]
+        }.json`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

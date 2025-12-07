@@ -192,6 +192,7 @@ export const MainPage = () => {
         excludeVenues,
         excludeTitles,
         bibliotecas,
+        titlesToVerify: selectedOptions
       };
 
       saveSearch(customLabel, searchParameters);
@@ -327,6 +328,8 @@ export const MainPage = () => {
         excludeTitles,
         excludeVenues,
         bibliotecas,
+        selectedOptions,
+        titlesToVerify: selectedOptions
       };
       saveHistoryEntry(internalParams);
     } catch (err) {
@@ -385,6 +388,7 @@ export const MainPage = () => {
         setExcludeVenues(params.excludeVenues || []);
         setBibliotecas(params.bibliotecas || []);
         setSelectedFilters(inferSelectedFilters(params));
+        setSelectedOptions(params.titlesToVerify || []);
         sessionStorage.removeItem("loadedSearch");
         setOpenToastE(true);
       } catch (error) {

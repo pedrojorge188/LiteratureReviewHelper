@@ -44,8 +44,8 @@ export const PrismaEditor = (apiData: SearchResponseDto) => {
 
   const reactFlowWrapper = useRef(null);
 
-  const [nodes, setNodes] = useState(initialNodes);
-  const [edges, setEdges] = useState(initialEdges);
+  const [nodes, setNodes] = useState<Node[]>(initialNodes);
+  const [edges, setEdges] = useState<Edge[]>(initialEdges);
 
   const defaultEdgeOptions = useMemo(() => ({
     style: {
@@ -120,7 +120,7 @@ export const PrismaEditor = (apiData: SearchResponseDto) => {
   const onConnect = useCallback((params: any) => setEdges((es: any[]) => addEdge(params, es)), []);
 
   const nodesWithHandlers = useMemo(() => {
-    return nodes.map((n: { data: any; }) => ({
+    return nodes.map((n: Node) => ({
       ...n,
       data: {
         ...n.data,

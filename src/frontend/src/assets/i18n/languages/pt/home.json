@@ -37,5 +37,9 @@
   "placeholder_exclude_titles": "Título Um, Título Dois...",
   "placeholder_exclude_venues": "Venue Um, Venue Dois...",
   "placeholder_venues": "Venue Um, Venue Dois...",
-  "select_filters": "Selecione os filtros"
+  "select_filters": "Selecione os filtros",
+  "no_libraries_configured": "Você precisa configurar as bibliotecas na página de configurações primeiro.",
+  "all_libraries_added": "Não há mais bibliotecas para adicionar.",
+  "configure_here": "configure aqui",
+  "search_still_loading": "Ainda estamos a procurar resultados... isto pode demorar alguns instantes."
 }

@@ -111,18 +111,7 @@ export const SavedSearchCard = ({
           {search.searchParameters.selectedTitlesForVerification?.length > 0 && (
             <div className="search-detail">
               <strong>Query validation titles:</strong>
-
-              <Stack spacing={0.5}>
-                {search.searchParameters.selectedTitlesForVerification.map(title => (
-                  <Typography
-                    key={title}
-                    component="span"
-                    className="verify-titles-list"
-                  >
-                    {title}
-                  </Typography>
-                ))}
-              </Stack>
+              <span className="truncate">{search.searchParameters.selectedTitlesForVerification.join(", ")}</span>
             </div>
           )}
         </div>

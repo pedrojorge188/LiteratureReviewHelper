@@ -313,11 +313,11 @@ export const SearchResultTitlesVerification = () => {
                 </IconButton>
 
                 <TextField
+                    className="search-field"
                     onChange={(e) => onSearchValueChange(e.target.value)}
                     label="Search"
                     variant="standard"
-                    placeholder={isListView ? "Introduce the title name" : "Introduce the group name"}
-                    sx={{ minWidth: 300, pb: 2 }} />
+                    placeholder={isListView ? "Introduce the title name" : "Introduce the group name"} />
             </Box>
             <Box className="list-box">
                 {isListView ?

@@ -9,7 +9,6 @@ import FolderIcon from '@mui/icons-material/Folder';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Box from "@mui/material/Box";
-import Tooltip from "@mui/material/Tooltip";
 import ViewListIcon from "@mui/icons-material/ViewList";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import AddIcon from "@mui/icons-material/Add";
@@ -28,6 +27,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { DependenciesModal } from "./DependenciesModal";
 import { useTranslation } from "react-i18next";
 import "../../styles/components/titleVerification.scss";
+import { SnackbarToast } from "../SnackbarToast";
 
 export const loadTitles = (): TitleToExclude[] => {
     const raw = localStorage.getItem("titlesToExclude");
@@ -36,7 +36,7 @@ export const loadTitles = (): TitleToExclude[] => {
     try {
         const parsedTitles = JSON.parse(raw) as TitleToExclude[];
         return parsedTitles
-    } catch (error) {
+    } catch (error: any) {
         console.error("Erro ao carregar os titulos a ser excluidos", error);
     }
 
@@ -56,7 +56,7 @@ export const loadGroups = (): TitlesGroups[] => {
         })) as TitlesGroups[];
 
         return parsedGroups
-    } catch (error) {
+    } catch (error: any) {
         console.error("Erro ao carregar os grupos de titulos a ser excluidos", error);
     }
 
@@ -75,18 +75,26 @@ export const SearchResultTitlesVerification = () => {
     const [searchTitlesGroups, setSearchTitlesGroups] = useState<TitlesGroups[]>([]);
     const [isListView, setIsListView] = useState<boolean>(true);
     const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
-    const [isSaveDialogMultipleInputsOpen, setisSaveDialogMultipleInputsOpen] = useState(false);
+    const [isSaveDialogMultipleInputsOpen, setIsSaveDialogMultipleInputsOpen] = useState(false);
     const [saveError, setSaveError] = useState<string>("");
     const [isRowEditMode, setRowEditMode] = useState<string>();
     const [editTitles, setEditTitles] = useState<{ [id: string]: string }>({});
+    const [editGroups, setEditGroups] = useState<{ [id: string]: string }>({});
     const [isDependenciesModalOpen, setDependenciesModalOpen] = useState(false);
     const [expandedRowsIds, setExpandedRowsIds] = useState<string[]>([]);
+    const [openToastD, setOpenToastD] = useState(false);
+    const [openToastC, setOpenToastC] = useState(false);
 
     useEffect(() => {
         setSearchTitlesToVerify(titlesToVerify);
         setSearchTitlesGroups(titlesGroups);
     }, [titlesToVerify, titlesGroups]);
 
+    useEffect(() => {
+        setRowEditMode("");
+        setEditTitles({});
+        setEditGroups({})
+    }, [isListView]);
 
     const saveTitles = (titles: string[]) => {
         const newTitles: TitleToExclude[] = titles.map(title => ({
@@ -101,47 +109,67 @@ export const SearchResultTitlesVerification = () => {
     }
 
     const deleteTitle = (titleId: string) => {
-        const updatedGroups = titlesGroups.map(group => ({
-            ...group,
-            titles: group.titles.filter(id => id !== titleId)
-        }));
+        try {
+            const updatedGroups = titlesGroups.map(group => ({
+                ...group,
+                titles: group.titles.filter(id => id !== titleId)
+            }));
 
-        const updatedTitles = titlesToVerify.filter(item => item.id !== titleId);
-        setTitlesToVerify(updatedTitles);
-        setTitlesGroups(updatedGroups);
+            const updatedTitles = titlesToVerify.filter(item => item.id !== titleId);
+            setTitlesToVerify(updatedTitles);
+            setTitlesGroups(updatedGroups);
 
-        localStorage.setItem(TITLES_KEY, JSON.stringify(updatedTitles));
-        localStorage.setItem(GROUPS_KEY, JSON.stringify(updatedGroups));
+            localStorage.setItem(TITLES_KEY, JSON.stringify(updatedTitles));
+            localStorage.setItem(GROUPS_KEY, JSON.stringify(updatedGroups));
 
-        loadTitles();
-        loadGroups();
+            loadTitles();
+            loadGroups();
+            setOpenToastC(true);
+        } catch (error) {
+            console.log(error)
+            setOpenToastD(true);
+        }
     }
 
 
     const updateTitle = () => {
-        const updatedTitles = titlesToVerify.map(title => ({
-            ...title,
-            title: editTitles[title.id] ?? title.title,
-        }));
-        setTitlesToVerify(updatedTitles);
-        localStorage.setItem(TITLES_KEY, JSON.stringify(updatedTitles));
-        setEditTitles({});
-        setRowEditMode("");
+        try {
+            const updatedTitles = titlesToVerify.map(title => ({
+                ...title,
+                title: editTitles[title.id] ?? title.title,
+            }));
+            setTitlesToVerify(updatedTitles);
+            localStorage.setItem(TITLES_KEY, JSON.stringify(updatedTitles));
+            setEditTitles({});
+            setRowEditMode("");
 
-        loadTitles();
+            loadTitles();
+            setOpenToastC(true);
+        } catch (error: any) {
+            console.log(error);
+            setOpenToastD(true);
+
+        }
     };
 
     const updateGroup = () => {
-        const updatedGroups = titlesGroups.map(group => ({
-            ...group,
-            name: editTitles[group.id] ?? group.name,
-        }));
-        setTitlesGroups(updatedGroups);
-        localStorage.setItem(GROUPS_KEY, JSON.stringify(updatedGroups));
-        setEditTitles({});
-        setRowEditMode("");
+        try {
+            const updatedGroups = titlesGroups.map(group => ({
+                ...group,
+                name: editGroups[group.id] ?? group.name,
+            }));
+            setTitlesGroups(updatedGroups);
+            localStorage.setItem(GROUPS_KEY, JSON.stringify(updatedGroups));
+            setEditGroups({});
+            setRowEditMode("");
 
-        loadGroups();
+            loadGroups();
+            setOpenToastC(true);
+        } catch (error: any) {
+            console.log(error);
+            setOpenToastD(true);
+
+        }
     };
 
     const saveGroups = (groupName: string) => {
@@ -160,11 +188,18 @@ export const SearchResultTitlesVerification = () => {
     }
 
     const deleteGroup = (id: string) => {
-        const updatedGroups = titlesGroups.filter(item => item.id !== id);
-        setTitlesGroups(updatedGroups);
-        localStorage.setItem(GROUPS_KEY, JSON.stringify(updatedGroups));
+        try {
+            const updatedGroups = titlesGroups.filter(item => item.id !== id);
+            setTitlesGroups(updatedGroups);
+            localStorage.setItem(GROUPS_KEY, JSON.stringify(updatedGroups));
 
-        loadGroups();
+            loadGroups();
+            setOpenToastC(true);
+        } catch (error: any) {
+            console.log(error);
+            setOpenToastD(true);
+
+        }
     }
 
     const handleSaveGroup = (groupName: string) => {
@@ -172,36 +207,26 @@ export const SearchResultTitlesVerification = () => {
             saveGroups(groupName);
             setIsSaveDialogOpen(false);
             setSaveError("");
-        } catch (error) {
+            setOpenToastC(true);
+        } catch (error: any) {
             console.error("Error saving search:", error);
-            // Set error message to be displayed in the dialog
-            if (error instanceof Error) {
-                setSaveError(error.message);
-            } else {
-                setSaveError(
-                    t("home:search_save_error") ||
-                    "Error saving search. Please try again."
-                );
-            }
+            setSaveError(error);
+            setOpenToastD(true);
         }
     }
 
     const handleSaveTitles = (titles: string[]) => {
         try {
+
             saveTitles(titles);
-            setisSaveDialogMultipleInputsOpen(false);
+            setIsSaveDialogMultipleInputsOpen(false);
             setSaveError("");
-        } catch (error) {
+            setOpenToastC(true);
+        }
+        catch (error: any) {
             console.error("Error saving search:", error);
-            // Set error message to be displayed in the dialog
-            if (error instanceof Error) {
-                setSaveError(error.message);
-            } else {
-                setSaveError(
-                    t("home:search_save_error") ||
-                    "Error saving search. Please try again."
-                );
-            }
+            setSaveError(error);
+            setOpenToastD(true);
         }
     }
 
@@ -212,19 +237,27 @@ export const SearchResultTitlesVerification = () => {
 
     const saveMultipleTitles = () => {
         setSaveError("");
-        setisSaveDialogMultipleInputsOpen(true)
+        setIsSaveDialogMultipleInputsOpen(true)
     }
 
     const saveGroupsLinksWithTitles = (updatedGroups: TitlesGroups[], newTitles?: TitleToExclude[]) => {
-        setTitlesGroups(updatedGroups);
-        localStorage.setItem(GROUPS_KEY, JSON.stringify(updatedGroups));
-        loadGroups();
+        try {
+            setTitlesGroups(updatedGroups);
+            localStorage.setItem(GROUPS_KEY, JSON.stringify(updatedGroups));
+            loadGroups();
 
-        if (newTitles) {
-            const updatedTitles = [...titlesToVerify, ...newTitles];
-            setTitlesToVerify(updatedTitles);
-            localStorage.setItem(TITLES_KEY, JSON.stringify(updatedTitles));
-            loadTitles();
+            if (newTitles) {
+                const updatedTitles = [...titlesToVerify, ...newTitles];
+                setTitlesToVerify(updatedTitles);
+                localStorage.setItem(TITLES_KEY, JSON.stringify(updatedTitles));
+                loadTitles();
+            }
+            setSaveError("");
+            setOpenToastC(true);
+        } catch (error: any) {
+            console.error("Error saving search:", error);
+            setSaveError(error);
+            setOpenToastD(true);
         }
     }
 
@@ -263,6 +296,20 @@ export const SearchResultTitlesVerification = () => {
 
     return (
         <>
+            <SnackbarToast
+                open={openToastD}
+                setOpen={setOpenToastD}
+                messageStr={t("warnings:error")}
+                type="error"
+            />
+
+            <SnackbarToast
+                open={openToastC}
+                setOpen={setOpenToastC}
+                messageStr={t("warnings:success")}
+                type="success"
+            />
+
             <SaveDialog
                 isOpen={isSaveDialogOpen}
                 onClose={() => setIsSaveDialogOpen(false)}
@@ -275,7 +322,7 @@ export const SearchResultTitlesVerification = () => {
 
             <SaveDialogMultipleInputs
                 isOpen={isSaveDialogMultipleInputsOpen}
-                onClose={() => setisSaveDialogMultipleInputsOpen(false)}
+                onClose={() => setIsSaveDialogMultipleInputsOpen(false)}
                 onSave={handleSaveTitles}
                 externalError={saveError}
             />
@@ -292,11 +339,11 @@ export const SearchResultTitlesVerification = () => {
                 {t("configurations:sections:verifyResults") || "Verification titles"}
             </h3>
             <Box className="titles-verification-action-buttons">
-                <IconButton className="action-button" size="small" aria-label="list view" title="List View" onClick={() => { setIsListView(true); setRowEditMode(""); setEditTitles({}) }}>
+                <IconButton className="action-button" size="small" aria-label="list view" title="List View" onClick={() => setIsListView(true)}>
                     <ViewListIcon />
                 </IconButton>
 
-                <IconButton className="action-button" size="small" aria-label="grouped view" title="Grouped View" onClick={() => { setIsListView(false); setRowEditMode(""); setEditTitles({}) }}>
+                <IconButton className="action-button" size="small" aria-label="grouped view" title="Grouped View" onClick={() => setIsListView(false)}>
                     <ViewModuleIcon />
                 </IconButton>
 
@@ -354,8 +401,9 @@ export const SearchResultTitlesVerification = () => {
                                             <TextField
                                                 className="group-edit-input"
                                                 variant="standard"
-                                                value={!editTitles[item.id] ? item.title : editTitles[item.id]}
+                                                value={editTitles[item.id] === undefined ? item.title : editTitles[item.id]}
                                                 onChange={(e) => setEditTitles(prev => ({ ...prev, [item.id]: e.target.value }))}
+                                                onBlur={(e) => setEditTitles(prev => ({ ...prev, [item.id]: e.target.value || item.title }))}
                                             />
                                             :
                                             item.title
@@ -411,8 +459,9 @@ export const SearchResultTitlesVerification = () => {
                                                 <TextField
                                                     className="group-edit-input"
                                                     variant="standard"
-                                                    value={!editTitles[item.id] ? item.name : editTitles[item.id]}
-                                                    onChange={(e) => setEditTitles(prev => ({ ...prev, [item.id]: e.target.value }))}
+                                                    value={editGroups[item.id] === undefined ? item.name : editGroups[item.id]}
+                                                    onChange={(e) => setEditGroups(prev => ({ ...prev, [item.id]: e.target.value }))}
+                                                    onBlur={(e) => setEditGroups(prev => ({ ...prev, [item.id]: e.target.value || item.name }))}
                                                 />
                                                 :
                                                 item.name

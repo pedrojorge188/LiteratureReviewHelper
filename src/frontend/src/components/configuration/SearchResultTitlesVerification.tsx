@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TitlesGroups, TitleToExclude } from "../types";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -71,6 +71,8 @@ export const SearchResultTitlesVerification = () => {
 
     const [titlesToVerify, setTitlesToVerify] = useState<TitleToExclude[]>(() => loadTitles());
     const [titlesGroups, setTitlesGroups] = useState<TitlesGroups[]>(() => loadGroups());
+    const [searchTitlesToVerify, setSearchTitlesToVerify] = useState<TitleToExclude[]>([]);
+    const [searchTitlesGroups, setSearchTitlesGroups] = useState<TitlesGroups[]>([]);
     const [isListView, setIsListView] = useState<boolean>(true);
     const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
     const [isSaveDialogMultipleInputsOpen, setisSaveDialogMultipleInputsOpen] = useState(false);
@@ -79,6 +81,11 @@ export const SearchResultTitlesVerification = () => {
     const [editTitles, setEditTitles] = useState<{ [id: string]: string }>({});
     const [isDependenciesModalOpen, setDependenciesModalOpen] = useState(false);
     const [expandedRowsIds, setExpandedRowsIds] = useState<string[]>([]);
+
+    useEffect(() => {
+        setSearchTitlesToVerify(titlesToVerify);
+        setSearchTitlesGroups(titlesGroups);
+    }, [titlesToVerify, titlesGroups]);
 
 
     const saveTitles = (titles: string[]) => {
@@ -240,6 +247,20 @@ export const SearchResultTitlesVerification = () => {
         }
     }
 
+    const onSearchValueChange = (searchTerm: string) => {
+        if (isListView) {
+            const filteredTitles = titlesToVerify.filter(title =>
+                title.title.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            setSearchTitlesToVerify(filteredTitles);
+        } else {
+            const filteredGroups = titlesGroups.filter(group =>
+                group.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            setSearchTitlesGroups(filteredGroups);
+        }
+    }
+
     return (
         <>
             <SaveDialog
@@ -305,174 +326,154 @@ export const SearchResultTitlesVerification = () => {
                         <AddLinkIcon />
                     </IconButton>
                 </Tooltip>
+                <TextField
+                    onChange={(e) => onSearchValueChange(e.target.value)}
+                    label="Search"
+                    variant="standard"
+                    placeholder={isListView ? "Introduce the title name" : "Introduce the group name"}
+                    sx={{ minWidth: 300, pb: 2 }} />
             </Box>
-            {isListView ?
-                <List className="titles-list">
-                    {titlesToVerify.map((item) =>
-                        <ListItem
-                            key={item.id}
-                            className="title-item"
-                            sx={{
-                                bgcolor: "background.paper",
-                                borderRadius: 1,
-                                mb: 1,
-                                minHeight: 80,
-                                display: "flex",
-                                alignItems: "center",
-                                "&:hover": { bgcolor: "grey.300" }
-                            }}
-                            secondaryAction={
-                                <Box className="actions-box" sx={{ display: "flex", gap: 1 }}>
-                                    <IconButton size="small" className="action-btn edit-btn" style={{ display: item.id === isRowEditMode ? 'none' : 'initial' }}>
-                                        <EditIcon onClick={() => setRowEditMode(item.id)} />
-                                    </IconButton>
-                                    <IconButton size="small" className="action-btn delete-btn" style={{ display: item.id === isRowEditMode ? 'none' : 'initial' }} onClick={() => deleteTitle(item.id)}>
-                                        <DeleteIcon />
-                                    </IconButton>
-                                    <IconButton size="small" className="action-btn save-btn" style={{ display: item.id === isRowEditMode ? 'initial' : 'none' }} onClick={() => updateTitle()}>
-                                        <CheckIcon />
-                                    </IconButton>
-                                    <IconButton size="small" className="action-btn cancel-btn" style={{ display: item.id === isRowEditMode ? 'initial' : 'none' }} onClick={() => setRowEditMode("")}>
-                                        <CloseIcon />
-                                    </IconButton>
-                                </Box>
-                            }
-                        >
-                            <ListItemIcon className="title-icon">
-                                <LabelIcon />
-                            </ListItemIcon>
-
-                            <ListItemText
-                                className="title-text"
-                                primary={
-                                    item.id === isRowEditMode ?
-                                        <TextField
-                                            className="title-edit-input"
-                                            style={{ width: '90%' }}
-                                            variant="standard"
-                                            value={!editTitles[item.id] ? item.title : editTitles[item.id]}
-                                            onChange={(e) => setEditTitles(prev => ({ ...prev, [item.id]: e.target.value }))}
-                                        />
-                                        :
-                                        item.title
-                                }
-                                secondary={
-                                    <Typography hidden={item.id === isRowEditMode} component="div" variant="body2" className="title-groups">{getTitlesGroups(item.id)}</Typography>
-                                }
-                            />
-                        </ListItem>,
-                    )}
-                </List>
-                :
-                <List className="groups-list">
-                    {titlesGroups.map((item) =>
-                        <Box key={item.id} className="group-box">
+            <Box className="list-box">
+                {isListView ?
+                    <List className="titles-list">
+                        {searchTitlesToVerify.map((item) =>
                             <ListItem
-                                className="group-item"
-                                sx={{
-                                    bgcolor: "background.paper",
-                                    borderRadius: 1,
-                                    mb: 1,
-                                    minHeight: 80,
-                                    display: "flex",
-                                    alignItems: "center",
-                                    "&:hover": { bgcolor: "grey.300" }
-                                }}
+                                key={item.id}
+                                className="title-item"
                                 secondaryAction={
                                     <Box className="actions-box" sx={{ display: "flex", gap: 1 }}>
                                         <IconButton size="small" className="action-btn edit-btn" style={{ display: item.id === isRowEditMode ? 'none' : 'initial' }}>
                                             <EditIcon onClick={() => setRowEditMode(item.id)} />
                                         </IconButton>
-                                        <IconButton size="small" className="action-btn delete-btn" style={{ display: item.id === isRowEditMode ? 'none' : 'initial' }} onClick={() => deleteGroup(item.id)}>
+                                        <IconButton size="small" className="action-btn delete-btn" style={{ display: item.id === isRowEditMode ? 'none' : 'initial' }} onClick={() => deleteTitle(item.id)}>
                                             <DeleteIcon />
                                         </IconButton>
-                                        <IconButton size="small" className="action-btn save-btn" style={{ display: item.id === isRowEditMode ? 'initial' : 'none' }} onClick={() => updateGroup()}>
+                                        <IconButton size="small" className="action-btn save-btn" style={{ display: item.id === isRowEditMode ? 'initial' : 'none' }} onClick={() => updateTitle()}>
                                             <CheckIcon />
                                         </IconButton>
                                         <IconButton size="small" className="action-btn cancel-btn" style={{ display: item.id === isRowEditMode ? 'initial' : 'none' }} onClick={() => setRowEditMode("")}>
                                             <CloseIcon />
                                         </IconButton>
-
-                                        <IconButton
-                                            hidden={item.titles.length === 0}
-                                            size="small"
-                                            className="action-btn expand-btn"
-                                            aria-label={expandedRowsIds.includes(item.id) ? "collapse" : "expand"}
-                                            onClick={() => changeRowState(item.id)}
-                                        >
-                                            {expandedRowsIds.includes(item.id) ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                                        </IconButton>
                                     </Box>
                                 }
                             >
-                                <ListItemIcon className="group-icon">
-                                    <FolderIcon />
+                                <ListItemIcon className="title-icon">
+                                    <LabelIcon />
                                 </ListItemIcon>
 
                                 <ListItemText
-                                    className="group-text"
+                                    className="title-text"
                                     primary={
                                         item.id === isRowEditMode ?
                                             <TextField
                                                 className="group-edit-input"
-                                                style={{ width: "90%" }}
                                                 variant="standard"
-                                                value={!editTitles[item.id] ? item.name : editTitles[item.id]}
+                                                value={!editTitles[item.id] ? item.title : editTitles[item.id]}
                                                 onChange={(e) => setEditTitles(prev => ({ ...prev, [item.id]: e.target.value }))}
                                             />
                                             :
-                                            item.name
+                                            item.title
                                     }
                                     secondary={
-                                        <Box className="group-secondary" hidden={item.id === isRowEditMode}>
-                                            <Typography component="div" variant="body2" className="group-count">
-                                                {item.titles.length}
-                                            </Typography>
-                                            <Typography component="div" variant="body2" className="group-date">
-                                                Creation date: {item.creationDate.toLocaleString()}
-                                            </Typography>
-                                        </Box>
+                                        <Typography hidden={item.id === isRowEditMode} component="div" variant="body2" className="title-groups">{getTitlesGroups(item.id)}</Typography>
                                     }
                                 />
-                            </ListItem>
+                            </ListItem>,
+                        )}
+                    </List>
+                    :
+                    <List className="groups-list">
+                        {searchTitlesGroups.map((item) =>
+                            <Box key={item.id} className="group-box">
+                                <ListItem
+                                    className="group-item"
+                                    secondaryAction={
+                                        <Box className="actions-box" sx={{ display: "flex", gap: 1 }}>
+                                            <IconButton size="small" className="action-btn edit-btn" style={{ display: item.id === isRowEditMode ? 'none' : 'initial' }}>
+                                                <EditIcon onClick={() => setRowEditMode(item.id)} />
+                                            </IconButton>
+                                            <IconButton size="small" className="action-btn delete-btn" style={{ display: item.id === isRowEditMode ? 'none' : 'initial' }} onClick={() => deleteGroup(item.id)}>
+                                                <DeleteIcon />
+                                            </IconButton>
+                                            <IconButton size="small" className="action-btn save-btn" style={{ display: item.id === isRowEditMode ? 'initial' : 'none' }} onClick={() => updateGroup()}>
+                                                <CheckIcon />
+                                            </IconButton>
+                                            <IconButton size="small" className="action-btn cancel-btn" style={{ display: item.id === isRowEditMode ? 'initial' : 'none' }} onClick={() => setRowEditMode("")}>
+                                                <CloseIcon />
+                                            </IconButton>
 
-                            <Collapse in={expandedRowsIds.includes(item.id)} timeout="auto" unmountOnExit>
-                                <List dense className="group-titles-list">
-                                    {getGroupTitles(item.titles).map((title) => (
-                                        <ListItem
-                                            key={`${item.id}-${title.id}`}
-                                            className="group-title-item"
-                                            component="div"
-                                            disableGutters
-                                            sx={{
-                                                bgcolor: "#fff",
-                                                borderRadius: 1,
-                                                mb: 1,
-                                                minHeight: 50,
-                                                display: "flex",
-                                                alignItems: "center",
-                                            }}
-                                        >
-                                            <ListItemIcon className="group-title-icon" sx={{ pl: 2 }}>
-                                                <LabelIcon />
-                                            </ListItemIcon>
+                                            <IconButton
+                                                hidden={item.titles.length === 0}
+                                                size="small"
+                                                className="action-btn expand-btn"
+                                                aria-label={expandedRowsIds.includes(item.id) ? "collapse" : "expand"}
+                                                onClick={() => changeRowState(item.id)}
+                                            >
+                                                {expandedRowsIds.includes(item.id) ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                                            </IconButton>
+                                        </Box>
+                                    }
+                                >
+                                    <ListItemIcon className="group-icon">
+                                        <FolderIcon />
+                                    </ListItemIcon>
 
-                                            <ListItemText
-                                                className="group-title-text"
-                                                primary={
-                                                    <Typography component="div" variant="body2">
-                                                        {title.title}
-                                                    </Typography>
-                                                }
-                                            />
-                                        </ListItem>
-                                    ))}
-                                </List>
-                            </Collapse>
-                        </Box>
-                    )}
-                </List>
-            }
+                                    <ListItemText
+                                        className="group-text"
+                                        primary={
+                                            item.id === isRowEditMode ?
+                                                <TextField
+                                                    className="group-edit-input"
+                                                    variant="standard"
+                                                    value={!editTitles[item.id] ? item.name : editTitles[item.id]}
+                                                    onChange={(e) => setEditTitles(prev => ({ ...prev, [item.id]: e.target.value }))}
+                                                />
+                                                :
+                                                item.name
+                                        }
+                                        secondary={
+                                            <Box className="group-secondary" hidden={item.id === isRowEditMode}>
+                                                <Typography component="div" variant="body2" className="group-count">
+                                                    {item.titles.length}
+                                                </Typography>
+                                                <Typography component="div" variant="body2" className="group-date">
+                                                    Creation date: {item.creationDate.toLocaleString()}
+                                                </Typography>
+                                            </Box>
+                                        }
+                                    />
+                                </ListItem>
+
+                                <Collapse in={expandedRowsIds.includes(item.id)} timeout="auto" unmountOnExit>
+                                    <List dense className="group-titles-list">
+                                        {getGroupTitles(item.titles).map((title) => (
+                                            <ListItem
+                                                key={`${item.id}-${title.id}`}
+                                                className="group-title-item"
+                                                component="div"
+                                                disableGutters
+                                            >
+                                                <ListItemIcon className="group-title-icon" sx={{ pl: 2 }}>
+                                                    <LabelIcon />
+                                                </ListItemIcon>
+
+                                                <ListItemText
+                                                    className="group-title-text"
+                                                    primary={
+                                                        <Typography component="div" variant="body2">
+                                                            {title.title}
+                                                        </Typography>
+                                                    }
+                                                />
+                                            </ListItem>
+                                        ))}
+                                    </List>
+                                </Collapse>
+                            </Box>
+                        )}
+                    </List>
+                }
+            </Box>
         </>
     )
 }

@@ -7,8 +7,20 @@
 /* ITEM PRINCIPAL */
 .title-item,
 .group-item {
-    transition: background 0.2s ease;
+    background-color: #fff;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+
+    &:hover {
+        background-color: #e0e0e0;
+    }
 }
+
+
+.tit
 
 /* ICONS */
 .title-icon,
@@ -59,9 +71,46 @@
 }
 
 .group-title-item {
-    border-radius: 6px;
+    background-color: #fff;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
 }
 
 .group-title-text {
     font-size: 0.9rem;
+}
+
+.list-box {
+    height: 600px;
+    overflow: auto;
+    padding: 1;
+
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: transparent;
+        border-radius: 3px;
+    }
+
+    &:hover {
+        &::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.3);
+        }
+    }
+}
+
+.group-edit-input {
+    width: 90%;
 }

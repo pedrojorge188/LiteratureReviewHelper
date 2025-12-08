@@ -9,7 +9,7 @@ import {
   SearchParameters,
 } from "./types";
 import { ArticlesList } from "./ArticlesList";
-import { LoadingCircle, CommonLink} from "../components/shared";
+import { LoadingCircle, CommonLink } from "../components/shared";
 import { ChipInput } from "../components/shared/ChipInput";
 import { Paths } from "../routes/RouteConfig";
 import Typography from "@mui/material/Typography";
@@ -42,6 +42,8 @@ import {
 } from "../utils";
 import Tooltip from "@mui/material/Tooltip";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import { useSelector } from "react-redux";
+import { setMainPageState } from "../store/ducks/mainpage";
 
 type FilterKey =
   | "authors"
@@ -53,6 +55,8 @@ type FilterKey =
 export const MainPage = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch<any>();
+  const mainState = useSelector((state: any) => state.MAIN_PAGE);
+
   const routes = Paths();
   const [queries, setQueries] = useState<Query[]>([{ value: "" }]);
   const [anoDe, setAnoDe] = useState<string>("");
@@ -105,7 +109,6 @@ export const MainPage = () => {
       if (interval) clearInterval(interval);
     };
   }, [isLoading]);
-
 
   const adicionarQuery = () => {
     setQueries(addQuery(queries));
@@ -195,7 +198,6 @@ export const MainPage = () => {
     const convertedQueries = params.queries.map((q, i) =>
       i === 0 ? { value: q.value } : { value: q.value, operator: q.operator }
     );
-
     setQueries(convertedQueries);
     setAnoDe(params.yearFrom || "");
     setAnoAte(params.yearTo || "");
@@ -206,7 +208,6 @@ export const MainPage = () => {
     setExcludeVenues(params.excludeVenues || []);
     setBibliotecas(params.libraries || []);
     setSelectedFilters(inferSelectedFilters(params));
-
     setIsImportDialogOpen(false);
     setOpenToastE(true);
   };
@@ -245,7 +246,7 @@ export const MainPage = () => {
   const pesquisar = async () => {
     if (queries.length === 1 && queries[0].value.trim() === "") {
       setOpenToastB(true);
-      return
+      return;
     }
 
     if (bibliotecas.length === 0) {
@@ -332,6 +333,7 @@ export const MainPage = () => {
   // Load search parameters from sessionStorage if coming from HistoryPage
   useEffect(() => {
     const loadedSearch = sessionStorage.getItem("loadedSearch");
+
     if (loadedSearch) {
       try {
         const params = JSON.parse(loadedSearch);
@@ -350,8 +352,53 @@ export const MainPage = () => {
       } catch (error) {
         console.error("Error loading search from history:", error);
       }
+    } else {
+      if (mainState) {
+        setQueries(mainState.queries);
+        setAnoDe(mainState.anoDe);
+        setAnoAte(mainState.anoAte);
+        setAuthors(mainState.authors);
+        setVenues(mainState.venues);
+        setExcludeAuthors(mainState.excludeAuthors);
+        setExcludeVenues(mainState.excludeVenues);
+        setExcludeTitles(mainState.excludeTitles);
+        setBibliotecas(mainState.bibliotecas);
+        setSelectedFilters(mainState.selectedFilters);
+        setResponse(mainState.response);
+      }
     }
   }, []);
+
+  useEffect(() => {
+    dispatch(
+      setMainPageState({
+        queries,
+        anoDe,
+        anoAte,
+        authors,
+        venues,
+        excludeAuthors,
+        excludeVenues,
+        excludeTitles,
+        bibliotecas,
+        selectedFilters,
+        response,
+      })
+    );
+  }, [
+    queries,
+    anoDe,
+    anoAte,
+    authors,
+    venues,
+    excludeAuthors,
+    excludeVenues,
+    excludeTitles,
+    bibliotecas,
+    selectedFilters,
+    response,
+  ]);
+  //fim usar estado redux
 
   const renderFilterRow = (key: FilterKey) => {
     switch (key) {
@@ -475,7 +522,7 @@ export const MainPage = () => {
         onClose={() => setIsImportDialogOpen(false)}
         onLoad={handleLoadSearch}
       />
-  
+
       <div
         className={`container-article ${
           showList && response ? "show" : "hide"
@@ -571,10 +618,7 @@ export const MainPage = () => {
               label={t("home:label_show_built_query")}
             />
             {showBuiltQuery && (
-              <textarea
-                value={buildQueryString(queries)}
-                readOnly
-              />
+              <textarea value={buildQueryString(queries)} readOnly />
             )}
           </div>
 
@@ -675,7 +719,8 @@ export const MainPage = () => {
             <div className="biblioteca-row">
               <select
                 disabled={
-                  availableLibraries.filter((lib) => !bibliotecas.includes(lib)).length === 0
+                  availableLibraries.filter((lib) => !bibliotecas.includes(lib))
+                    .length === 0
                 }
                 value={bibliotecaSelecionada}
                 onChange={(e) => {
@@ -708,7 +753,15 @@ export const MainPage = () => {
                   link={{ external: false, url: routes.libListPage.path }}
                   title={t("sideMenu:configuration")}
                 >
-                  <p style={{ fontSize: "12px", color: "#0098e3ff", marginTop: "4px", textDecoration: "underline", cursor: "pointer" }}>
+                  <p
+                    style={{
+                      fontSize: "12px",
+                      color: "#0098e3ff",
+                      marginTop: "4px",
+                      textDecoration: "underline",
+                      cursor: "pointer",
+                    }}
+                  >
                     {t("home:configure_here")}
                   </p>
                 </CommonLink>
@@ -716,8 +769,11 @@ export const MainPage = () => {
             )}
 
             {availableLibraries.length > 0 &&
-              availableLibraries.filter((lib) => !bibliotecas.includes(lib)).length === 0 && (
-                <p style={{ fontSize: "12px", color: "#888", marginTop: "4px" }}>
+              availableLibraries.filter((lib) => !bibliotecas.includes(lib))
+                .length === 0 && (
+                <p
+                  style={{ fontSize: "12px", color: "#888", marginTop: "4px" }}
+                >
                   {t("home:all_libraries_added")}
                 </p>
               )}

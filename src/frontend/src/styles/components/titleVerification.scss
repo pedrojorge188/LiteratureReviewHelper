@@ -20,8 +20,6 @@
 }
 
 
-.tit
-
 /* ICONS */
 .title-icon,
 .group-icon,
@@ -113,4 +111,16 @@
 
 .group-edit-input {
     width: 90%;
+}
+
+.titles-verification-action-buttons {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+
+    .action-button {
+        &:hover {
+            background: none;
+        }
+    }
 }

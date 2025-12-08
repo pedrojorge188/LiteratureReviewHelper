@@ -291,41 +291,27 @@ export const SearchResultTitlesVerification = () => {
             <h3 className="bibliotecas-lista-titulo">
                 {t("configurations:sections:verifyResults") || "Verification titles"}
             </h3>
-            <Box
-                sx={{
-                    display: "flex",
-                    gap: 2,
-                    mb: 2,
-                }}
-            >
-                <Tooltip title="List View">
-                    <IconButton aria-label="list view" onClick={() => { setIsListView(true); setRowEditMode(""); setEditTitles({}) }}>
-                        <ViewListIcon />
-                    </IconButton>
-                </Tooltip>
+            <Box className="titles-verification-action-buttons">
+                <IconButton className="action-button" size="small" aria-label="list view" title="List View" onClick={() => { setIsListView(true); setRowEditMode(""); setEditTitles({}) }}>
+                    <ViewListIcon />
+                </IconButton>
 
-                <Tooltip title="Grouped View">
-                    <IconButton aria-label="grouped view" onClick={() => { setIsListView(false); setRowEditMode(""); setEditTitles({}) }}>
-                        <ViewModuleIcon />
-                    </IconButton>
-                </Tooltip>
+                <IconButton className="action-button" size="small" aria-label="grouped view" title="Grouped View" onClick={() => { setIsListView(false); setRowEditMode(""); setEditTitles({}) }}>
+                    <ViewModuleIcon />
+                </IconButton>
 
-                <Tooltip title="Add Title">
-                    <IconButton aria-label="add title" onClick={saveMultipleTitles}>
-                        <AddIcon />
-                    </IconButton>
-                </Tooltip>
+                <IconButton className="action-button" size="small" aria-label="add title" title="Add Title" onClick={saveMultipleTitles}>
+                    <AddIcon />
+                </IconButton>
 
-                <Tooltip title="Add Group">
-                    <IconButton aria-label="add group" onClick={save}>
-                        <GroupAddIcon />
-                    </IconButton>
-                </Tooltip>
-                <Tooltip title="Manage links">
-                    <IconButton aria-label="add link" onClick={() => setDependenciesModalOpen(true)}>
-                        <AddLinkIcon />
-                    </IconButton>
-                </Tooltip>
+                <IconButton className="action-button" size="small" aria-label="add group" title="Add Group" onClick={save}>
+                    <GroupAddIcon />
+                </IconButton>
+
+                <IconButton className="action-button" size="small" aria-label="add link" title="Manage links" onClick={() => setDependenciesModalOpen(true)}>
+                    <AddLinkIcon />
+                </IconButton>
+
                 <TextField
                     onChange={(e) => onSearchValueChange(e.target.value)}
                     label="Search"

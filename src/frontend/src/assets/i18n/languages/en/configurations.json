@@ -27,5 +27,24 @@
   },
   "sections": {
     "verifyResults": "Verification Titles"
-  }
+  },
+  "deleteDialog": {
+    "titleHeader": "Are you sure you want to delete this title?",
+    "groupHeader": "Are you sure you want to delete this group?"
+  },
+  "saveDialog": {
+    "dialogHeader": "Create Group",
+    "dialogPrompt": "Enter the group name",
+    "dialogPlaceholder": "e.g., Aerospace"
+  },
+  "listView": "List View",
+  "groupedView": "Grouped View",
+  "addTitle": "Add Title",
+  "addGroup": "Add Group",
+  "manageLinks": "Manage links",
+  "enterTitleName": "Introduce the title name",
+  "enterGroupName": "Introduce the group name",
+  "creationDate": "Creation date:",
+  "expand": "Expand",
+  "collapse": "Collapse"
 }

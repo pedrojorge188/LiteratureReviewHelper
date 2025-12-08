@@ -881,14 +881,20 @@ export const MainPage = () => {
 
           {/* Titulos */}
           <div className="section">
-            <label>Titles used for query verification
-              <Tooltip title={t("warnings:advancedquery")}>
+            <label>{t("home:titlesUsedForQueryVerification") || "Titles used for query verification"}
+              <Tooltip title={t("home:titlesUsedForVerificationHelp")}>
                 <span className="rows-container__label__icon">
                   <HelpOutlineIcon />
                 </span>
               </Tooltip>
             </label>
             <Box>
+              <Typography variant="body1" sx={{ mb: 1 }}>
+                <Trans
+                  i18nKey="home:autoCompletePrompt"
+                  components={{ bold: <b /> }}
+                />
+              </Typography>
               <Autocomplete
                 multiple
                 options={autoCompleteOptions || []}
@@ -896,8 +902,9 @@ export const MainPage = () => {
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 onChange={onTitlesSelectionChange}
                 getOptionLabel={(option) => ("title" in option ? option.title : option.name)}
-                groupBy={(option) => ("title" in option ? "Titles" : "Groups")}
-                renderInput={(params) => <TextField {...params} size="small" label="Select titles or groups" />}
+                groupBy={(option) => ("title" in option ? t("home:titlesLabelAutoComplete") || "Titles"
+                  : t("home:groupsLabelAutoComplete") || "Groups")}
+                renderInput={(params) => <TextField {...params} size="small" label={t("home:selectTitlesOrGroups") || "Select titles or groups"} />}
                 renderValue={(value, getTagProps) =>
                   value.map((option, index) => {
                     const label = "title" in option ? option.title : option.name;

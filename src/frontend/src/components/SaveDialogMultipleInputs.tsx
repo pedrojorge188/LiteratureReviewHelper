@@ -72,16 +72,17 @@ export const SaveDialogMultipleInputs = ({
       >
         <Box className="modal-header">
           <Typography variant="h4" className="modal-title">
-            {"Add Titles"}
+            {t("saveDialogMultipleInputs:header") || "Add Titles"}
           </Typography>
 
-          <IconButton onClick={handleClose} size="small" className="btn-close">
+          <IconButton onClick={handleClose} size="small" className="btn-close" title={t("import:close") || "Close"}>
             <CloseIcon />
           </IconButton>
         </Box>
 
         <Typography className="modal-description">
-          {"Add multiple titles. Remove any title by clicking ×."}
+          {t("saveDialogMultipleInputs:prompt")
+            || "Add multiple titles. Remove any title by clicking ×."}
         </Typography>
 
         <Box className="inputs-wrapper">
@@ -94,9 +95,9 @@ export const SaveDialogMultipleInputs = ({
                 className="input-field"
                 value={title}
                 onChange={(e) => handleTitleChange(index, e.target.value)}
-                placeholder="Enter title"
+                placeholder={t("saveDialogMultipleInputs:placeholder") || "Enter title"}
               />
-              <IconButton className="btn-delete" onClick={() => removeInput(index)}>
+              <IconButton className="btn-delete" onClick={() => removeInput(index)} title={t("savedsearchcard:delete") || "Delete"}>
                 <CloseIcon />
               </IconButton>
             </Box>
@@ -104,7 +105,7 @@ export const SaveDialogMultipleInputs = ({
         </Box>
 
         <Box className="add-button-wrapper">
-          <IconButton className="btn-add" onClick={addInput}>
+          <IconButton className="btn-add" onClick={addInput} title={t("home:botao_adicionar") || "Add"}>
             <AddIcon />
           </IconButton>
         </Box>
@@ -117,11 +118,11 @@ export const SaveDialogMultipleInputs = ({
 
         <Box className="modal-footer">
           <Button className="btn-secondary" onClick={handleClose}>
-            Cancel
+            {t("editSearchDialog:cancel") || "Cancel"}
           </Button>
 
           <Button className="btn-primary" onClick={handleSave}>
-            Save
+            {t("editSearchDialog:save") || "Save"}
           </Button>
         </Box>
       </Box>

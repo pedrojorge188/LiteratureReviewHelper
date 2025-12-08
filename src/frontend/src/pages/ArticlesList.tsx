@@ -201,7 +201,8 @@ export const ArticlesList = ({ response, setShow, titlesUsedForVerification }: A
                   )}
                 </div>
                 <Alert hidden={missingTitles.length < 1} severity="warning" sx={{ mt: 2 }}>
-                  <AlertTitle>Titles missing</AlertTitle>
+                  <AlertTitle>{t("warnings:missingTitlesHeader") || "Articles missing"}</AlertTitle>
+                  <span>{t("warnings:missingTitlesBody") || "The following articles are not present in the response"}</span>
                   <ul>
                     {missingTitles.map((title) => (
                       <li key={title}>{title}</li>

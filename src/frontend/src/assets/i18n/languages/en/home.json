@@ -41,5 +41,11 @@
   "no_libraries_configured": "You need to configure libraries in the configurations page first.",
   "all_libraries_added": "There are no more libraries to add.",
   "configure_here": "configure here",
-  "search_still_loading": "We are still searching for results... this may take a few moments."
+  "search_still_loading": "We are still searching for results... this may take a few moments.",
+  "titlesUsedForQueryVerification": "Titles used for query verification",
+  "selectTitlesOrGroups": "Select titles or groups",
+  "titlesLabelAutoComplete": "Titles",
+  "groupsLabelAutoComplete": "Groups",
+  "autoCompletePrompt": "Type a value and press <bold>Enter</bold> to add it ",
+  "titlesUsedForVerificationHelp": "Verification titles are used to validate the query. If the search does not contain the defined titles, a warning will be displayed"
 }

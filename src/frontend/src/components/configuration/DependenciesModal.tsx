@@ -16,6 +16,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { TitlesGroups, TitleToExclude } from "../types";
 import { v4 as uuidv4 } from 'uuid';
 import "../../styles/components/manageGroupsModal.scss"
+import { useTranslation } from "react-i18next";
 
 interface DependenciesModalProps {
     titles: TitleToExclude[];
@@ -32,6 +33,7 @@ export const DependenciesModal = ({
     onClose,
     onGroupsUpdate
 }: DependenciesModalProps) => {
+    const { t } = useTranslation();
     const [titlesGroups, setTitlesGroups] = useState<TitlesGroups[]>([]);
     const [searchTitlesGroups, setSearchTitlesGroups] = useState<TitlesGroups[]>([]);
     const [searchTerm, setSearchTerm] = useState<string>();
@@ -113,7 +115,7 @@ export const DependenciesModal = ({
             <Box className="mg-container" onClick={(e) => e.stopPropagation()}>
 
                 <Box className="mg-header">
-                    <Typography variant="h6" className="mg-title">Manage Groups</Typography>
+                    <Typography variant="h6" className="mg-title">{t("dependenciesModal:manageGroups") || "Manage Groups"}</Typography>
 
                     <IconButton onClick={onClose} className="mg-close-btn">
                         <CloseIcon />
@@ -122,10 +124,10 @@ export const DependenciesModal = ({
 
                 <TextField
                     className="search-field"
-                    label="Search"
+                    label={t("home:botao_pesquisar") || "Search"}
                     variant="standard"
                     onChange={(e) => onSearchValueChange(e.target.value)}
-                    placeholder="Introduce group name" />
+                    placeholder={t("configurations:enterGroupName") || "Introduce the group name"} />
 
                 {searchTitlesGroups.map(group => (
                     <Box key={group.id} className="mg-group-card">
@@ -148,6 +150,7 @@ export const DependenciesModal = ({
                                                 edge="end"
                                                 onClick={() => removeTitleFromGroup(group.id, titleId)}
                                                 className="mg-delete-btn"
+                                                title={t("savedsearchcard:delete") || "Delete"}
                                             >
                                                 <DeleteIcon fontSize="small" />
                                             </IconButton>
@@ -169,7 +172,7 @@ export const DependenciesModal = ({
                                     setNewTitles(prev => ({ ...prev, [group.id]: value }))
                                 }
                                 renderInput={(params) => (
-                                    <TextField {...params} size="small" placeholder="Add titles" />
+                                    <TextField {...params} size="small" placeholder={t("saveDialogMultipleInputs:header") || "Add Titles"} />
                                 )}
                                 className="mg-autocomplete"
                             />
@@ -178,6 +181,7 @@ export const DependenciesModal = ({
                                 variant="outlined"
                                 onClick={() => addTitlesToGroup(group.id)}
                                 className="mg-add-btn"
+                                title={t("home:botao_adicionar") || "Add"}
                             >
                                 <AddIcon fontSize="small" />
                             </Button>
@@ -188,7 +192,7 @@ export const DependenciesModal = ({
 
                 <Box className="mg-footer">
                     <Button variant="outlined" onClick={onClose} className="mg-close-footer-btn">
-                        Close
+                        {t("import:close") || "Close"}
                     </Button>
                 </Box>
             </Box>

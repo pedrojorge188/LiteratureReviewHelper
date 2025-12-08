@@ -346,8 +346,8 @@ export const SearchResultTitlesVerification = () => {
             <ConfirmDialog
                 isOpen={isConfirmDeleteTitleOpen}
                 message={
-                    t("favorites:confirm_delete") ||
-                    "Are you sure you want to delete this search?"
+                    t("configurations:deleteDialog:titleHeader") ||
+                    "Are you sure you want to delete this title?"
                 }
                 onConfirm={confirmDeleteTitle}
                 onCancel={cancelDeleteTitle}
@@ -356,8 +356,8 @@ export const SearchResultTitlesVerification = () => {
             <ConfirmDialog
                 isOpen={isConfirmDeleteGroupOpen}
                 message={
-                    t("favorites:confirm_delete") ||
-                    "Are you sure you want to delete this search?"
+                    t("configurations:deleteDialog:groupHeader") ||
+                    "Are you sure you want to delete this group?"
                 }
                 onConfirm={confirmDeleteGroup}
                 onCancel={cancelDeleteGroup}
@@ -381,9 +381,9 @@ export const SearchResultTitlesVerification = () => {
                 onClose={() => setIsSaveDialogOpen(false)}
                 onSave={handleSaveGroup}
                 externalError={saveError}
-                dialogHeader="Create Group"
-                dialogPrompt="Enter the group name"
-                dialogPlaceholder="e.g., Aerospace"
+                dialogHeader={t("configurations:saveDialog:dialogHeader")}
+                dialogPrompt={t("configurations:saveDialog:dialogPrompt")}
+                dialogPlaceholder={t("configurations:saveDialog:dialogPlaceholder")}
             />
 
             <SaveDialogMultipleInputs
@@ -405,32 +405,58 @@ export const SearchResultTitlesVerification = () => {
                 {t("configurations:sections:verifyResults") || "Verification titles"}
             </h3>
             <Box className="titles-verification-action-buttons">
-                <IconButton className="action-button" size="small" aria-label="list view" title="List View" onClick={() => setIsListView(true)}>
+                <IconButton
+                    className="action-button"
+                    size="small"
+                    aria-label="list view"
+                    title={t("configurations:listView") || "List View"}
+                    onClick={() => setIsListView(true)}>
                     <ViewListIcon />
                 </IconButton>
 
-                <IconButton className="action-button" size="small" aria-label="grouped view" title="Grouped View" onClick={() => setIsListView(false)}>
+                <IconButton
+                    className="action-button"
+                    size="small"
+                    aria-label="grouped view"
+                    title={t("configurations:groupedView") || "Grouped View"}
+                    onClick={() => setIsListView(false)}>
                     <ViewModuleIcon />
                 </IconButton>
 
-                <IconButton className="action-button" size="small" aria-label="add title" title="Add Title" onClick={saveMultipleTitles}>
+                <IconButton
+                    className="action-button"
+                    size="small"
+                    aria-label="add title"
+                    title={t("configurations:addTitle") || "Add Title"}
+                    onClick={saveMultipleTitles}>
                     <AddIcon />
                 </IconButton>
 
-                <IconButton className="action-button" size="small" aria-label="add group" title="Add Group" onClick={save}>
+                <IconButton
+                    className="action-button"
+                    size="small"
+                    aria-label="add group"
+                    title={t("configurations:addGroup") || "Add Group"}
+                    onClick={save}>
                     <GroupAddIcon />
                 </IconButton>
 
-                <IconButton className="action-button" size="small" aria-label="add link" title="Manage links" onClick={() => setDependenciesModalOpen(true)}>
+                <IconButton
+                    className="action-button"
+                    size="small"
+                    aria-label="add link"
+                    title={t("configurations:manageLinks") || "Manage links"}
+                    onClick={() => setDependenciesModalOpen(true)}>
                     <AddLinkIcon />
                 </IconButton>
 
                 <TextField
                     className="search-field"
                     onChange={(e) => onSearchValueChange(e.target.value)}
-                    label="Search"
+                    label={t("home:botao_pesquisar") || "Search"}
                     variant="standard"
-                    placeholder={isListView ? "Introduce the title name" : "Introduce the group name"} />
+                    placeholder={isListView ? t("configurations:enterTitleName") || "Introduce the title name"
+                        : t("configurations:enterGroupName") || "Introduce the group name"} />
             </Box>
             <Box className="list-box">
                 {isListView ?
@@ -441,16 +467,36 @@ export const SearchResultTitlesVerification = () => {
                                 className="title-item"
                                 secondaryAction={
                                     <Box className="actions-box" sx={{ display: "flex", gap: 1 }}>
-                                        <IconButton size="small" className="action-btn edit-btn" style={{ display: item.id === isRowEditMode ? 'none' : 'initial' }}>
-                                            <EditIcon onClick={() => setRowEditMode(item.id)} />
+                                        <IconButton
+                                            size="small"
+                                            className="action-btn edit-btn"
+                                            style={{ display: item.id === isRowEditMode ? 'none' : 'initial' }}
+                                            onClick={() => setRowEditMode(item.id)}
+                                            title={t("savedsearchcard:edit") || "Edit"}>
+                                            <EditIcon />
                                         </IconButton>
-                                        <IconButton size="small" className="action-btn delete-btn" style={{ display: item.id === isRowEditMode ? 'none' : 'initial' }} onClick={() => handleTitleDelete(item.id)}>
+                                        <IconButton
+                                            size="small"
+                                            className="action-btn delete-btn"
+                                            style={{ display: item.id === isRowEditMode ? 'none' : 'initial' }}
+                                            onClick={() => handleTitleDelete(item.id)}
+                                            title={t("savedsearchcard:delete") || "Delete"}>
                                             <DeleteIcon />
                                         </IconButton>
-                                        <IconButton size="small" className="action-btn save-btn" style={{ display: item.id === isRowEditMode ? 'initial' : 'none' }} onClick={() => updateTitle()}>
+                                        <IconButton
+                                            size="small"
+                                            className="action-btn save-btn"
+                                            style={{ display: item.id === isRowEditMode ? 'initial' : 'none' }}
+                                            onClick={() => updateTitle()}
+                                            title={t("editSearchDialog:save") || "Save"}>
                                             <CheckIcon />
                                         </IconButton>
-                                        <IconButton size="small" className="action-btn cancel-btn" style={{ display: item.id === isRowEditMode ? 'initial' : 'none' }} onClick={() => setRowEditMode("")}>
+                                        <IconButton
+                                            size="small"
+                                            className="action-btn cancel-btn"
+                                            style={{ display: item.id === isRowEditMode ? 'initial' : 'none' }}
+                                            onClick={() => setRowEditMode("")}
+                                            title={t("editSearchDialog:cancel") || "Cancel"}>
                                             <CloseIcon />
                                         </IconButton>
                                     </Box>
@@ -489,16 +535,36 @@ export const SearchResultTitlesVerification = () => {
                                     className="group-item"
                                     secondaryAction={
                                         <Box className="actions-box" sx={{ display: "flex", gap: 1 }}>
-                                            <IconButton size="small" className="action-btn edit-btn" style={{ display: item.id === isRowEditMode ? 'none' : 'initial' }}>
-                                                <EditIcon onClick={() => setRowEditMode(item.id)} />
+                                            <IconButton
+                                                size="small"
+                                                className="action-btn edit-btn"
+                                                style={{ display: item.id === isRowEditMode ? 'none' : 'initial' }}
+                                                onClick={() => setRowEditMode(item.id)}
+                                                title={t("savedsearchcard:edit") || "Edit"}>
+                                                <EditIcon />
                                             </IconButton>
-                                            <IconButton size="small" className="action-btn delete-btn" style={{ display: item.id === isRowEditMode ? 'none' : 'initial' }} onClick={() => handleGroupDelete(item.id)}>
+                                            <IconButton
+                                                size="small"
+                                                className="action-btn delete-btn"
+                                                style={{ display: item.id === isRowEditMode ? 'none' : 'initial' }}
+                                                onClick={() => handleGroupDelete(item.id)}
+                                                title={t("savedsearchcard:delete") || "Delete"}>
                                                 <DeleteIcon />
                                             </IconButton>
-                                            <IconButton size="small" className="action-btn save-btn" style={{ display: item.id === isRowEditMode ? 'initial' : 'none' }} onClick={() => updateGroup()}>
+                                            <IconButton
+                                                size="small"
+                                                className="action-btn save-btn"
+                                                style={{ display: item.id === isRowEditMode ? 'initial' : 'none' }}
+                                                onClick={() => updateGroup()}
+                                                title={t("editSearchDialog:save") || "Save"}>
                                                 <CheckIcon />
                                             </IconButton>
-                                            <IconButton size="small" className="action-btn cancel-btn" style={{ display: item.id === isRowEditMode ? 'initial' : 'none' }} onClick={() => setRowEditMode("")}>
+                                            <IconButton
+                                                size="small"
+                                                className="action-btn cancel-btn"
+                                                style={{ display: item.id === isRowEditMode ? 'initial' : 'none' }}
+                                                onClick={() => setRowEditMode("")}
+                                                title={t("editSearchDialog:cancel") || "Cancel"}>
                                                 <CloseIcon />
                                             </IconButton>
 
@@ -508,6 +574,8 @@ export const SearchResultTitlesVerification = () => {
                                                 className="action-btn expand-btn"
                                                 aria-label={expandedRowsIds.includes(item.id) ? "collapse" : "expand"}
                                                 onClick={() => changeRowState(item.id)}
+                                                title={!expandedRowsIds.includes(item.id) ?
+                                                    t("configurations:expand") || "Expand" : t("configurations:collapse") || "Collapse"}
                                             >
                                                 {expandedRowsIds.includes(item.id) ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                                             </IconButton>
@@ -538,7 +606,7 @@ export const SearchResultTitlesVerification = () => {
                                                     {item.titles.length}
                                                 </Typography>
                                                 <Typography component="div" variant="body2" className="group-date">
-                                                    Creation date: {item.creationDate.toLocaleString()}
+                                                    {t("configurations:creationDate") || "Creation date:"} {item.creationDate.toLocaleString()}
                                                 </Typography>
                                             </Box>
                                         }

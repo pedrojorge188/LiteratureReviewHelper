@@ -33,10 +33,21 @@ export const DependenciesModal = ({
     onGroupsUpdate
 }: DependenciesModalProps) => {
     const [titlesGroups, setTitlesGroups] = useState<TitlesGroups[]>([]);
+    const [searchTitlesGroups, setSearchTitlesGroups] = useState<TitlesGroups[]>([]);
+    const [searchTerm, setSearchTerm] = useState<string>();
     const [newTitles, setNewTitles] = useState<Record<string, string[]>>({});
 
     useEffect(() => {
         setTitlesGroups(groups);
+
+        let filteredGroups: TitlesGroups[] = groups;
+        if (searchTerm) {
+            filteredGroups = titlesGroups.filter(group =>
+                group.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        setSearchTitlesGroups(filteredGroups);
     }, [groups]);
 
     const addTitlesToGroup = (groupId: string) => {
@@ -87,6 +98,14 @@ export const DependenciesModal = ({
         return titles.filter(t => !group.titles.includes(t.id));
     };
 
+    const onSearchValueChange = (searchTerm: string) => {
+        const filteredGroups = titlesGroups.filter(group =>
+            group.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        setSearchTerm(searchTerm);
+        setSearchTitlesGroups(filteredGroups);
+    }
+
     if (!isOpen) return null;
 
     return (
@@ -101,7 +120,14 @@ export const DependenciesModal = ({
                     </IconButton>
                 </Box>
 
-                {titlesGroups.map(group => (
+                <TextField
+                    className="search-field"
+                    label="Search"
+                    variant="standard"
+                    onChange={(e) => onSearchValueChange(e.target.value)}
+                    placeholder="Introduce group name" />
+
+                {searchTitlesGroups.map(group => (
                     <Box key={group.id} className="mg-group-card">
 
                         <Typography variant="subtitle1" className="mg-group-name">

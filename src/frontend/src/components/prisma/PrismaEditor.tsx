@@ -16,16 +16,19 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { toPng } from "html-to-image";
 import { EditableNode } from "./EditableNode";
 import { mapApiToFlow } from "./mapApiToFlow";
+import { useTranslation } from "react-i18next";
 
 import "@xyflow/react/dist/style.css";
 
 import { SearchResponseDto } from "../../pages/types";
 
 export const PrismaEditor = (apiData: SearchResponseDto) => {
+  const { t } = useTranslation();
+
   const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null);
 
   const { nodes: initialNodes, edges: initialEdges } = useMemo(() => {
-    const data = mapApiToFlow(apiData);
+    const data = mapApiToFlow(apiData, t);
 
     const fixedEdges = data.edges.map((edge: Edge) => ({
       ...edge,
@@ -61,14 +64,14 @@ export const PrismaEditor = (apiData: SearchResponseDto) => {
       nds.map((n) =>
         n.id === id
           ? {
-              ...n,
-              data: {
-                ...n.data,
-                label: value,
-                onChange: handleNodeLabelChange,
-                onDelete: handleNodeDelete,
-              },
-            }
+            ...n,
+            data: {
+              ...n.data,
+              label: value,
+              onChange: handleNodeLabelChange,
+              onDelete: handleNodeDelete,
+            },
+          }
           : n
       )
     );
@@ -79,14 +82,14 @@ export const PrismaEditor = (apiData: SearchResponseDto) => {
       nds.map((n) =>
         n.id === id
           ? {
-              ...n,
-              data: {
-                ...n.data,
-                title: value,
-                onChange: handleNodeTitleChange,
-                onDelete: handleNodeDelete,
-              },
-            }
+            ...n,
+            data: {
+              ...n.data,
+              title: value,
+              onChange: handleNodeTitleChange,
+              onDelete: handleNodeDelete,
+            },
+          }
           : n
       )
     );
@@ -103,7 +106,7 @@ export const PrismaEditor = (apiData: SearchResponseDto) => {
           y: Math.random() * 250,
         },
         data: {
-          label: "New node",
+          label: t("prisma:new_node_label"),
           onChange: handleNodeLabelChange,
           onDelete: handleNodeDelete,
         },
@@ -113,8 +116,8 @@ export const PrismaEditor = (apiData: SearchResponseDto) => {
   }, [handleNodeDelete, handleNodeLabelChange]);
 
   const onNodesChange = useCallback((changes: any) => setNodes((ns: Node[]) => applyNodeChanges(changes, ns)), []);
-  const onEdgesChange = useCallback((changes: any) => setEdges((es: Edge[]) => applyEdgeChanges(changes, es)), [] );
-  const onConnect = useCallback((params: any) => setEdges((es: any[]) => addEdge(params, es)), [] );
+  const onEdgesChange = useCallback((changes: any) => setEdges((es: Edge[]) => applyEdgeChanges(changes, es)), []);
+  const onConnect = useCallback((params: any) => setEdges((es: any[]) => addEdge(params, es)), []);
 
   const nodesWithHandlers = useMemo(() => {
     return nodes.map((n: { data: any; }) => ({
@@ -144,27 +147,29 @@ export const PrismaEditor = (apiData: SearchResponseDto) => {
     const viewportElement = document.querySelector('.react-flow__viewport') as HTMLElement;
 
     if (viewportElement) {
-        toPng(viewportElement, {
-            backgroundColor: '#ffffff',
-            width: imageWidth,
-            height: imageHeight,
-            style: {
-                width: String(imageWidth),
-                height: String(imageHeight),
-                transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
-            },
-            filter: (node: HTMLElement) => {
-              const exclusionClasses = ['react-flow__minimap', 'react-flow__controls'];
-              return !exclusionClasses.some((classname) => node.classList?.contains(classname));
-            }
-        }).then((dataUrl: string) => {
-            const link = document.createElement('a');
-            const timestamp = new Date().toISOString().replace(/[:.]/g, "-").substring(0, 19);
-            const queryName = apiData.query?.substring(0, 30).replace(/[^a-zA-Z0-9]/g, "_") || "search";
-            link.download = `flowchart_${queryName}_${timestamp}.png`;
-            link.href = dataUrl;
-            link.click();
-        });
+      toPng(viewportElement, {
+        backgroundColor: '#ffffff',
+        width: imageWidth,
+        height: imageHeight,
+        style: {
+          width: String(imageWidth),
+          height: String(imageHeight),
+          transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
+        },
+        filter: (node: HTMLElement) => {
+          const exclusionClasses = ['react-flow__minimap', 'react-flow__controls'];
+          return !exclusionClasses.some((classname) => node.classList?.contains(classname));
+        }
+      }).then((dataUrl: string) => {
+        const link = document.createElement('a');
+        const timestamp = new Date().toISOString().replace(/[:.]/g, "-").substring(0, 19);
+        const queryName = apiData.query?.substring(0, 30).replace(/[^a-zA-Z0-9]/g, "_") || t("prisma:export_default_query_name");
+        const prefix = t("prisma:export_filename_prefix");
+
+        link.download = `${prefix}_${queryName}_${timestamp}.png`;
+        link.href = dataUrl;
+        link.click();
+      });
     }
   }, [rfInstance, apiData]);
 
@@ -189,10 +194,10 @@ export const PrismaEditor = (apiData: SearchResponseDto) => {
 
       <div className="flow-actions">
         <button className="add-node-btn" onClick={handleAddNode}>
-          Add Step
+          {t("prisma:button_add_step")}
         </button>
         <button className="export-flow-btn" onClick={handleExportPng}>
-          Export Flowchart
+          {t("prisma:button_export_flowchart")}
         </button>
       </div>
     </div>

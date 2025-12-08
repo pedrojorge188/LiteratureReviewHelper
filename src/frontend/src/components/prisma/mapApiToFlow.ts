@@ -1,25 +1,33 @@
 import { Engines, SearchResponseDto } from "../../pages/types";
 
-export const resolveFilterName = (name: string) => {
+export const resolveFilterName = (
+    name: string,
+    t: (key: string, options?: any) => string
+) => {
     switch (name) {
         case "YearResultFilter":
-            return "Dates";
+            return t("prisma:filter_dates");
         case "DuplicateResultFilter":
-            return "Duplicates";
+            return t("prisma:filter_duplicates");
         case "AuthorResultFilter":
-            return "Authors";
+            return t("prisma:filter_authors");
         case "TitleResultFilter":
-            return "Titles";
+            return t("prisma:filter_titles");
         case "VenueResultFilter":
-            return "Venues"
+            return t("prisma:filter_venues");
+        default:
+            return name;
     }
-}
+};
 
-export const mapApiToFlow = (data: SearchResponseDto) => {
+export const mapApiToFlow = (
+    data: SearchResponseDto,
+    t: (key: string, options?: any) => string
+) => {
     if (!data) return { nodes: [], edges: [] };
 
-    const nodes: any = [];
-    const edges: any = [];
+    const nodes: any[] = [];
+    const edges: any[] = [];
     let idCounter = 1;
 
     const engines = Object.entries(data.articlesByEngine || {});
@@ -45,23 +53,33 @@ export const mapApiToFlow = (data: SearchResponseDto) => {
         rawEngineDropped[engine] = totalDropped;
     });
 
-    const totalRawArticles = Object.values(rawEngineTotals).reduce((sum, val) => sum + val, 0);
-    const totalRRemovedArticlesViaFilters = Object.values(rawEngineDropped).reduce((sum, val) => sum + val, 0);
-
+    const totalRawArticles = Object.values(rawEngineTotals).reduce(
+        (sum, val) => sum + val,
+        0
+    );
+    const totalRRemovedArticlesViaFilters = Object.values(rawEngineDropped).reduce(
+        (sum, val) => sum + val,
+        0
+    );
 
     const queryNodeId = `${idCounter++}`;
     nodes.push({
         id: queryNodeId,
         type: "editableNode",
         position: { x: 400, y: 50 },
-        data: { label: `Query: ${data.query}\nTotal articles: ${totalRawArticles}`, title: 'Research Query' },
+        data: {
+            label: `${t("prisma:flow_query_label")}: ${data.query}\n${t(
+                "prisma:flow_total_articles_label"
+            )}: ${totalRawArticles}`,
+            title: t("prisma:flow_research_query_title")
+        }
     });
 
     const engineSpacing = 250;
     const totalWidth = (engines.length - 1) * engineSpacing;
     const startX = 400 - totalWidth / 2;
 
-    const lastFilterNodes: any[] = [];
+    const lastFilterNodes: { id: string; y: number }[] = [];
 
     engines.forEach(([engine, count], engineIdx) => {
         const x = startX + engineIdx * engineSpacing;
@@ -72,10 +90,20 @@ export const mapApiToFlow = (data: SearchResponseDto) => {
             id: engineNodeId,
             type: "editableNode",
             position: { x, y },
-            data: { label: `Total articles: ${rawEngineTotals[engine] || count}`, title: engine },
+            data: {
+                label: `${t("prisma:flow_total_articles_label")}: ${rawEngineTotals[engine] || count
+                    }`,
+                title: engine
+            }
         });
 
-        edges.push({ id: `e${queryNodeId}-${engineNodeId}`, source: queryNodeId, target: engineNodeId, animated: true, style: { strokeWidth: 3, strokeDasharray: '5,5', color: 'black' } });
+        edges.push({
+            id: `e${queryNodeId}-${engineNodeId}`,
+            source: queryNodeId,
+            target: engineNodeId,
+            animated: true,
+            style: { strokeWidth: 3, strokeDasharray: "5,5", color: "black" }
+        });
 
         const filters = data.filterImpactByEngine?.[engine as Engines];
 
@@ -93,32 +121,50 @@ export const mapApiToFlow = (data: SearchResponseDto) => {
                     type: "editableNode",
                     position: { x, y: fy },
                     data: {
-                        label: `Total articles: ${filterData.INPUT}\nArticles retrieved: ${filterData.OUTPUT}\nArticles dropped: ${filterData.DROPPED}`,
-                        title: resolveFilterName(filterName)
-                    },
+                        label:
+                            `${t("prisma:flow_total_articles_label")}: ${filterData.INPUT}\n` +
+                            `${t("prisma:flow_articles_retrieved_label")}: ${filterData.OUTPUT}\n` +
+                            `${t("prisma:flow_articles_dropped_label")}: ${filterData.DROPPED}`,
+                        title: resolveFilterName(filterName, t)
+                    }
                 });
 
-                edges.push({ id: `e${prevNodeId}-${filterNodeId}`, source: prevNodeId, target: filterNodeId, animated: true, style: { strokeWidth: 3, strokeDasharray: '5,5', color: 'black' } });
+                edges.push({
+                    id: `e${prevNodeId}-${filterNodeId}`,
+                    source: prevNodeId,
+                    target: filterNodeId,
+                    animated: true,
+                    style: { strokeWidth: 3, strokeDasharray: "5,5", color: "black" }
+                });
                 prevNodeId = filterNodeId;
             });
 
             const newY = y + 180 + filterEntries.length * 180;
             const filteredEngineNodeId = `${idCounter++}`;
-            const filteredEngineY = y + 180 + filterEntries.length * 180;
+            const filteredEngineY = newY;
 
             nodes.push({
                 id: filteredEngineNodeId,
                 type: "editableNode",
                 position: { x, y: newY },
-                data: { label: `Total articles: ${count}`, title: `${engine} filtered articles` },
+                data: {
+                    label: `${t("prisma:flow_total_articles_label")}: ${count}`,
+                    title: t("prisma:flow_filtered_articles_title", { engine })
+                }
             });
 
-            edges.push({ id: `e${prevNodeId}-${filteredEngineNodeId}`, source: prevNodeId, target: filteredEngineNodeId, animated: true, style: { strokeWidth: 3, strokeDasharray: '5,5', color: 'black' } });
+            edges.push({
+                id: `e${prevNodeId}-${filteredEngineNodeId}`,
+                source: prevNodeId,
+                target: filteredEngineNodeId,
+                animated: true,
+                style: { strokeWidth: 3, strokeDasharray: "5,5", color: "black" }
+            });
             lastFilterNodes.push({ id: filteredEngineNodeId, y: filteredEngineY });
-        };
+        }
     });
 
-    const maxY = Math.max(...lastFilterNodes.map(n => n.y));
+    const maxY = Math.max(...lastFilterNodes.map((n) => n.y));
     const finalNodeY = maxY + 180;
 
     const finalNodeId = `${idCounter++}`;
@@ -127,9 +173,14 @@ export const mapApiToFlow = (data: SearchResponseDto) => {
         type: "editableNode",
         position: { x: 400, y: finalNodeY },
         data: {
-            label: `Final Articles after filtering: ${data.totalArticles}\nArticles removed: ${data.duplicatedResultsRemoved}\nArticles filtered out: ${totalRRemovedArticlesViaFilters}`,
-            title: 'Final Result'
-        },
+            label:
+                `${t("prisma:flow_final_articles_after_filtering_label")}: ${data.totalArticles
+                }\n` +
+                `${t("prisma:flow_articles_removed_label")}: ${data.duplicatedResultsRemoved
+                }\n` +
+                `${t("prisma:flow_articles_filtered_out_label")}: ${totalRRemovedArticlesViaFilters}`,
+            title: t("prisma:flow_final_result_title")
+        }
     });
 
     lastFilterNodes.forEach(({ id }) => {
@@ -138,7 +189,7 @@ export const mapApiToFlow = (data: SearchResponseDto) => {
             source: id,
             target: finalNodeId,
             animated: true,
-            style: { strokeWidth: 3, strokeDasharray: '5,5', color: 'black' }
+            style: { strokeWidth: 3, strokeDasharray: "5,5", color: "black" }
         });
     });
 

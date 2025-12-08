@@ -11,6 +11,7 @@ import savedsearchcard from "./savedsearchcard.json";
 import savedsearchpageheader from "./savedsearchpageheader.json";
 import warnings from "./warnings.json";
 import editSearchDialog from "./editSearchDialog.json";
+import prisma from "./prisma.json";
 import saveDialogMultipleInputs from "./saveDialogMultipleInputs.json"
 import dependenciesModal from "./dependenciesModal.json"
 
@@ -28,6 +29,7 @@ export const pt = {
   savedsearchpageheader: savedsearchpageheader,
   warnings: warnings,
   editSearchDialog: editSearchDialog,
+  prisma: prisma,
   saveDialogMultipleInputs,
   dependenciesModal
 };

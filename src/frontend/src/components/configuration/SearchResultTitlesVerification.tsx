@@ -28,6 +28,7 @@ import { DependenciesModal } from "./DependenciesModal";
 import { useTranslation } from "react-i18next";
 import "../../styles/components/titleVerification.scss";
 import { SnackbarToast } from "../SnackbarToast";
+import { ConfirmDialog } from "../ConfirmDialog";
 
 export const loadTitles = (): TitleToExclude[] => {
     const raw = localStorage.getItem("titlesToExclude");
@@ -84,6 +85,9 @@ export const SearchResultTitlesVerification = () => {
     const [expandedRowsIds, setExpandedRowsIds] = useState<string[]>([]);
     const [openToastD, setOpenToastD] = useState(false);
     const [openToastC, setOpenToastC] = useState(false);
+    const [isConfirmDeleteTitleOpen, setIsConfirmDeleteTitleOpen] = useState(false);
+    const [isConfirmDeleteGroupOpen, setIsConfirmDeleteGroupOpen] = useState(false);
+    const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
     useEffect(() => {
         setSearchTitlesToVerify(titlesToVerify);
@@ -109,26 +113,21 @@ export const SearchResultTitlesVerification = () => {
     }
 
     const deleteTitle = (titleId: string) => {
-        try {
-            const updatedGroups = titlesGroups.map(group => ({
-                ...group,
-                titles: group.titles.filter(id => id !== titleId)
-            }));
+        const updatedGroups = titlesGroups.map(group => ({
+            ...group,
+            titles: group.titles.filter(id => id !== titleId)
+        }));
 
-            const updatedTitles = titlesToVerify.filter(item => item.id !== titleId);
-            setTitlesToVerify(updatedTitles);
-            setTitlesGroups(updatedGroups);
+        const updatedTitles = titlesToVerify.filter(item => item.id !== titleId);
+        setTitlesToVerify(updatedTitles);
+        setTitlesGroups(updatedGroups);
 
-            localStorage.setItem(TITLES_KEY, JSON.stringify(updatedTitles));
-            localStorage.setItem(GROUPS_KEY, JSON.stringify(updatedGroups));
+        localStorage.setItem(TITLES_KEY, JSON.stringify(updatedTitles));
+        localStorage.setItem(GROUPS_KEY, JSON.stringify(updatedGroups));
 
-            loadTitles();
-            loadGroups();
-            setOpenToastC(true);
-        } catch (error) {
-            console.log(error)
-            setOpenToastD(true);
-        }
+        loadTitles();
+        loadGroups();
+        setOpenToastC(true);
     }
 
 
@@ -188,18 +187,12 @@ export const SearchResultTitlesVerification = () => {
     }
 
     const deleteGroup = (id: string) => {
-        try {
-            const updatedGroups = titlesGroups.filter(item => item.id !== id);
-            setTitlesGroups(updatedGroups);
-            localStorage.setItem(GROUPS_KEY, JSON.stringify(updatedGroups));
+        const updatedGroups = titlesGroups.filter(item => item.id !== id);
+        setTitlesGroups(updatedGroups);
+        localStorage.setItem(GROUPS_KEY, JSON.stringify(updatedGroups));
 
-            loadGroups();
-            setOpenToastC(true);
-        } catch (error: any) {
-            console.log(error);
-            setOpenToastD(true);
-
-        }
+        loadGroups();
+        setOpenToastC(true);
     }
 
     const handleSaveGroup = (groupName: string) => {
@@ -294,8 +287,81 @@ export const SearchResultTitlesVerification = () => {
         }
     }
 
+    const handleTitleDelete = (id: string) => {
+        setDeleteTargetId(id);
+        setIsConfirmDeleteTitleOpen(true);
+    };
+
+    const handleGroupDelete = (id: string) => {
+        setDeleteTargetId(id);
+        setIsConfirmDeleteGroupOpen(true);
+    };
+
+    const confirmDeleteTitle = () => {
+        try {
+            if (deleteTargetId) {
+                deleteTitle(deleteTargetId);
+                loadGroups();
+                loadTitles();
+            }
+            setIsConfirmDeleteTitleOpen(false);
+            setDeleteTargetId(null);
+            setOpenToastC(true);
+        } catch (error) {
+            console.log(error)
+            setOpenToastD(true);
+        }
+
+    };
+
+    const cancelDeleteTitle = () => {
+        setIsConfirmDeleteTitleOpen(false);
+        setDeleteTargetId(null);
+    };
+
+    const confirmDeleteGroup = () => {
+        try {
+            if (deleteTargetId) {
+                deleteGroup(deleteTargetId);
+                loadGroups();
+                loadTitles();
+            }
+            setIsConfirmDeleteGroupOpen(false);
+            setDeleteTargetId(null);
+            setOpenToastC(true);
+        } catch (error: any) {
+            console.log(error);
+            setOpenToastD(true);
+
+        }
+    };
+
+    const cancelDeleteGroup = () => {
+        setIsConfirmDeleteGroupOpen(false);
+        setDeleteTargetId(null);
+    };
+
     return (
         <>
+            <ConfirmDialog
+                isOpen={isConfirmDeleteTitleOpen}
+                message={
+                    t("favorites:confirm_delete") ||
+                    "Are you sure you want to delete this search?"
+                }
+                onConfirm={confirmDeleteTitle}
+                onCancel={cancelDeleteTitle}
+            />
+
+            <ConfirmDialog
+                isOpen={isConfirmDeleteGroupOpen}
+                message={
+                    t("favorites:confirm_delete") ||
+                    "Are you sure you want to delete this search?"
+                }
+                onConfirm={confirmDeleteGroup}
+                onCancel={cancelDeleteGroup}
+            />
             <SnackbarToast
                 open={openToastD}
                 setOpen={setOpenToastD}
@@ -378,7 +444,7 @@ export const SearchResultTitlesVerification = () => {
                                         <IconButton size="small" className="action-btn edit-btn" style={{ display: item.id === isRowEditMode ? 'none' : 'initial' }}>
                                             <EditIcon onClick={() => setRowEditMode(item.id)} />
                                         </IconButton>
-                                        <IconButton size="small" className="action-btn delete-btn" style={{ display: item.id === isRowEditMode ? 'none' : 'initial' }} onClick={() => deleteTitle(item.id)}>
+                                        <IconButton size="small" className="action-btn delete-btn" style={{ display: item.id === isRowEditMode ? 'none' : 'initial' }} onClick={() => handleTitleDelete(item.id)}>
                                             <DeleteIcon />
                                         </IconButton>
                                         <IconButton size="small" className="action-btn save-btn" style={{ display: item.id === isRowEditMode ? 'initial' : 'none' }} onClick={() => updateTitle()}>
@@ -426,7 +492,7 @@ export const SearchResultTitlesVerification = () => {
                                             <IconButton size="small" className="action-btn edit-btn" style={{ display: item.id === isRowEditMode ? 'none' : 'initial' }}>
                                                 <EditIcon onClick={() => setRowEditMode(item.id)} />
                                             </IconButton>
-                                            <IconButton size="small" className="action-btn delete-btn" style={{ display: item.id === isRowEditMode ? 'none' : 'initial' }} onClick={() => deleteGroup(item.id)}>
+                                            <IconButton size="small" className="action-btn delete-btn" style={{ display: item.id === isRowEditMode ? 'none' : 'initial' }} onClick={() => handleGroupDelete(item.id)}>
                                                 <DeleteIcon />
                                             </IconButton>
                                             <IconButton size="small" className="action-btn save-btn" style={{ display: item.id === isRowEditMode ? 'initial' : 'none' }} onClick={() => updateGroup()}>

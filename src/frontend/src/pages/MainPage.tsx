@@ -9,9 +9,9 @@ import {
   SearchParameters,
 } from "./types";
 import { ArticlesList } from "./ArticlesList";
-import { LoadingCircle } from "../components/shared";
+import { LoadingCircle, CommonLink } from "../components/shared";
 import { ChipInput } from "../components/shared/ChipInput";
-
+import { Paths } from "../routes/RouteConfig";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import FormControl from "@mui/material/FormControl";
@@ -42,6 +42,8 @@ import {
 } from "../utils";
 import Tooltip from "@mui/material/Tooltip";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import { useSelector } from "react-redux";
+import { setMainPageState } from "../store/ducks/mainpage";
 import { TitleOption, TitlesGroups, TitleToExclude } from "../components/types";
 import { loadGroups, loadTitles } from "../components/configuration/SearchResultTitlesVerification";
 import { Autocomplete, AutocompleteChangeReason, Chip, TextField } from "@mui/material";
@@ -59,7 +61,9 @@ type FilterKey =
 export const MainPage = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch<any>();
+  const mainState = useSelector((state: any) => state.MAIN_PAGE);
 
+  const routes = Paths();
   const [queries, setQueries] = useState<Query[]>([{ value: "" }]);
   const [anoDe, setAnoDe] = useState<string>("");
   const [anoAte, setAnoAte] = useState<string>("");
@@ -80,7 +84,7 @@ export const MainPage = () => {
   const [openToastD, setOpenToastD] = useState(false);
   const [openToastE, setOpenToastE] = useState(false);
   const [showBuiltQuery, setShowBuiltQuery] = useState(false);
-
+  const [openSearchDelayToast, setOpenSearchDelayToast] = useState(false);
   // Filter values
   const [authors, setAuthors] = useState<string[]>([]);
   const [venues, setVenues] = useState<string[]>([]);
@@ -117,6 +121,20 @@ export const MainPage = () => {
   }, []);
 
   const availableLibraries = getAvailableLibraries(apiSettings);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+
+    if (isLoading) {
+      interval = setInterval(() => {
+        setOpenSearchDelayToast(true);
+      }, 10000); // 10 seconds
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isLoading]);
 
   const adicionarQuery = () => {
     setQueries(addQuery(queries));
@@ -208,7 +226,6 @@ export const MainPage = () => {
     const convertedQueries = params.queries.map((q, i) =>
       i === 0 ? { value: q.value } : { value: q.value, operator: q.operator }
     );
-
     setQueries(convertedQueries);
     setAnoDe(params.yearFrom || "");
     setAnoAte(params.yearTo || "");
@@ -219,7 +236,6 @@ export const MainPage = () => {
     setExcludeVenues(params.excludeVenues || []);
     setBibliotecas(params.libraries || []);
     setSelectedFilters(inferSelectedFilters(params));
-
     setIsImportDialogOpen(false);
     setOpenToastE(true);
   };
@@ -256,9 +272,9 @@ export const MainPage = () => {
   };
 
   const pesquisar = async () => {
-    if (queries.length === 1 && queries[0].value.trim() === "") {
+    if (queries.length === 1 && (!queries[0].value || queries[0].value.trim() === "")) {
       setOpenToastB(true);
-      return
+      return;
     }
 
     if (bibliotecas.length === 0) {
@@ -334,6 +350,25 @@ export const MainPage = () => {
       if (getArticles.fulfilled.match(resultAction)) {
         setResponse(resultAction.payload as SearchResponseDto);
         setShowList(true);
+
+        try {
+          const internalParams = {
+            queries: normalizeQueries(queries),
+            anoDe,
+            anoAte,
+            authors,
+            venues,
+            excludeAuthors,
+            excludeTitles,
+            excludeVenues,
+            bibliotecas,
+            titlesToVerify: selectedOptions,
+            selectedTitlesForVerification
+          };
+          saveHistoryEntry(internalParams);
+        } catch (err) {
+          console.error("Error saving search history:", err);
+        }
       } else {
         setOpenToastB(true);
         console.error("Erro na pesquisa:", resultAction.error);
@@ -345,9 +380,10 @@ export const MainPage = () => {
     }
   };
 
-  // Load search parameters from sessionStorage if coming from HistoryPage
+
   useEffect(() => {
     const loadedSearch = sessionStorage.getItem("loadedSearch");
+
     if (loadedSearch) {
       try {
         const params = JSON.parse(loadedSearch);
@@ -367,8 +403,56 @@ export const MainPage = () => {
       } catch (error) {
         console.error("Error loading search from history:", error);
       }
+    } else {
+      if (mainState) {
+        setQueries(mainState.queries);
+        setAnoDe(mainState.anoDe);
+        setAnoAte(mainState.anoAte);
+        setAuthors(mainState.authors);
+        setVenues(mainState.venues);
+        setExcludeAuthors(mainState.excludeAuthors);
+        setExcludeVenues(mainState.excludeVenues);
+        setExcludeTitles(mainState.excludeTitles);
+        setBibliotecas(mainState.bibliotecas);
+        setSelectedFilters(mainState.selectedFilters);
+        setResponse(mainState.response);
+        setSelectedOptions(mainState.selectedOptions);
+      }
     }
   }, []);
+
+  useEffect(() => {
+    dispatch(
+      setMainPageState({
+        queries,
+        anoDe,
+        anoAte,
+        authors,
+        venues,
+        excludeAuthors,
+        excludeVenues,
+        excludeTitles,
+        bibliotecas,
+        selectedFilters,
+        response,
+        selectedOptions
+      })
+    );
+  }, [
+    queries,
+    anoDe,
+    anoAte,
+    authors,
+    venues,
+    excludeAuthors,
+    excludeVenues,
+    excludeTitles,
+    bibliotecas,
+    selectedFilters,
+    response,
+    selectedOptions
+  ]);
+  //fim usar estado redux
 
   const renderFilterRow = (key: FilterKey) => {
     switch (key) {
@@ -589,6 +673,12 @@ export const MainPage = () => {
         messageStr={t("warnings:noQuery")}
         type="warning"
       />
+      <SnackbarToast
+        messageStr={t("home:search_still_loading")}
+        open={openSearchDelayToast}
+        setOpen={setOpenSearchDelayToast}
+        type="info"
+      />
       <SaveDialog
         isOpen={isSaveDialogOpen}
         onClose={() => setIsSaveDialogOpen(false)}
@@ -695,10 +785,7 @@ export const MainPage = () => {
               label={t("home:label_show_built_query")}
             />
             {showBuiltQuery && (
-              <textarea
-                value={buildQueryString(queries)}
-                readOnly
-              />
+              <textarea value={buildQueryString(queries)} readOnly />
             )}
           </div>
 
@@ -847,48 +934,94 @@ export const MainPage = () => {
           {/* Bibliotecas */}
           <div className="section">
             <label>{t("home:label_bibliotecas")}</label>
+
             <div className="biblioteca-row">
               <select
+                disabled={
+                  availableLibraries.filter((lib) => !bibliotecas.includes(lib))
+                    .length === 0
+                }
                 value={bibliotecaSelecionada}
-                onChange={(e) => setBibliotecaSelecionada(e.target.value)}
+                onChange={(e) => {
+                  const lib = e.target.value;
+                  if (!lib) return;
+
+                  setBibliotecaSelecionada(lib);
+                  setBibliotecas((prev) => [...prev, lib]);
+                }}
               >
                 <option value="">{t("home:selecionar_biblioteca")}</option>
-                {availableLibraries.map((libName) => (
-                  <option key={libName} value={libName}>
-                    {libName}
-                  </option>
-                ))}
+
+                {availableLibraries
+                  .filter((libName) => !bibliotecas.includes(libName))
+                  .map((libName) => (
+                    <option key={libName} value={libName}>
+                      {libName}
+                    </option>
+                  ))}
               </select>
-              <button type="button" onClick={adicionarBiblioteca}>
-                {t("home:botao_adicionar")}
-              </button>
             </div>
-            <div hidden={bibliotecas.length === 0}>
-              <h3 className="bibliotecas-lista-titulo">
-                {t("home:lista_bibliotecas")}
-              </h3>
-              <ul className="bibliotecas-lista">
-                {bibliotecas.map((b, i) => (
-                  <li key={i}>
-                    <span>{b}</span>
-                    <button
-                      type="button"
-                      className="remove-btn"
-                      onClick={() => removerBiblioteca(b)}
-                    >
-                      {t("home:botao_remover")}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-              {apiError && bibliotecas.length === 0 && (
-                <p
-                  style={{ color: "red", marginTop: "10px", fontSize: "14px" }}
+
+            {/* Mensagens abaixo do dropdown */}
+            {availableLibraries.length === 0 && (
+              <p style={{ fontSize: "12px", color: "#888", marginTop: "4px" }}>
+                {t("home:no_libraries_configured")}
+                <br />
+                <CommonLink
+                  linkClass="small-config-link"
+                  link={{ external: false, url: routes.libListPage.path }}
+                  title={t("sideMenu:configuration")}
                 >
-                  {t("home:erro_selecionar_api")}
+                  <p
+                    style={{
+                      fontSize: "12px",
+                      color: "#0098e3ff",
+                      marginTop: "4px",
+                      textDecoration: "underline",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {t("home:configure_here")}
+                  </p>
+                </CommonLink>
+              </p>
+            )}
+
+            {availableLibraries.length > 0 &&
+              availableLibraries.filter((lib) => !bibliotecas.includes(lib))
+                .length === 0 && (
+                <p
+                  style={{ fontSize: "12px", color: "#888", marginTop: "4px" }}
+                >
+                  {t("home:all_libraries_added")}
                 </p>
               )}
-            </div>
+
+            {bibliotecas.length > 0 && (
+              <div>
+                <h3 className="bibliotecas-lista-titulo">
+                  {t("home:lista_bibliotecas")}
+                </h3>
+
+                <ul className="bibliotecas-lista">
+                  {bibliotecas.map((b, i) => (
+                    <li key={i}>
+                      <span>{b}</span>
+                      <button
+                        type="button"
+                        className="remove-btn"
+                        onClick={() => {
+                          removerBiblioteca(b);
+                          setBibliotecas((prev) => prev.filter((x) => x !== b));
+                        }}
+                      >
+                        {t("home:botao_remover")}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
 
           <hr hidden={bibliotecas.length > 0} />

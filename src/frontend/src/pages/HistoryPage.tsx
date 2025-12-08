@@ -131,11 +131,12 @@ export const HistoryPage = () => {
         </div>
       ) : (
         <div className="searches-list">
-          {historySearches.map((search) => (
+          {historySearches.map((search, key) => (
             <SavedSearchCard
               search={search}
               onLoad={handleLoad}
               onDelete={handleDelete}
+              key={key}
             />
           ))}
         </div>

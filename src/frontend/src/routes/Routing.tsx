@@ -9,6 +9,7 @@ import { setLang } from "../store/ducks/home";
 import App from "../App";
 import { NotFound } from "../pages/NotFound";
 import { MainPage } from "../pages";
+import { KeepAlive } from "react-activation";
 
 export const Routing = () => {
   const { lang, langLoaded } = useSelector(
@@ -31,7 +32,11 @@ export const Routing = () => {
         <Route index element={<MainPage />} />
         {Object.entries(allRelativePaths).map(
           ([key, { path, element }], index) => (
-            <Route path={path} element={element} key={index} />
+            <Route
+              path={path}
+              element={<KeepAlive id={path}>{element}</KeepAlive>}
+              key={index}
+            />
           )
         )}
       </Route>

@@ -52,7 +52,7 @@ export const updateQuery = (
   field: keyof Query,
   value: string
 ): Query[] => {
-  const newQueries = [...queries];
+  const newQueries = queries.map((q) => ({ ...q })); // <- clonar os objetos de forma profunda sem ficar apenas por referencias que dão problema
   newQueries[index][field] = value;
   return normalizeQueries(newQueries);
 };

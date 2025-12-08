@@ -41,8 +41,15 @@ export const ArticlesList = ({ response, setShow, titlesUsedForVerification }: A
   const downloadCSV = async () => {
     if (!artigos || artigos.length === 0) return;
 
-    const header = ["title", "authors", "publicationYear", "venue", "link", "source"];
-    const rows = artigos.map(a => [
+    const header = [
+      "title",
+      "authors",
+      "publicationYear",
+      "venue",
+      "link",
+      "source",
+    ];
+    const rows = artigos.map((a) => [
       `"${a.title ?? ""}"`,
       `"${a.authors ?? ""}"`,
       `"${a.publicationYear ?? ""}"`,
@@ -50,17 +57,19 @@ export const ArticlesList = ({ response, setShow, titlesUsedForVerification }: A
       `"${a.link ?? ""}"`,
       `"${a.source ?? ""}"`,
     ]);
-    const csvContent = [header, ...rows].map(row => row.join(",")).join("\n");
+    const csvContent = [header, ...rows].map((row) => row.join(",")).join("\n");
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
 
-    if ('showSaveFilePicker' in window) {
+    if ("showSaveFilePicker" in window) {
       try {
         const handle = await w.showSaveFilePicker({
           suggestedName: "articles.csv",
-          types: [{
-            description: "CSV File",
-            accept: { "text/csv": [".csv"] }
-          }]
+          types: [
+            {
+              description: "CSV File",
+              accept: { "text/csv": [".csv"] },
+            },
+          ],
         });
         const writable = await handle.createWritable();
         await writable.write(blob);
@@ -136,8 +145,6 @@ export const ArticlesList = ({ response, setShow, titlesUsedForVerification }: A
     }
   };
 
-
-
   return (
     <div className="lista-artigos-page">
       <div className="lista-artigos-card">
@@ -146,10 +153,16 @@ export const ArticlesList = ({ response, setShow, titlesUsedForVerification }: A
             className="lista-artigos-card__rollback__btn"
             onClick={() => setShow(false)}
           >
-            <img src={ArrowIcon} alt="Voltar atrás" />
+            <img
+              className="lista-artigos-card__rollback__btn__img"
+              src={ArrowIcon}
+              alt="Voltar atrás"
+            />
+            <span className="lista-artigos-card__rollback__text">
+              {t("articles:sair")}
+            </span>
           </button>
         </div>
-
         <div className="header">
           <h2>{!moreInfo ? t("articles:titulo_lista") : "Metrics"}</h2>
 
@@ -235,19 +248,20 @@ export const ArticlesList = ({ response, setShow, titlesUsedForVerification }: A
                   &lt;
                 </button>
 
-                {gerarBotoesPaginacao().map((p, i) => p === "..." ? (
-                  <span key={i} className="ellipsis">
-                    ...
-                  </span>
-                ) : (
-                  <button
-                    key={i}
-                    onClick={() => mudarPagina(p as number)}
-                    className={p === paginaAtual ? "active" : ""}
-                  >
-                    {p}
-                  </button>
-                )
+                {gerarBotoesPaginacao().map((p, i) =>
+                  p === "..." ? (
+                    <span key={i} className="ellipsis">
+                      ...
+                    </span>
+                  ) : (
+                    <button
+                      key={i}
+                      onClick={() => mudarPagina(p as number)}
+                      className={p === paginaAtual ? "active" : ""}
+                    >
+                      {p}
+                    </button>
+                  )
                 )}
 
                 <button

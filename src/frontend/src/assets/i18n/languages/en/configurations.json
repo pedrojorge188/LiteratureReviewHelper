@@ -8,7 +8,8 @@
   "alerts": {
     "rowsSaved": "Number of elements saved!",
     "maxResultsSaved": "Maximum searches saved!",
-    "librarySettingsSaved": "Settings for {{libName}} saved!"
+    "librarySettingsSaved": "Settings for {{libName}} saved!",
+    "token_required_warning": "This library requires a token or you must mark it as 'No token needed'."
   },
   "labels": {
     "rowsPerPage": "Rows",
@@ -16,7 +17,10 @@
     "noTokenNeeded": "No token needed"
   },
   "buttons": {
-    "save": "Save"
+    "save": "Save",
+    "select": "Select",
+    "unselect": "Unselect",
+    "resetSettings": "Reset Configurations"
   },
   "placeholders": {
     "insertToken": "Insert token"

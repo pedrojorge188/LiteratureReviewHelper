@@ -41,5 +41,11 @@
   "no_libraries_configured": "Você precisa configurar as bibliotecas na página de configurações primeiro.",
   "all_libraries_added": "Não há mais bibliotecas para adicionar.",
   "configure_here": "configure aqui",
-  "search_still_loading": "Ainda estamos a procurar resultados... isto pode demorar alguns instantes."
+  "search_still_loading": "Ainda estamos a procurar resultados... isto pode demorar alguns instantes.",
+  "titlesUsedForQueryVerification": "Títulos usados para verificação da pesquisa",
+  "selectTitlesOrGroups": "Selecione títulos ou grupos",
+  "titlesLabelAutoComplete": "Titulos",
+  "groupsLabelAutoComplete": "Grupos",
+  "autoCompletePrompt": "Escreva um valor e carregue no <bold>Enter</bold> para adicioná-lo",
+  "titlesUsedForVerificationHelp": "Os títulos para verificação servem para validar a pesquisa. Se a consulta não incluir os títulos definidos, será apresentado um aviso"
 }

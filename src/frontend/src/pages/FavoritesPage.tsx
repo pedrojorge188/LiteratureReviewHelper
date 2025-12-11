@@ -93,6 +93,8 @@ export const FavoritesPage = () => {
           ? searchParameters.excluirTitulos.split(",").map((s) => s.trim())
           : [],
         bibliotecas: searchParameters.bibliotecas,
+        titlesToVerify: editingSearch?.searchParameters.titlesToVerify || [],
+        selectedTitlesForVerification: editingSearch?.searchParameters.selectedTitlesForVerification || []
       };
 
       updateSearch(id, newLabel, internalParams);
@@ -106,7 +108,7 @@ export const FavoritesPage = () => {
       if (error instanceof Error && error.message.includes("already exists")) {
         setEditError(
           t("saveDialog:error_duplicate_name") ||
-            "A search with this name already exists. Please choose a different name."
+          "A search with this name already exists. Please choose a different name."
         );
       } else {
         setOpenToastD(true);
@@ -126,6 +128,7 @@ export const FavoritesPage = () => {
       excludeTitles: search.searchParameters.excludeTitles,
       excludeVenues: search.searchParameters.excludeVenues,
       bibliotecas: search.searchParameters.libraries,
+      titlesToVerify: search.searchParameters.titlesToVerify
     };
     sessionStorage.setItem("loadedSearch", JSON.stringify(internalParams));
     navigate("/");
@@ -138,9 +141,8 @@ export const FavoritesPage = () => {
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `saved-searches-${
-        new Date().toISOString().split("T")[0]
-      }.json`;
+      link.download = `saved-searches-${new Date().toISOString().split("T")[0]
+        }.json`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -162,9 +164,8 @@ export const FavoritesPage = () => {
       link.href = url;
       // Use the search name as the filename, sanitized for file systems
       const sanitizedName = search.id.replace(/[<>:"/\\|?*]/g, "-");
-      link.download = `${sanitizedName}-${
-        new Date().toISOString().split("T")[0]
-      }.json`;
+      link.download = `${sanitizedName}-${new Date().toISOString().split("T")[0]
+        }.json`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

@@ -4,6 +4,7 @@ import { InfoDialog, SnackbarToast } from "../components";
 import { Engines } from "./types";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import Tooltip from "@mui/material/Tooltip";
+import { SearchResultTitlesVerification } from "../components/configuration/SearchResultTitlesVerification";
 
 // Chave para guardar as definições das bibliotecas no localStorage
 const SETTINGS_KEY = "librarySettings";
@@ -232,7 +233,7 @@ export const ConfigurationPage = () => {
               </li>
             ))}
           </ul>
-          
+
           {/* TOAST: Warning de token em falta */}
           <SnackbarToast
             messageStr={t("configurations:alerts:token_required_warning")}
@@ -265,7 +266,7 @@ export const ConfigurationPage = () => {
                 setMaxResults("");
                 localStorage.removeItem("rowsPerPage");
                 localStorage.removeItem("maxResults");
-                
+
                 setIsInfoOpen(true);
               }}
             >
@@ -275,7 +276,11 @@ export const ConfigurationPage = () => {
             </button>
           </div>
         </section>
-        </div>
+        {/* Secção para titulos */}
+        <section className="section">
+          <SearchResultTitlesVerification />
+        </section>
+      </div>
     </>
   );
 };

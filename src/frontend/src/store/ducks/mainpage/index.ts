@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Query, SearchResponseDto } from "../../../pages/types";
+import { TitleOption } from "../../../components/types";
 
 interface MainPageState {
   queries: Query[];
@@ -13,6 +14,7 @@ interface MainPageState {
   bibliotecas: string[];
   selectedFilters: string[];
   response: SearchResponseDto | null;
+  selectedOptions: TitleOption[];
 }
 
 const initialState: MainPageState = {
@@ -27,6 +29,7 @@ const initialState: MainPageState = {
   bibliotecas: [],
   selectedFilters: [],
   response: null,
+  selectedOptions: []
 };
 
 const mainPageSlice = createSlice({

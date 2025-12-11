@@ -24,5 +24,27 @@
   },
   "placeholders": {
     "insertToken": "Inserir token"
-  }
+  },
+  "sections": {
+    "verifyResults": "Titulos de Verificação"
+  },
+  "deleteDialog": {
+    "titleHeader": "Tem a certeza de que deseja eliminar este título?",
+    "groupHeader": "Tem a certeza de que deseja eliminar este grupo?"
+  },
+  "saveDialog": {
+    "dialogHeader": "Criar Grupo",
+    "dialogPrompt": "Introduza o nome do grupo",
+    "dialogPlaceholder": "e.g., Aeroespacial"
+  },
+  "listView": "Vista em Lista",
+  "groupedView": "Vista Agrupada",
+  "addTitle": "Adicionar Título",
+  "addGroup": "Adicionar Grupo",
+  "manageLinks": "Gerir ligações",
+  "enterTitleName": "Introduza o nome do título",
+  "enterGroupName": "Introduza o nome do grupo",
+  "creationDate": "Data de criação:",
+  "expand": "Expandir",
+  "collapse": "Recolher"
 }

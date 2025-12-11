@@ -60,6 +60,7 @@ export const HistoryPage = () => {
       excluirVenues: search.searchParameters.excludeVenues,
       excluirTitulos: search.searchParameters.excludeTitles,
       bibliotecas: search.searchParameters.libraries,
+      titlesToVerify: search.searchParameters.titlesToVerify
     };
     sessionStorage.setItem("loadedSearch", JSON.stringify(internalParams));
     navigate("/");

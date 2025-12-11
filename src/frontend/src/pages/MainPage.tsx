@@ -44,6 +44,12 @@ import Tooltip from "@mui/material/Tooltip";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import { useSelector } from "react-redux";
 import { setMainPageState } from "../store/ducks/mainpage";
+import { TitleOption, TitlesGroups, TitleToExclude } from "../components/types";
+import { loadGroups, loadTitles } from "../components/configuration/SearchResultTitlesVerification";
+import { Autocomplete, AutocompleteChangeReason, Chip, TextField } from "@mui/material";
+import FolderIcon from "@mui/icons-material/Folder";
+import LabelIcon from "@mui/icons-material/Label";
+
 
 type FilterKey =
   | "authors"
@@ -87,11 +93,31 @@ export const MainPage = () => {
   const [excludeTitles, setExcludeTitles] = useState<string[]>([]);
   const [selectedFilters, setSelectedFilters] = useState<FilterKey[]>([]);
 
+  //Titles Verification
+  const [titlesToVerify, setTitlesToVerify] = useState<TitleToExclude[]>([]);
+  const [titlesGroups, setTitlesGroups] = useState<TitlesGroups[]>([]);
+  const [autoCompleteOptions, setAutoCompleteOptions] = useState<TitleOption[]>();
+  const [selectedOptions, setSelectedOptions] = useState<TitleOption[]>([]);
+  const [selectedTitlesForVerification, setSelectedTitlesForVerification] = useState<string[]>([]);
+
+
   const toParam = (values: string[]) =>
     values.length ? values.join(";") : undefined;
 
   useEffect(() => {
     setApiSettings(loadApiSettings());
+
+    const titlesToVerify = loadTitles();
+    const titlesGroups = loadGroups().filter(g => g.titles.length > 0);
+
+    const allOptions: TitleOption[] = [
+      ...titlesToVerify,
+      ...titlesGroups.filter(g => g.titles.length > 0)
+    ];
+
+    setTitlesToVerify(titlesToVerify);
+    setTitlesGroups(titlesGroups);
+    setAutoCompleteOptions(allOptions);
   }, []);
 
   const availableLibraries = getAvailableLibraries(apiSettings);
@@ -155,6 +181,8 @@ export const MainPage = () => {
         excludeVenues,
         excludeTitles,
         bibliotecas,
+        titlesToVerify: selectedOptions,
+        selectedTitlesForVerification
       };
 
       saveSearch(customLabel, searchParameters);
@@ -171,7 +199,7 @@ export const MainPage = () => {
       } else {
         setSaveError(
           t("home:search_save_error") ||
-            "Error saving search. Please try again."
+          "Error saving search. Please try again."
         );
         setOpenToastD(false);
       }
@@ -278,6 +306,26 @@ export const MainPage = () => {
       .join(",");
 
     try {
+      const internalParams = {
+        queries: normalizeQueries(queries),
+        anoDe,
+        anoAte,
+        authors,
+        venues,
+        excludeAuthors,
+        excludeTitles,
+        excludeVenues,
+        bibliotecas,
+        selectedOptions,
+        titlesToVerify: selectedOptions,
+        selectedTitlesForVerification
+      };
+      saveHistoryEntry(internalParams);
+    } catch (err) {
+      console.error("Error saving search history:", err);
+    }
+
+    try {
       const payload: SearchRequestPayload = {
         query: queryString || undefined,
         apiList: apiListParam,
@@ -302,7 +350,7 @@ export const MainPage = () => {
       if (getArticles.fulfilled.match(resultAction)) {
         setResponse(resultAction.payload as SearchResponseDto);
         setShowList(true);
-        
+
         try {
           const internalParams = {
             queries: normalizeQueries(queries),
@@ -314,6 +362,8 @@ export const MainPage = () => {
             excludeTitles,
             excludeVenues,
             bibliotecas,
+            titlesToVerify: selectedOptions,
+            selectedTitlesForVerification
           };
           saveHistoryEntry(internalParams);
         } catch (err) {
@@ -347,6 +397,7 @@ export const MainPage = () => {
         setExcludeVenues(params.excludeVenues || []);
         setBibliotecas(params.bibliotecas || []);
         setSelectedFilters(inferSelectedFilters(params));
+        setSelectedOptions(params.titlesToVerify || []);
         sessionStorage.removeItem("loadedSearch");
         setOpenToastE(true);
       } catch (error) {
@@ -365,6 +416,7 @@ export const MainPage = () => {
         setBibliotecas(mainState.bibliotecas);
         setSelectedFilters(mainState.selectedFilters);
         setResponse(mainState.response);
+        setSelectedOptions(mainState.selectedOptions);
       }
     }
   }, []);
@@ -383,6 +435,7 @@ export const MainPage = () => {
         bibliotecas,
         selectedFilters,
         response,
+        selectedOptions
       })
     );
   }, [
@@ -397,6 +450,7 @@ export const MainPage = () => {
     bibliotecas,
     selectedFilters,
     response,
+    selectedOptions
   ]);
   //fim usar estado redux
 
@@ -468,6 +522,121 @@ export const MainPage = () => {
     {} as Record<FilterKey, string>
   );
 
+  //Verificação de titulos
+  useEffect(() => {
+    const selectedTitles = selectedOptions
+      .filter((opt): opt is TitleToExclude => "title" in opt)
+      .map(t => t.title);
+
+    setSelectedTitlesForVerification(selectedTitles);
+  }, [selectedOptions]);
+
+  const addGroupTitlesToSelection = (group: TitlesGroups, currentSelection: TitleOption[]): TitleOption[] => {
+    const groupTitles = titlesToVerify.filter(t => group.titles.includes(t.id));
+    const newSelection = [...currentSelection];
+
+    groupTitles.forEach((t) => {
+      if (!newSelection.some((v) => "title" in v && v.id === t.id)) {
+        newSelection.push(t);
+      }
+    });
+
+    if (!newSelection.includes(group)) newSelection.push(group);
+
+    titlesGroups.forEach(otherGroup => {
+      if (
+        otherGroup.id !== group.id &&
+        !newSelection.some(v => "titles" in v && v.id === otherGroup.id) &&
+        otherGroup.titles.every(tId => group.titles.includes(tId))
+      ) {
+        newSelection.push(otherGroup);
+      }
+    });
+
+    return newSelection;
+  };
+
+  const addFullySelectedGroups = (currentSelection: TitleOption[]): TitleOption[] => {
+    const selectedTitlesIds = currentSelection
+      .filter((opt): opt is TitleToExclude => "title" in opt)
+      .map(t => t.id);
+
+    const groupsFullyMatchingSelectedTitles = titlesGroups.filter(group =>
+      group.titles.every(id => selectedTitlesIds.includes(id))
+    );
+
+    const groupsNotSelected = groupsFullyMatchingSelectedTitles.filter(
+      group => !currentSelection.some(opt => "titles" in opt && opt.id === group.id)
+    );
+
+    return [...currentSelection, ...groupsNotSelected];
+  };
+
+  const removeEmptyGroupsAfterTitleRemoval = (currentSelection: TitleOption[], removedTitle: TitleToExclude): TitleOption[] => {
+    let updatedSelection = [...currentSelection];
+
+    const affectedGroups = titlesGroups.filter(g => g.titles.includes(removedTitle.id));
+
+    affectedGroups.forEach(group => {
+      const hasOtherTitlesSelected = group.titles.some(id =>
+        updatedSelection.some(sel => "title" in sel && sel.id === id)
+      );
+
+      if (!hasOtherTitlesSelected && updatedSelection.find(opt => "titles" in opt && opt.id === group.id)) {
+        updatedSelection = updatedSelection.filter(sel => !("name" in sel && sel.id === group.id));
+      }
+    });
+
+    return updatedSelection;
+  };
+
+  const removeGroupsWithAllTitlesRemoved = (currentSelection: TitleOption[], titlesIdsToRemove: string[]): TitleOption[] => {
+    return currentSelection.filter(sel => {
+      if ("name" in sel) {
+        return !sel.titles.every(id => titlesIdsToRemove.includes(id));
+      }
+      return !titlesIdsToRemove.includes(sel.id);
+    });
+  };
+
+  const onTitlesSelectionChange = (_event: any, value: TitleOption[], reason: AutocompleteChangeReason, details?: { option: TitleOption }) => {
+    if (reason === "clear") {
+      setSelectedOptions([]);
+      return;
+    }
+
+    if (!value) return;
+
+    let newSelections: TitleOption[] = [...value];
+
+    if (reason === "selectOption" && details?.option) {
+      const option = details.option;
+
+      if ("title" in option) {
+        newSelections = addFullySelectedGroups(newSelections);
+      } else {
+        newSelections = addGroupTitlesToSelection(option, newSelections);
+      }
+
+      setSelectedOptions(newSelections);
+
+    } else if (reason === "removeOption" && details?.option) {
+      const removed = details.option;
+
+      if ("title" in removed) {
+        newSelections = removeEmptyGroupsAfterTitleRemoval(newSelections, removed);
+      } else {
+        const titlesIdsToRemove = removed.titles;
+        if (titlesIdsToRemove.length > 0) {
+          newSelections = removeGroupsWithAllTitlesRemoved(newSelections, titlesIdsToRemove);
+        }
+      }
+
+      setSelectedOptions(newSelections);
+    }
+  };
+
+
   return (
     <>
       {isLoading && <LoadingCircle />}
@@ -524,17 +693,15 @@ export const MainPage = () => {
       />
 
       <div
-        className={`container-article ${
-          showList && response ? "show" : "hide"
-        }`}
+        className={`container-article ${showList && response ? "show" : "hide"
+          }`}
       >
-        {response && <ArticlesList response={response} setShow={setShowList} />}
+        {response && <ArticlesList response={response} setShow={setShowList} titlesUsedForVerification={selectedTitlesForVerification} />}
       </div>
 
       <div
-        className={`pesquisa-container ${
-          (showList && response) || isLoading ? "hide-pesquisa" : ""
-        }`}
+        className={`pesquisa-container ${(showList && response) || isLoading ? "hide-pesquisa" : ""
+          }`}
       >
         <h2>{t("home:titulo_pesquisa")}</h2>
 
@@ -709,6 +876,65 @@ export const MainPage = () => {
                   </Box>
                 </Stack>
               ))}
+            </Box>
+          </div>
+
+          {/* Titulos */}
+          <div className="section">
+            <label>{t("home:titlesUsedForQueryVerification") || "Titles used for query verification"}
+              <Tooltip title={t("home:titlesUsedForVerificationHelp")}>
+                <span className="rows-container__label__icon">
+                  <HelpOutlineIcon />
+                </span>
+              </Tooltip>
+            </label>
+            <Box>
+              <Typography variant="body1" sx={{ mb: 1 }}>
+                <Trans
+                  i18nKey="home:autoCompletePrompt"
+                  components={{ bold: <b /> }}
+                />
+              </Typography>
+              <Autocomplete
+                multiple
+                options={autoCompleteOptions || []}
+                value={selectedOptions}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                onChange={onTitlesSelectionChange}
+                getOptionLabel={(option) => ("title" in option ? option.title : option.name)}
+                groupBy={(option) => ("title" in option ? t("home:titlesLabelAutoComplete") || "Titles"
+                  : t("home:groupsLabelAutoComplete") || "Groups")}
+                renderInput={(params) => <TextField {...params} size="small" label={t("home:selectTitlesOrGroups") || "Select titles or groups"} />}
+                renderValue={(value, getTagProps) =>
+                  value.map((option, index) => {
+                    const label = "title" in option ? option.title : option.name;
+                    const tagProps = getTagProps({ index });
+
+                    const chipContent = (
+                      <Chip
+                        {...tagProps}
+                        icon={"title" in option ? <LabelIcon /> : <FolderIcon />}
+                        label={label}
+                        size="small"
+                        variant="outlined"
+                      />
+                    );
+
+                    if ("title" in option) return chipContent;
+
+                    const tooltipTitle = titlesToVerify
+                      .filter((t) => option.titles.includes(t.id))
+                      .map((t) => t.title)
+                      .join(", ");
+
+                    return (
+                      <Tooltip key={option.id} title={tooltipTitle} arrow>
+                        {chipContent}
+                      </Tooltip>
+                    );
+                  })
+                }
+              />
             </Box>
           </div>
 

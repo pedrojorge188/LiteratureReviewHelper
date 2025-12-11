@@ -1,0 +1,131 @@
+/* LISTA */
+.titles-list,
+.groups-list {
+    padding: 0;
+}
+
+/* ITEM PRINCIPAL */
+.title-item,
+.group-item {
+    background-color: #fff;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+
+    &:hover {
+        background-color: #e0e0e0;
+    }
+}
+
+
+/* ICONS */
+.title-icon,
+.group-icon,
+.group-title-icon {
+    color: #666;
+}
+
+/* TEXTO */
+.title-text,
+.group-text {
+    font-size: 1rem;
+}
+
+.title-groups {
+    opacity: 0.8;
+}
+
+/* ACTION BUTTONS */
+.actions-box {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.action-btn {
+    transition: transform 0.15s ease;
+}
+
+.action-btn:hover {
+    transform: scale(1.15);
+}
+
+/* GRUPOS */
+.group-secondary {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.group-date {
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+/* TITULOS DENTRO DO GRUPO */
+.group-titles-list {
+    padding-left: 3rem !important;
+}
+
+.group-title-item {
+    background-color: #fff;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+}
+
+.group-title-text {
+    font-size: 0.9rem;
+}
+
+.list-box {
+    height: 600px;
+    overflow: auto;
+    padding: 1;
+
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: transparent;
+        border-radius: 3px;
+    }
+
+    &:hover {
+        &::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.3);
+        }
+    }
+}
+
+.group-edit-input {
+    width: 90%;
+}
+
+.titles-verification-action-buttons {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+
+    .action-button {
+        &:hover {
+            background: none;
+        }
+    }
+
+    .search-field {
+        min-width: 300px;
+        padding-bottom: 1.2em;
+    }
+}

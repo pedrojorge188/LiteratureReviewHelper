@@ -176,9 +176,10 @@ export const mapApiToFlow = (
             label:
                 `${t("prisma:flow_final_articles_after_filtering_label")}: ${data.totalArticles
                 }\n` +
-                `${t("prisma:flow_articles_removed_label")}: ${data.duplicatedResultsRemoved
+                `${t("prisma:flow_articles_filtered_out_label")}: ${totalRRemovedArticlesViaFilters
                 }\n` +
-                `${t("prisma:flow_articles_filtered_out_label")}: ${totalRRemovedArticlesViaFilters}`,
+                `${t("prisma:flow_articles_removed_label")}: ${data.duplicatedResultsRemoved
+                }`,
             title: t("prisma:flow_final_result_title")
         }
     });

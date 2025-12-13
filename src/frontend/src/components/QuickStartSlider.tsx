@@ -1,26 +1,33 @@
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import ChevronLeftIcon from "../assets/images/fontawesome/chevronLeftIcon.svg?url";
 import ChevronRightIcon from "../assets/images/fontawesome/chevronRightIcon.svg?url";
 
-interface Props {
-  images?: string[];
-  descriptions?: string[];
-}
+export const QuickStartSlider = () => {
+  const { t } = useTranslation();
 
-const DEFAULT_PLACEHOLDERS = (() => {
-  const make = (label: string, color = "#eaeaea") => {
-    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='800' height='450'><rect width='100%' height='100%' fill='${color}'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='28' fill='#666'>${label}</text></svg>`;
-    return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
-  };
-  return [make("Placeholder 1"), make("Placeholder 2", "#f5f7ff"), make("Placeholder 3", "#fff5f5")];
-})();
+  const quickstartModules = import.meta.glob("../assets/images/quickstart/*", { eager: true, as: "url" }) as Record<string, string>;
 
-export const QuickStartSlider: React.FC<Props> = ({ images: propImages = [], descriptions: propDescriptions = [] }) => {
-  const images = useMemo(() => (propImages && propImages.length > 0 ? propImages : DEFAULT_PLACEHOLDERS), [propImages]);
-  const descriptions = useMemo(
-    () => (propDescriptions && propDescriptions.length >= images.length ? propDescriptions : images.map((_, i) => propDescriptions[i] || `Static description for slide ${i + 1}.`)),
-    [propDescriptions, images]
-  );
+  const discoveredItems = useMemo(() => {
+    const entries = Object.entries(quickstartModules).sort(([a], [b]) => a.localeCompare(b));
+    return entries.map(([modulePath, url]) => {
+      const file = modulePath.split("/").pop() || "";
+      const name = file.replace(/\.[^.]+$/, "").toLowerCase();
+      return { modulePath, url, name };
+    });
+  }, [quickstartModules]);
+
+  const discovered = useMemo(() => discoveredItems.map((d) => d.url), [discoveredItems]);
+
+  const images = discovered;
+
+  const descriptions = useMemo(() => {
+    return discoveredItems.map((item, i) => {
+      const key = `quickstart:description_${item.name}`;
+      const translated = t(key, { defaultValue: "" });
+      return translated;
+    });
+  }, [discoveredItems, t]);
 
   const [current, setCurrent] = useState<number>(0);
 

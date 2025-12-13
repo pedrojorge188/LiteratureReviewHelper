@@ -1,0 +1,11 @@
+@use "../utilities" as *;
+@use "../variables" as vars;
+
+.container-quickstart {
+  width: 100%;
+  padding: 1.5rem;
+  color: #444;
+  position: relative;
+  opacity: 100%;
+  pointer-events: all;
+}

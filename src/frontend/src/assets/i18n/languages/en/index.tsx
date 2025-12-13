@@ -15,6 +15,7 @@ import saveDialogMultipleInputs from "./saveDialogMultipleInputs.json";
 import dependenciesModal from "./dependenciesModal.json";
 import aboutUs from "./aboutUs.json";
 import prisma from "./prisma.json";
+import quickstart from "./quickstart.json";
 
 export const en = {
   general: general,
@@ -34,4 +35,5 @@ export const en = {
   prisma: prisma,
   saveDialogMultipleInputs,
   dependenciesModal,
+  quickstart
 };

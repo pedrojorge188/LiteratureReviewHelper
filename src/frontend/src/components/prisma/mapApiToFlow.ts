@@ -148,7 +148,7 @@ export const mapApiToFlow = (
                 type: "editableNode",
                 position: { x, y: newY },
                 data: {
-                    label: `${t("prisma:flow_total_articles_label")}: ${count}`,
+                    label: `${t("prisma:flow_total_articles_label_filtered_articles")}: ${count}`,
                     title: t("prisma:flow_filtered_articles_title", { engine })
                 }
             });

@@ -1,12 +1,15 @@
 import { Engines, SearchResponseDto } from "../../pages/types";
 import { resolveFilterName } from "./mapApiToFlow";
+import { useTranslation } from "react-i18next";
 
 export const PrismaReport = (data: SearchResponseDto) => {
+    const { t } = useTranslation();
+
     if (!data) return null;
 
-    const rawEngineTotals: Record<string, number> = { };
-    const rawEngineDropped: Record<string, number> = { };
-    
+    const rawEngineTotals: Record<string, number> = {};
+    const rawEngineDropped: Record<string, number> = {};
+
     Object.entries(data.filterImpactByEngine || {}).forEach(([engine, filters]) => {
         const firstFilter = Object.values(filters)[0];
         if (firstFilter) rawEngineTotals[engine] = firstFilter.INPUT;
@@ -32,57 +35,75 @@ export const PrismaReport = (data: SearchResponseDto) => {
     return (
         <div className="flow-report">
             <div className="section">
-                <div className="heading">Search Report</div>
-                <p><strong>Query:</strong> {data.query}</p>
-                <p><strong>Total Articles:</strong> {totalRawArticles}</p>
-                <p><strong>Final Articles:</strong> {data.totalArticles}</p>
+                <div className="heading">
+                    {t("prisma:report_title")}
+                </div>
+                <p>
+                    <strong>{t("prisma:report_query_label")}:</strong> {data.query}
+                </p>
+                <p>
+                    <strong>{t("prisma:report_total_articles_label")}:</strong> {totalRawArticles}
+                </p>
+                <p>
+                    <strong>{t("prisma:report_final_articles_label")}:</strong> {data.totalArticles}
+                </p>
                 {data.duplicatedResultsRemoved !== undefined && (
-                    <p><strong>Duplicated Removed:</strong> {data.duplicatedResultsRemoved}</p>
+                    <p>
+                        <strong>{t("prisma:report_duplicates_removed_label")}:</strong>{" "}
+                        {data.duplicatedResultsRemoved}
+                    </p>
                 )}
-                <p><strong>Removed via filtering</strong>: {totalRRemovedArticlesViaFilters}</p>
+                <p>
+                    <strong>{t("prisma:report_removed_via_filters_label")}:</strong>{" "}
+                    {totalRRemovedArticlesViaFilters}
+                </p>
             </div>
 
-        <div className="section">
-            <div className="heading">Articles by Engine</div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Engine</th>
-                        <th>Total Articles</th>
-                        <th>Final Articles</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {Object.entries(data.articlesByEngine || {}).map(([engine, count]) => (
-                        <tr key={engine}>
-                            <td>{engine}</td>
-                            <td>{rawEngineTotals[engine] || count}</td>
-                            <td>{count}</td>
+            <div className="section">
+                <div className="heading">
+                    {t("prisma:report_articles_by_engine_title")}
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>{t("prisma:report_table_engine_header")}</th>
+                            <th>{t("prisma:report_table_total_articles_header")}</th>
+                            <th>{t("prisma:report_table_final_articles_header")}</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                        {Object.entries(data.articlesByEngine || {}).map(([engine, count]) => (
+                            <tr key={engine}>
+                                <td>{engine}</td>
+                                <td>{rawEngineTotals[engine] || count}</td>
+                                <td>{count}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
 
-        <div className="section">
-            <div className="heading">Filter Impact by Engine</div>
+            <div className="section">
+                <div className="heading">
+                    {t("prisma:report_filter_impact_title")}
+                </div>
 
-            {Object.entries(data.filterImpactByEngine || {}).map(([engine, filters]) => (
-                <div key={engine} style={{ marginBottom: "20px" }}>
-                    <div className="subheading">{engine}</div>
+                {Object.entries(data.filterImpactByEngine || {}).map(([engine, filters]) => (
+                    <div key={engine} style={{ marginBottom: "20px" }}>
+                        <div className="subheading">{engine}</div>
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Filter</th>
-                                    <th>Received</th>
-                                    <th>Gathered</th>
-                                    <th>Dropped</th>
+                                    <th>{t("prisma:report_table_filter_header")}</th>
+                                    <th>{t("prisma:report_table_received_header")}</th>
+                                    <th>{t("prisma:report_table_gathered_header")}</th>
+                                    <th>{t("prisma:report_table_dropped_header")}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {Object.entries(filters).map(([filterName, stats]) => (
                                     <tr key={filterName}>
-                                        <td>{resolveFilterName(filterName)}</td>
+                                        <td>{resolveFilterName(filterName, t)}</td>
                                         <td>{stats.INPUT}</td>
                                         <td>{stats.OUTPUT}</td>
                                         <td>{stats.DROPPED}</td>

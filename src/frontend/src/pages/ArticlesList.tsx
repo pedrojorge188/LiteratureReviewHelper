@@ -164,7 +164,7 @@ export const ArticlesList = ({ response, setShow, titlesUsedForVerification }: A
           </button>
         </div>
         <div className="header">
-          <h2>{!moreInfo ? t("articles:titulo_lista") : "Metrics"}</h2>
+          <h2>{!moreInfo ? t("articles:titulo_lista") : t("articles:title_metrics")}</h2>
 
           <div>
             <a

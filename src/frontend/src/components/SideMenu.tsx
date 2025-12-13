@@ -74,7 +74,6 @@ export const SideMenu = () => {
                 {t("sideMenu:history")}
               </CommonLink>
             </div>
-
             <div className="side-menu__container__content-menu__link-container">
               <CommonLink
                 linkClass={`side-menu__container__content-menu__link-container__link ${
@@ -86,6 +85,15 @@ export const SideMenu = () => {
                 title={t("sideMenu:configuration")}
               >
                 {t("sideMenu:configuration")}
+              </CommonLink>
+            </div>
+            <div className="side-menu__container__content-menu__link-container">
+              <CommonLink
+                linkClass={`side-menu__container__content-menu__link-container__link ${location.pathname === `/${routes.quickStartPage.path}` ? "selected" : ""}`}
+                link={{ external: false, url: routes.quickStartPage.path }}
+                title={t("sideMenu:quickstart")}
+              >
+                {t("sideMenu:quickstart")}
               </CommonLink>
             </div>
           </div>

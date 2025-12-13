@@ -33,7 +33,6 @@ export const QuickStartSlider = () => {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <div style={{ aspectRatio: "16/9", maxHeight: "70vh", border: "1px solid #ddd", borderRadius: 6, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", background: "#fafafa" }}>
           <img src={images[current]} alt={`slide-${current}`} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
         </div>
@@ -49,7 +48,6 @@ export const QuickStartSlider = () => {
         </div>
 
         <div style={{ width: "100%", minHeight: 160, padding: 12, background: "#fff", border: "1px solid #eee", borderRadius: 4 }}>{descriptions[current]}</div>
-      </div>
     </div>
   );
 };

@@ -1,0 +1,31 @@
+{
+  "aboutUs": {
+    "headerTitle": "Sobre Nós: UniSearchAcademy",
+    "headerSubtitle": "Simplificando o Início da Pesquisa Científica",
+
+    "missionTitle": "A Nossa Missão: Otimizar o seu Tempo de Pesquisa Académica",
+
+    "value1Title": "Agregação em Múltiplas Fontes",
+    "value1Description": "Pesquisa simultânea em diversas bibliotecas e bases de dados académicas a partir de um único interface intuitivo.",
+    "value1Benefit": "Benefício: Menos clicks, mais cobertura. Encontre tudo o que precisa sem sair da aplicação.",
+
+    "value2Title": "Identificação Inteligente de Duplicados",
+    "value2Description": "Algoritmos de desduplicação avançados que detetam e assinalam registos idênticos, mesmo que provenientes de fontes diferentes.",
+    "value2Benefit": "Benefício: Integridade e poupança de tempo. Garanta que a sua lista de artigos é limpa e única.",
+
+    "value3Title": "Pesquisa e Filtragem Avançada",
+    "value3Description": "Suporte para a construção de queries complexas e gestão eficiente de resultados.",
+    "value3Benefit": "Benefício: Foco e Precisão. Refine a sua pesquisa para encontrar exatamente o que é relevante para o seu tema.",
+
+    "value4Title": "Plataforma Electron (Desktop)",
+    "value4Description": "A aplicação é desenvolvida em Electron, oferecendo a estabilidade e velocidade de uma aplicação desktop nativa, combinada com a flexibilidade da tecnologia web.",
+    "value4Benefit": "Benefício: Desempenho Estável. Uma experiência de utilizador rápida e fiável.",
+
+    "academicTitle": "Desenvolvido no ISEC: Rigor e Inovação",
+    "academicContext": "Este projeto de software foi concebido e implementado no âmbito da Unidade Curricular de Projeto do Mestrado em Mestrado em Engenharia Informática no Instituto Superior de Engenharia de Coimbra (ISEC).",
+    "academicQuote": "O Nosso Objetivo: O desenvolvimento desta aplicação serviu como um desafio prático para aplicar metodologias avançadas de engenharia de software, resultando numa ferramenta que oferece uma contribuição real e tangível para a comunidade de investigação.",
+
+    "ctaTitle": "A Sua Pesquisa Começa Agora",
+    "ctaText": "Como o UniSearchAcademy é a sua aplicação desktop de pesquisa, já está pronto para utilizar o poder da pesquisa unificada. Se tiver dúvidas, sugestões ou desejar comunicar um problema, utilize os nossos canais de feedback disponíveis no menu de Ajuda da aplicação."
+  }
+}

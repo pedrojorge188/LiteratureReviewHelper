@@ -11,12 +11,14 @@ import savedsearchcard from "./savedsearchcard.json";
 import savedsearchpageheader from "./savedsearchpageheader.json";
 import warnings from "./warnings.json";
 import editSearchDialog from "./editSearchDialog.json";
-import saveDialogMultipleInputs from "./saveDialogMultipleInputs.json"
-import dependenciesModal from "./dependenciesModal.json"
+import saveDialogMultipleInputs from "./saveDialogMultipleInputs.json";
+import dependenciesModal from "./dependenciesModal.json";
+import aboutUs from "./aboutUs.json";
 
 export const pt = {
   general: general,
   home: home,
+  aboutUs: aboutUs,
   sideMenu: sideMenu,
   articles: articles,
   saveDialog: saveDialog,
@@ -29,5 +31,5 @@ export const pt = {
   warnings: warnings,
   editSearchDialog: editSearchDialog,
   saveDialogMultipleInputs,
-  dependenciesModal
+  dependenciesModal,
 };

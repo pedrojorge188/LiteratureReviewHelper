@@ -13,6 +13,7 @@ import warnings from "./warnings.json";
 import editSearchDialog from "./editSearchDialog.json";
 import saveDialogMultipleInputs from "./saveDialogMultipleInputs.json"
 import dependenciesModal from "./dependenciesModal.json"
+import quickstart from "./quickstart.json"
 
 export const pt = {
   general: general,
@@ -29,5 +30,6 @@ export const pt = {
   warnings: warnings,
   editSearchDialog: editSearchDialog,
   saveDialogMultipleInputs,
-  dependenciesModal
+  dependenciesModal,
+  quickstart
 };

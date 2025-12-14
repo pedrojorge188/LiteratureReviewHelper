@@ -40,13 +40,13 @@ const AboutUs = () => {
             <p className="card-benefit">{t("aboutUs:aboutUs.value3Benefit")}</p>
           </div>
 
-          <div className="value-card">
+          {/* <div className="value-card">
             <h3 className="card-title">{t("aboutUs:aboutUs.value4Title")}</h3>
             <p className="card-description">
               {t("aboutUs:aboutUs.value4Description")}
             </p>
             <p className="card-benefit">{t("aboutUs:aboutUs.value4Benefit")}</p>
-          </div>
+          </div> */}
         </div>
       </section>
 

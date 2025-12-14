@@ -39,7 +39,6 @@
   color: var(--primary-color);
   margin-bottom: 25px;
   border-left: 5px solid var(--secondary-color);
-  padding-left: 15px;
 }
 
 /* Cards de Valor */
@@ -81,7 +80,7 @@
 /* Secção Académica */
 .academic-section {
   background-color: var(--background-light);
-  padding: 40px;
+  padding: 40px 40px 40px 0px;
   border-radius: 8px;
 }
 
@@ -93,7 +92,7 @@
 .academic-quote {
   font-style: italic;
   border-left: 4px solid var(--secondary-color);
-  padding-left: 20px;
+
   color: #495057;
   margin: 20px 0;
 }

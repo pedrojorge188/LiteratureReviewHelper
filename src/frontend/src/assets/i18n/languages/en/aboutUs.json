@@ -17,15 +17,11 @@
     "value3Description": "Support for building complex queries and efficient results management.",
     "value3Benefit": "Benefit: Focus and Precision. Refine your search to find exactly what is relevant to your topic.",
 
-    "value4Title": "Electron Platform (Desktop)",
-    "value4Description": "The application is developed using Electron, offering the stability and speed of a native desktop application, combined with the flexibility of web technology.",
-    "value4Benefit": "Benefit: Stable Performance. A fast and reliable user experience.",
-
     "academicTitle": "Developed at ISEC: Rigor and Innovation",
-    "academicContext": "This software project was conceived and implemented as part of the Project Curricular Unit of the Master's in Informatic Engineering at the Instituto Superior de Engenharia de Coimbra (ISEC).",
+    "academicContext": "This software project was conceived and implemented as part of the Software Project Curricular Unit in the Master's in Informatics Engineering at the Coimbra Institute of Engineering (Instituto Superior de Engenharia de Coimbra).",
     "academicQuote": "Our Goal: The development of this application served as a practical challenge to apply advanced software engineering methodologies, resulting in a tool that offers a real and tangible contribution to the research community.",
 
     "ctaTitle": "Your Research Starts Now",
-    "ctaText": "As UniSearchAcademy is your desktop research application, you are already ready to use the power of unified search. If you have questions, suggestions, or wish to report a problem, use our feedback channels available in the application's Help menu."
+    "ctaText": "As UniSearchAcademy is your desktop research application, you are already ready to use the power of unified search."
   }
 }

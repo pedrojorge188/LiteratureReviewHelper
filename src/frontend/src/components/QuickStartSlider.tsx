@@ -35,22 +35,48 @@ export const QuickStartSlider = () => {
   const [current, setCurrent] = useState<number>(0);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        <div style={{ aspectRatio: "16/9", maxHeight: "70vh", border: "1px solid #ddd", borderRadius: 6, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", background: "#fafafa" }}>
-          <img src={images[current]} alt={`slide-${current}`} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+    <div className="quickstart-slider">
+      <div className="quickstart-slider__viewport">
+        <img
+          src={images[current]}
+          alt={`slide-${current}`}
+          className="quickstart-slider__image"
+        />
+      </div>
+
+      <div className="quickstart-slider__controls">
+        <button
+          className="quickstart-slider__button"
+          onClick={() => setCurrent(c => Math.max(0, c - 1))}
+          disabled={current === 0}
+        >
+          <img
+            src={ChevronLeftIcon}
+            alt="Previous"
+            className="quickstart-slider__icon"
+          />
+        </button>
+
+        <div className="quickstart-slider__counter">
+          {current + 1} / {images.length}
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <button onClick={() => setCurrent((c) => Math.max(0, c - 1))} disabled={current === 0} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: 8 }}>
-            <img src={ChevronLeftIcon} alt="Prev" style={{ width: 18, height: 18 }} />
-          </button>
-          <div style={{ flex: 1, textAlign: "center" }}>{`${current + 1} / ${images.length}`}</div>
-          <button onClick={() => setCurrent((c) => Math.min(images.length - 1, c + 1))} disabled={current >= images.length - 1} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: 8 }}>
-            <img src={ChevronRightIcon} alt="Next" style={{ width: 18, height: 18 }} />
-          </button>
-        </div>
+        <button
+          className="quickstart-slider__button"
+          onClick={() => setCurrent(c => Math.min(images.length - 1, c + 1))}
+          disabled={current >= images.length - 1}
+        >
+          <img
+            src={ChevronRightIcon}
+            alt="Next"
+            className="quickstart-slider__icon"
+          />
+        </button>
+      </div>
 
-        <div style={{ width: "100%", minHeight: 160, padding: 12, background: "#fff", border: "1px solid #eee", borderRadius: 4 }}>{descriptions[current]}</div>
+      <div className="quickstart-slider__description">
+        {descriptions[current]}
+      </div>
     </div>
   );
 };

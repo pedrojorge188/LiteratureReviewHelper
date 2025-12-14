@@ -4,30 +4,33 @@ import ChevronLeftIcon from "../assets/images/fontawesome/chevronLeftIcon.svg?ur
 import ChevronRightIcon from "../assets/images/fontawesome/chevronRightIcon.svg?url";
 
 export const QuickStartSlider = () => {
-  const { t } = useTranslation();
+  const { i18n, t } = useTranslation();
 
-  const quickstartModules = import.meta.glob("../assets/images/quickstart/*", { eager: true, as: "url" }) as Record<string, string>;
+  const images = useMemo(
+    () => [
+      `/quickstart/${i18n.language}/slide-01.png`,
+      `/quickstart/${i18n.language}/slide-02.png`,
+      `/quickstart/${i18n.language}/slide-03.png`,
+      `/quickstart/${i18n.language}/slide-04.png`,
+      `/quickstart/${i18n.language}/slide-05.png`,
+      `/quickstart/${i18n.language}/slide-06.png`,
+      `/quickstart/${i18n.language}/slide-07.png`,
+      `/quickstart/${i18n.language}/slide-08.png`,
+      `/quickstart/${i18n.language}/slide-09.png`,
+      `/quickstart/${i18n.language}/slide-10.png`,
+      `/quickstart/${i18n.language}/slide-11.png`,
+      `/quickstart/${i18n.language}/slide-12.png`,
+    ],
+    [i18n.language]
+  );
 
-  const discoveredItems = useMemo(() => {
-    const entries = Object.entries(quickstartModules).sort(([a], [b]) => a.localeCompare(b));
-    return entries.map(([modulePath, url]) => {
-      const file = modulePath.split("/").pop() || "";
-      const name = file.replace(/\.[^.]+$/, "").toLowerCase();
-      return { modulePath, url, name };
-    });
-  }, [quickstartModules]);
-
-  const discovered = useMemo(() => discoveredItems.map((d) => d.url), [discoveredItems]);
-
-  const images = discovered;
-
-  const descriptions = useMemo(() => {
-    return discoveredItems.map((item, i) => {
-      const key = `quickstart:description_${item.name}`;
-      const translated = t(key, { defaultValue: "" });
-      return translated;
-    });
-  }, [discoveredItems, t]);
+  const descriptions = useMemo(
+    () =>
+      images.map((_, i) =>
+        t(`quickstart:description_slide-${i + 1}`, { defaultValue: "" })
+      ),
+    [images, t]
+  );
 
   const [current, setCurrent] = useState<number>(0);
 

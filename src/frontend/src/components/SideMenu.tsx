@@ -25,19 +25,6 @@ export const SideMenu = () => {
             <div className="side-menu__container__content-menu__link-container">
               <CommonLink
                 linkClass={`side-menu__container__content-menu__link-container__link ${
-                  location.pathname === `/${routes.aboutuspage.path}`
-                    ? "selected"
-                    : ""
-                }`}
-                link={{ external: false, url: routes.aboutuspage.path }}
-                title={t("sideMenu:aboutUs")}
-              >
-                {t("sideMenu:aboutUs")}
-              </CommonLink>
-            </div>
-            <div className="side-menu__container__content-menu__link-container">
-              <CommonLink
-                linkClass={`side-menu__container__content-menu__link-container__link ${
                   location.pathname === `/${routes.searchPage.path}`
                     ? "selected"
                     : ""
@@ -94,6 +81,19 @@ export const SideMenu = () => {
                 title={t("sideMenu:quickstart")}
               >
                 {t("sideMenu:quickstart")}
+              </CommonLink>
+            </div>
+            <div className="side-menu__container__content-menu__link-container">
+              <CommonLink
+                linkClass={`side-menu__container__content-menu__link-container__link ${
+                  location.pathname === `/${routes.aboutuspage.path}`
+                    ? "selected"
+                    : ""
+                }`}
+                link={{ external: false, url: routes.aboutuspage.path }}
+                title={t("sideMenu:aboutUs")}
+              >
+                {t("sideMenu:aboutUs")}
               </CommonLink>
             </div>
           </div>

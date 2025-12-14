@@ -1,0 +1,73 @@
+@use "../variables" as vars;
+
+.quickstart-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  &__viewport {
+    aspect-ratio: 16 / 9;
+    max-height: 70vh;
+    border: 1px solid vars.$color-white-3;
+    border-radius: 6px;
+    overflow: hidden;
+    background: vars.$color-white-4;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  &__controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border: none;
+    background: rgba(vars.$color-white-3, 0.2);
+    cursor: pointer;
+    transition: vars.$trans-all-1;
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    &:hover:not(:disabled) {
+      background: vars.$color-white-3;
+    }
+  }
+
+  &__icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  &__counter {
+    flex: 1;
+    text-align: center;
+    font-size: 14px;
+    color: vars.$color-gray-3;
+  }
+
+  &__description {
+    width: 100%;
+    min-height: 160px;
+    padding: 12px;
+    background: vars.$color-white;
+    border: 1px solid vars.$color-white-2;
+    border-radius: 4px;
+  }
+}

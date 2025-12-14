@@ -1,0 +1,15 @@
+{
+    "title": "Quick Start",
+    "description_slide-1": "Welcome to UniSearchAcademy! This quick start guide will help you get up and running in no time.",
+    "description_slide-2": "Use the icons to the right of the search box segments to add a new segment, reorder segments, or delete the segment. Use the dropdown to the left to select how to combine the segments. You can view the generated query by checking the \"Show built query\" checkbox.",
+    "description_slide-3": "Use the dropdowns under \"Publication Year\" to limit the results of your query to a specific range of years. Additional filters are available in the dropdown below and will be added to the page as they are selected - to add a new value to any of those, simply write it in the respective input box and press Enter.",
+    "description_slide-4": "For the libraries to be available as a source you need to configure them first in the \"Configurations\" page. Certain libraries, like HAL, can be accessed without an API token while others, like Springer, require you to provide one. Depending on the library simply check \"No token needed\" or input your own token in the respective input box. Finish by clicking \"Select\" to ensure your configuration is saved and the library becomes available as a source in the \"Search\" page.",
+    "description_slide-5": "Now that you have configured your sources, you can select them from the dropdown under \"Libraries\". Ensure the library appears in the list below and click \"Search\". Now you just to wait for the results to appear.",
+    "description_slide-6": "Congratulations, you have successfully performed your first search using UniSearchAcademy!",
+    "description_slide-7": "You can go back and check on your previous searches by going to the \"History\" page. At any moment you may choose to load the parameters of a previous search by clicking the \"Load\" button or delete it from the history by clicking the \"Delete\" button.",
+    "description_slide-8": "At any point during the configuration of your search you may save it into the \"Saved Searches\" by clicking the \"Save Search\" button. You will be prompted to provide a name for your saved search.",
+    "description_slide-9": "You can access your saved searches from the \"Saved Searches\" page. Saved Searches are your own curated list of search templates that you can load at any time by clicking the \"Load\" button or delete by clicking the \"Delete\" button. You can also edit these searches by clicking the \"Edit\" button.",
+    "description_slide-10": "You can configure Verification Titles and group them into Verification Title Groups from the \"Configurations\" page. These titles will be looked for in your search results and a warning will be displayed in case any of them is missing.",
+    "description_slide-11": "In the \"Search\" page, select the Verification Title or Verification Title Group you want to use.",
+    "description_slide-12": "A warning will be displayed at the top of the results list for the titles that cannot be found in the results."
+}

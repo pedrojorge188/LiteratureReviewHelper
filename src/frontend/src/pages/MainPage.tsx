@@ -317,26 +317,6 @@ export const MainPage = () => {
       .join(",");
 
     try {
-      const internalParams = {
-        queries: normalizeQueries(queries),
-        anoDe,
-        anoAte,
-        authors,
-        venues,
-        excludeAuthors,
-        excludeTitles,
-        excludeVenues,
-        bibliotecas,
-        selectedOptions,
-        titlesToVerify: selectedOptions,
-        selectedTitlesForVerification,
-      };
-      saveHistoryEntry(internalParams);
-    } catch (err) {
-      console.error("Error saving search history:", err);
-    }
-
-    try {
       const payload: SearchRequestPayload = {
         query: queryString || undefined,
         apiList: apiListParam,
@@ -373,6 +353,7 @@ export const MainPage = () => {
             excludeTitles,
             excludeVenues,
             bibliotecas,
+            selectedOptions,
             titlesToVerify: selectedOptions,
             selectedTitlesForVerification,
           };

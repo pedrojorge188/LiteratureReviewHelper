@@ -4,6 +4,7 @@ import {
   FavoritesPage,
   HistoryPage,
   MainPage,
+  QuickStartPage,
 } from "../pages";
 import AboutUs from "../pages/Aboutus";
 import { langDefault, langDefaultRedirect, langs } from "../utils";
@@ -21,6 +22,7 @@ export const Paths = (): IRoute => ({
   },
   savePage: { path: "favoritos", element: <FavoritesPage /> },
   libListPage: { path: "configuracoes", element: <ConfigurationPage /> },
+  quickStartPage: { path: "quickstart", element: <QuickStartPage /> },
   aboutuspage: { path: "sobre", element: <AboutUs /> },
 });
 

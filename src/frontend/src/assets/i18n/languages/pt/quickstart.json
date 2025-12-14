@@ -1,0 +1,15 @@
+{
+    "title": "Início Rápido",
+    "description_slide-1": "Bem-vindo ao UniSearchAcademy! Este guia de início rápido irá ajudá‑lo a começar em pouco tempo.",
+    "description_slide-2": "Use os ícones à direita dos segmentos da caixa de pesquisa para adicionar um novo segmento, reordenar segmentos ou excluir um segmento. Use o menu suspenso à esquerda para selecionar como combinar os segmentos. Pode ver a query construída marcando a caixa \"Mostrar query construída\".",
+    "description_slide-3": "Use os menus suspensos em \"Ano de Publicação\" para limitar os resultados da sua pesquisa a um intervalo específico de anos. Filtros adicionais estão disponíveis no menu abaixo e serão adicionados à página quando selecionados — para adicionar um novo valor a qualquer um deles, escreva‑o na caixa respetiva e prima Enter.",
+    "description_slide-4": "Para que as bibliotecas estejam disponíveis como fonte, precisa configurá‑las primeiro na página \"Configurações\". Algumas bibliotecas, como HAL, podem ser acedidas sem token de API, enquanto outras, como Springer, exigem que forneça um token. Dependendo da biblioteca, marque \"Não precisa de token\" ou insira o seu token no campo apropriado. Termine clicando em \"Selecionar\" para garantir que a sua configuração é guardada e a biblioteca fica disponível na página \"Pesquisa\".",
+    "description_slide-5": "Agora que configurou as suas fontes, pode selecioná‑las no menu \"Bibliotecas\". Verifique que a biblioteca aparece na lista abaixo e clique em \"Pesquisar\". Depois, aguarde que os resultados apareçam.",
+    "description_slide-6": "Parabéns, realizou com sucesso a sua primeira pesquisa usando o UniSearchAcademy!",
+    "description_slide-7": "Pode consultar as suas pesquisas anteriores na página \"Histórico\". A qualquer momento pode carregar os parâmetros de uma pesquisa anterior clicando em \"Carregar\" ou eliminá‑la do histórico clicando em \"Eliminar\".",
+    "description_slide-8": "A qualquer momento durante a configuração da sua pesquisa pode guardá‑la em \"Pesquisas Guardadas\" clicando em \"Guardar Pesquisa\". Ser-lhe-á pedido um nome para a pesquisa guardada.",
+    "description_slide-9": "Pode aceder às suas pesquisas guardadas na página \"Pesquisas Guardadas\". As pesquisas guardadas são a sua lista personalizada de modelos de pesquisa que pode carregar a qualquer momento clicando em \"Carregar\" ou eliminar clicando em \"Eliminar\". Também pode editá‑las clicando em \"Editar\".",
+    "description_slide-10": "Pode configurar Títulos de Verificação e agrupá‑los em Grupos de Títulos de Verificação na página \"Configurações\". Esses títulos serão procurados nos resultados da pesquisa e um aviso será mostrado caso algum deles não seja encontrado.",
+    "description_slide-11": "Na página \"Pesquisa\", selecione o Título ou Grupo de Títulos de Verificação que pretende utilizar.",
+    "description_slide-12": "Será exibido um aviso no topo da lista de resultados para os títulos que não forem encontrados nos resultados."
+}

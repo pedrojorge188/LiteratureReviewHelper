@@ -1,7 +1,11 @@
 @use "./../variables" as vars;
 @use "./../utilities" as util;
 .side-menu {
+  height: 100%;
   &__container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     &__title-container {
       display: flex;
       justify-content: center;
@@ -28,6 +32,12 @@
             font-weight: 700;
           }
         }
+      }
+      &--main {
+        flex: 1;
+      }
+      &--bottom {
+        padding-bottom: 20px;;
       }
     }
   }

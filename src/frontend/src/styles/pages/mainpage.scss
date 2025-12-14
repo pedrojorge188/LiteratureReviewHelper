@@ -23,6 +23,30 @@
   position: relative;
   opacity: 100%;
   pointer-events: all;
+  &__top {
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    max-width: 1200px;
+    align-items: center;
+    h2 {
+      margin-bottom: 0;
+    }
+    button {
+      background: vars.$color-gray-2;
+      color: vars.$color-white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: 0.2s;
+
+      &:hover {
+        color: vars.$color-gray-2;
+        background-color: vars.$color-white;
+      }
+    }
+  }
   &.hide-pesquisa {
     position: absolute;
     opacity: 0;

@@ -8,7 +8,7 @@ export const TopMenu = () => {
           <div className="top-menu__container__left">
             <div className="top-menu_container__left__logo-container">
               <div className="top-menu__container__left__logo-container__logo">
-                <img src="/Logo.png" alt="Logo" />
+                <img src="./Logo.png" alt="Logo" />
               </div>
             </div>
           </div>

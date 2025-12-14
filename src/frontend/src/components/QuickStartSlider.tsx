@@ -8,18 +8,18 @@ export const QuickStartSlider = () => {
 
   const images = useMemo(
     () => [
-      `/quickstart/${i18n.language}/slide-01.png`,
-      `/quickstart/${i18n.language}/slide-02.png`,
-      `/quickstart/${i18n.language}/slide-03.png`,
-      `/quickstart/${i18n.language}/slide-04.png`,
-      `/quickstart/${i18n.language}/slide-05.png`,
-      `/quickstart/${i18n.language}/slide-06.png`,
-      `/quickstart/${i18n.language}/slide-07.png`,
-      `/quickstart/${i18n.language}/slide-08.png`,
-      `/quickstart/${i18n.language}/slide-09.png`,
-      `/quickstart/${i18n.language}/slide-10.png`,
-      `/quickstart/${i18n.language}/slide-11.png`,
-      `/quickstart/${i18n.language}/slide-12.png`,
+      `./quickstart/${i18n.language}/slide-01.png`,
+      `./quickstart/${i18n.language}/slide-02.png`,
+      `./quickstart/${i18n.language}/slide-03.png`,
+      `./quickstart/${i18n.language}/slide-04.png`,
+      `./quickstart/${i18n.language}/slide-05.png`,
+      `./quickstart/${i18n.language}/slide-06.png`,
+      `./quickstart/${i18n.language}/slide-07.png`,
+      `./quickstart/${i18n.language}/slide-08.png`,
+      `./quickstart/${i18n.language}/slide-09.png`,
+      `./quickstart/${i18n.language}/slide-10.png`,
+      `./quickstart/${i18n.language}/slide-11.png`,
+      `./quickstart/${i18n.language}/slide-12.png`,
     ],
     [i18n.language]
   );

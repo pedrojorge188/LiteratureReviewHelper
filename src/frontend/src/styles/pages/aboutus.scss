@@ -1,0 +1,123 @@
+.about-us-container {
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+  color: var(--text-dark);
+  line-height: 1.6;
+}
+
+/* Títulos da Página */
+.about-us-header {
+  text-align: center;
+  margin-bottom: 50px;
+  padding-bottom: 20px;
+  border-bottom: 3px solid var(--primary-color);
+}
+
+.header-title {
+  font-size: 2.5em;
+  color: var(--primary-color);
+  margin-bottom: 10px;
+}
+
+.header-subtitle {
+  font-size: 1.2em;
+  color: #6c757d;
+}
+
+/* Secções Comuns */
+.about-us-section {
+  padding: 30px 0;
+  margin-bottom: 40px;
+}
+
+.section-title {
+  font-size: 1.8em;
+  color: var(--primary-color);
+  margin-bottom: 25px;
+  border-left: 5px solid var(--secondary-color);
+}
+
+/* Cards de Valor */
+.value-cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.value-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s;
+}
+
+.value-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  cursor: default;
+}
+
+.card-title {
+  font-size: 1.3em;
+  color: var(--primary-color);
+  margin-bottom: 10px;
+}
+
+.card-benefit {
+  font-weight: bold;
+  color: var(--secondary-color);
+  margin-top: 15px;
+  border-top: 1px dashed var(--border-light);
+  padding-top: 10px;
+}
+
+/* Secção Académica */
+.academic-section {
+  background-color: var(--background-light);
+  padding: 40px 40px 40px 0px;
+  border-radius: 8px;
+}
+
+.academic-text {
+  font-size: 1.1em;
+  margin-bottom: 20px;
+}
+
+.academic-quote {
+  font-style: italic;
+  border-left: 4px solid var(--secondary-color);
+
+  color: #495057;
+  margin: 20px 0;
+}
+
+/* Call to Action */
+.cta-section {
+  text-align: center;
+  border-top: 1px solid var(--border-light);
+  padding-top: 40px;
+}
+
+.cta-text {
+  font-size: 1.1em;
+  color: var(--text-dark);
+}
+
+/* Responsividade Básica */
+@media (max-width: 768px) {
+  .about-us-container {
+    padding: 20px 10px;
+  }
+
+  .header-title {
+    font-size: 2em;
+  }
+
+  .value-cards-container {
+    grid-template-columns: 1fr;
+  }
+}

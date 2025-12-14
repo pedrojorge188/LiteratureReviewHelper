@@ -11,13 +11,15 @@ import savedsearchcard from "./savedsearchcard.json";
 import savedsearchpageheader from "./savedsearchpageheader.json";
 import warnings from "./warnings.json";
 import editSearchDialog from "./editSearchDialog.json";
+import saveDialogMultipleInputs from "./saveDialogMultipleInputs.json";
+import dependenciesModal from "./dependenciesModal.json";
+import aboutUs from "./aboutUs.json";
 import prisma from "./prisma.json";
-import saveDialogMultipleInputs from "./saveDialogMultipleInputs.json"
-import dependenciesModal from "./dependenciesModal.json"
 
 export const en = {
   general: general,
   home: home,
+  aboutUs: aboutUs,
   sideMenu: sideMenu,
   articles: articles,
   saveDialog: saveDialog,
@@ -31,5 +33,5 @@ export const en = {
   editSearchDialog: editSearchDialog,
   prisma: prisma,
   saveDialogMultipleInputs,
-  dependenciesModal
+  dependenciesModal,
 };

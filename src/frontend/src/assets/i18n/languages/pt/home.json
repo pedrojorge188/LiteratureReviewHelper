@@ -47,5 +47,6 @@
   "titlesLabelAutoComplete": "Titulos",
   "groupsLabelAutoComplete": "Grupos",
   "autoCompletePrompt": "Escreva um valor e carregue no <bold>Enter</bold> para adicioná-lo",
-  "titlesUsedForVerificationHelp": "Os títulos para verificação servem para validar a pesquisa. Se a consulta não incluir os títulos definidos, será apresentado um aviso"
+  "titlesUsedForVerificationHelp": "Os títulos para verificação servem para validar a pesquisa. Se a consulta não incluir os títulos definidos, será apresentado um aviso",
+  "limpar": "Limpar Pesquisa"
 }

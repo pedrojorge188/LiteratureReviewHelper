@@ -45,11 +45,18 @@ import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import { useSelector } from "react-redux";
 import { setMainPageState } from "../store/ducks/mainpage";
 import { TitleOption, TitlesGroups, TitleToExclude } from "../components/types";
-import { loadGroups, loadTitles } from "../components/configuration/SearchResultTitlesVerification";
-import { Autocomplete, AutocompleteChangeReason, Chip, TextField } from "@mui/material";
+import {
+  loadGroups,
+  loadTitles,
+} from "../components/configuration/SearchResultTitlesVerification";
+import {
+  Autocomplete,
+  AutocompleteChangeReason,
+  Chip,
+  TextField,
+} from "@mui/material";
 import FolderIcon from "@mui/icons-material/Folder";
 import LabelIcon from "@mui/icons-material/Label";
-
 
 type FilterKey =
   | "authors"
@@ -96,10 +103,11 @@ export const MainPage = () => {
   //Titles Verification
   const [titlesToVerify, setTitlesToVerify] = useState<TitleToExclude[]>([]);
   const [titlesGroups, setTitlesGroups] = useState<TitlesGroups[]>([]);
-  const [autoCompleteOptions, setAutoCompleteOptions] = useState<TitleOption[]>();
+  const [autoCompleteOptions, setAutoCompleteOptions] =
+    useState<TitleOption[]>();
   const [selectedOptions, setSelectedOptions] = useState<TitleOption[]>([]);
-  const [selectedTitlesForVerification, setSelectedTitlesForVerification] = useState<string[]>([]);
-
+  const [selectedTitlesForVerification, setSelectedTitlesForVerification] =
+    useState<string[]>([]);
 
   const toParam = (values: string[]) =>
     values.length ? values.join(";") : undefined;
@@ -108,11 +116,11 @@ export const MainPage = () => {
     setApiSettings(loadApiSettings());
 
     const titlesToVerify = loadTitles();
-    const titlesGroups = loadGroups().filter(g => g.titles.length > 0);
+    const titlesGroups = loadGroups().filter((g) => g.titles.length > 0);
 
     const allOptions: TitleOption[] = [
       ...titlesToVerify,
-      ...titlesGroups.filter(g => g.titles.length > 0)
+      ...titlesGroups.filter((g) => g.titles.length > 0),
     ];
 
     setTitlesToVerify(titlesToVerify);
@@ -182,7 +190,7 @@ export const MainPage = () => {
         excludeTitles,
         bibliotecas,
         titlesToVerify: selectedOptions,
-        selectedTitlesForVerification
+        selectedTitlesForVerification,
       };
 
       saveSearch(customLabel, searchParameters);
@@ -199,7 +207,7 @@ export const MainPage = () => {
       } else {
         setSaveError(
           t("home:search_save_error") ||
-          "Error saving search. Please try again."
+            "Error saving search. Please try again."
         );
         setOpenToastD(false);
       }
@@ -272,7 +280,10 @@ export const MainPage = () => {
   };
 
   const pesquisar = async () => {
-    if (queries.length === 1 && (!queries[0].value || queries[0].value.trim() === "")) {
+    if (
+      queries.length === 1 &&
+      (!queries[0].value || queries[0].value.trim() === "")
+    ) {
       setOpenToastB(true);
       return;
     }
@@ -318,7 +329,7 @@ export const MainPage = () => {
         bibliotecas,
         selectedOptions,
         titlesToVerify: selectedOptions,
-        selectedTitlesForVerification
+        selectedTitlesForVerification,
       };
       saveHistoryEntry(internalParams);
     } catch (err) {
@@ -363,7 +374,7 @@ export const MainPage = () => {
             excludeVenues,
             bibliotecas,
             titlesToVerify: selectedOptions,
-            selectedTitlesForVerification
+            selectedTitlesForVerification,
           };
           saveHistoryEntry(internalParams);
         } catch (err) {
@@ -379,7 +390,6 @@ export const MainPage = () => {
       setIsLoading(false);
     }
   };
-
 
   useEffect(() => {
     const loadedSearch = sessionStorage.getItem("loadedSearch");
@@ -435,7 +445,7 @@ export const MainPage = () => {
         bibliotecas,
         selectedFilters,
         response,
-        selectedOptions
+        selectedOptions,
       })
     );
   }, [
@@ -450,7 +460,7 @@ export const MainPage = () => {
     bibliotecas,
     selectedFilters,
     response,
-    selectedOptions
+    selectedOptions,
   ]);
   //fim usar estado redux
 
@@ -526,13 +536,18 @@ export const MainPage = () => {
   useEffect(() => {
     const selectedTitles = selectedOptions
       .filter((opt): opt is TitleToExclude => "title" in opt)
-      .map(t => t.title);
+      .map((t) => t.title);
 
     setSelectedTitlesForVerification(selectedTitles);
   }, [selectedOptions]);
 
-  const addGroupTitlesToSelection = (group: TitlesGroups, currentSelection: TitleOption[]): TitleOption[] => {
-    const groupTitles = titlesToVerify.filter(t => group.titles.includes(t.id));
+  const addGroupTitlesToSelection = (
+    group: TitlesGroups,
+    currentSelection: TitleOption[]
+  ): TitleOption[] => {
+    const groupTitles = titlesToVerify.filter((t) =>
+      group.titles.includes(t.id)
+    );
     const newSelection = [...currentSelection];
 
     groupTitles.forEach((t) => {
@@ -543,11 +558,11 @@ export const MainPage = () => {
 
     if (!newSelection.includes(group)) newSelection.push(group);
 
-    titlesGroups.forEach(otherGroup => {
+    titlesGroups.forEach((otherGroup) => {
       if (
         otherGroup.id !== group.id &&
-        !newSelection.some(v => "titles" in v && v.id === otherGroup.id) &&
-        otherGroup.titles.every(tId => group.titles.includes(tId))
+        !newSelection.some((v) => "titles" in v && v.id === otherGroup.id) &&
+        otherGroup.titles.every((tId) => group.titles.includes(tId))
       ) {
         newSelection.push(otherGroup);
       }
@@ -556,50 +571,71 @@ export const MainPage = () => {
     return newSelection;
   };
 
-  const addFullySelectedGroups = (currentSelection: TitleOption[]): TitleOption[] => {
+  const addFullySelectedGroups = (
+    currentSelection: TitleOption[]
+  ): TitleOption[] => {
     const selectedTitlesIds = currentSelection
       .filter((opt): opt is TitleToExclude => "title" in opt)
-      .map(t => t.id);
+      .map((t) => t.id);
 
-    const groupsFullyMatchingSelectedTitles = titlesGroups.filter(group =>
-      group.titles.every(id => selectedTitlesIds.includes(id))
+    const groupsFullyMatchingSelectedTitles = titlesGroups.filter((group) =>
+      group.titles.every((id) => selectedTitlesIds.includes(id))
     );
 
     const groupsNotSelected = groupsFullyMatchingSelectedTitles.filter(
-      group => !currentSelection.some(opt => "titles" in opt && opt.id === group.id)
+      (group) =>
+        !currentSelection.some((opt) => "titles" in opt && opt.id === group.id)
     );
 
     return [...currentSelection, ...groupsNotSelected];
   };
 
-  const removeEmptyGroupsAfterTitleRemoval = (currentSelection: TitleOption[], removedTitle: TitleToExclude): TitleOption[] => {
+  const removeEmptyGroupsAfterTitleRemoval = (
+    currentSelection: TitleOption[],
+    removedTitle: TitleToExclude
+  ): TitleOption[] => {
     let updatedSelection = [...currentSelection];
 
-    const affectedGroups = titlesGroups.filter(g => g.titles.includes(removedTitle.id));
+    const affectedGroups = titlesGroups.filter((g) =>
+      g.titles.includes(removedTitle.id)
+    );
 
-    affectedGroups.forEach(group => {
-      const hasOtherTitlesSelected = group.titles.some(id =>
-        updatedSelection.some(sel => "title" in sel && sel.id === id)
+    affectedGroups.forEach((group) => {
+      const hasOtherTitlesSelected = group.titles.some((id) =>
+        updatedSelection.some((sel) => "title" in sel && sel.id === id)
       );
 
-      if (!hasOtherTitlesSelected && updatedSelection.find(opt => "titles" in opt && opt.id === group.id)) {
-        updatedSelection = updatedSelection.filter(sel => !("name" in sel && sel.id === group.id));
+      if (
+        !hasOtherTitlesSelected &&
+        updatedSelection.find((opt) => "titles" in opt && opt.id === group.id)
+      ) {
+        updatedSelection = updatedSelection.filter(
+          (sel) => !("name" in sel && sel.id === group.id)
+        );
       }
     });
 
     return updatedSelection;
   };
 
-  const removeGroupsWithAllTitlesRemoved = (currentSelection: TitleOption[], titlesIdsToRemove: string[]): TitleOption[] => {
-    return currentSelection.filter(sel => {
+  const removeGroupsWithAllTitlesRemoved = (
+    currentSelection: TitleOption[],
+    titlesIdsToRemove: string[]
+  ): TitleOption[] => {
+    return currentSelection.filter((sel) => {
       if ("name" in sel) {
-        return !sel.titles.every(id => titlesIdsToRemove.includes(id));
+        return !sel.titles.every((id) => titlesIdsToRemove.includes(id));
       }
       return !titlesIdsToRemove.includes(sel.id);
     });
   };
 
-  const onTitlesSelectionChange = (_event: any, value: TitleOption[], reason: AutocompleteChangeReason, details?: { option: TitleOption }) => {
+  const onTitlesSelectionChange = (
+    _event: any,
+    value: TitleOption[],
+    reason: AutocompleteChangeReason,
+    details?: { option: TitleOption }
+  ) => {
     if (reason === "clear") {
       setSelectedOptions([]);
       return;
@@ -619,16 +655,21 @@ export const MainPage = () => {
       }
 
       setSelectedOptions(newSelections);
-
     } else if (reason === "removeOption" && details?.option) {
       const removed = details.option;
 
       if ("title" in removed) {
-        newSelections = removeEmptyGroupsAfterTitleRemoval(newSelections, removed);
+        newSelections = removeEmptyGroupsAfterTitleRemoval(
+          newSelections,
+          removed
+        );
       } else {
         const titlesIdsToRemove = removed.titles;
         if (titlesIdsToRemove.length > 0) {
-          newSelections = removeGroupsWithAllTitlesRemoved(newSelections, titlesIdsToRemove);
+          newSelections = removeGroupsWithAllTitlesRemoved(
+            newSelections,
+            titlesIdsToRemove
+          );
         }
       }
 
@@ -636,6 +677,20 @@ export const MainPage = () => {
     }
   };
 
+  const handleCleanSearch = () => {
+    setQueries([{ value: "" }]);
+    setAnoDe("");
+    setAnoAte("");
+    setAuthors([]);
+    setVenues([]);
+    setExcludeAuthors([]);
+    setExcludeVenues([]);
+    setExcludeTitles([]);
+    setBibliotecas([]);
+    setSelectedFilters([]);
+    setResponse(null);
+    setSelectedOptions([]);
+  };
 
   return (
     <>
@@ -693,17 +748,35 @@ export const MainPage = () => {
       />
 
       <div
-        className={`container-article ${showList && response ? "show" : "hide"
-          }`}
+        className={`container-article ${
+          showList && response ? "show" : "hide"
+        }`}
       >
-        {response && <ArticlesList response={response} setShow={setShowList} titlesUsedForVerification={selectedTitlesForVerification} />}
+        {response && (
+          <ArticlesList
+            response={response}
+            setShow={setShowList}
+            titlesUsedForVerification={selectedTitlesForVerification}
+          />
+        )}
       </div>
 
       <div
-        className={`pesquisa-container ${(showList && response) || isLoading ? "hide-pesquisa" : ""
-          }`}
+        className={`pesquisa-container ${
+          (showList && response) || isLoading ? "hide-pesquisa" : ""
+        }`}
       >
-        <h2>{t("home:titulo_pesquisa")}</h2>
+        <div className="pesquisa-container__top">
+          <h2>{t("home:titulo_pesquisa")}</h2>
+          <button
+            type="button"
+            onClick={() => {
+              handleCleanSearch();
+            }}
+          >
+            {t("home:limpar") || "Clean"}
+          </button>
+        </div>
 
         <div className="pesquisa-container__content">
           {/* Query Section */}
@@ -881,7 +954,9 @@ export const MainPage = () => {
 
           {/* Titulos */}
           <div className="section">
-            <label>{t("home:titlesUsedForQueryVerification") || "Titles used for query verification"}
+            <label>
+              {t("home:titlesUsedForQueryVerification") ||
+                "Titles used for query verification"}
               <Tooltip title={t("home:titlesUsedForVerificationHelp")}>
                 <span className="rows-container__label__icon">
                   <HelpOutlineIcon />
@@ -901,19 +976,36 @@ export const MainPage = () => {
                 value={selectedOptions}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 onChange={onTitlesSelectionChange}
-                getOptionLabel={(option) => ("title" in option ? option.title : option.name)}
-                groupBy={(option) => ("title" in option ? t("home:titlesLabelAutoComplete") || "Titles"
-                  : t("home:groupsLabelAutoComplete") || "Groups")}
-                renderInput={(params) => <TextField {...params} size="small" label={t("home:selectTitlesOrGroups") || "Select titles or groups"} />}
+                getOptionLabel={(option) =>
+                  "title" in option ? option.title : option.name
+                }
+                groupBy={(option) =>
+                  "title" in option
+                    ? t("home:titlesLabelAutoComplete") || "Titles"
+                    : t("home:groupsLabelAutoComplete") || "Groups"
+                }
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    size="small"
+                    label={
+                      t("home:selectTitlesOrGroups") ||
+                      "Select titles or groups"
+                    }
+                  />
+                )}
                 renderValue={(value, getTagProps) =>
                   value.map((option, index) => {
-                    const label = "title" in option ? option.title : option.name;
+                    const label =
+                      "title" in option ? option.title : option.name;
                     const tagProps = getTagProps({ index });
 
                     const chipContent = (
                       <Chip
                         {...tagProps}
-                        icon={"title" in option ? <LabelIcon /> : <FolderIcon />}
+                        icon={
+                          "title" in option ? <LabelIcon /> : <FolderIcon />
+                        }
                         label={label}
                         size="small"
                         variant="outlined"
@@ -979,7 +1071,7 @@ export const MainPage = () => {
                   link={{ external: false, url: routes.libListPage.path }}
                   title={t("sideMenu:configuration")}
                 >
-                  <p
+                  <span
                     style={{
                       fontSize: "12px",
                       color: "#0098e3ff",
@@ -989,7 +1081,7 @@ export const MainPage = () => {
                     }}
                   >
                     {t("home:configure_here")}
-                  </p>
+                  </span>
                 </CommonLink>
               </p>
             )}

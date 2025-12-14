@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { PrismaReport } from '../components/prisma/PrismaReport';
 import { PrismaCharts } from '../components/prisma/PrismaCharts';
 import { SearchResponseDto } from './types';
+import { useTranslation } from 'react-i18next';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -24,7 +25,7 @@ function TabPanel(props: TabPanelProps) {
       hidden={value !== index}
       id={`full-width-tabpanel-${index}`}
       aria-labelledby={`full-width-tab-${index}`}
-  
+
     >
       {value === index && (
         <Box sx={{ marginTop: 3, paddingLeft: 2 }}>
@@ -37,14 +38,15 @@ function TabPanel(props: TabPanelProps) {
 
 export const SearchStatisticsPage = (apiData: SearchResponseDto) => {
   const theme = useTheme();
-    const [tab, setTab] = useState(0);
+  const { t } = useTranslation();
+  const [tab, setTab] = useState(0);
 
   return (
     <Box sx={{ width: "100%" }}>
       <Tabs value={tab} onChange={(_, newValue) => setTab(newValue)}>
-        <Tab label="Flow" />
-        <Tab label="Report" />
-        <Tab label="Charts" />
+        <Tab label={t("prisma:tab_flow")} />
+        <Tab label={t("prisma:tab_report")} />
+        <Tab label={t("prisma:tab_charts")} />
       </Tabs>
 
       <TabPanel value={tab} index={0} dir={theme.direction}>
@@ -59,5 +61,5 @@ export const SearchStatisticsPage = (apiData: SearchResponseDto) => {
         <PrismaCharts {...apiData} />
       </TabPanel>
     </Box>
-  )
+  );
 };

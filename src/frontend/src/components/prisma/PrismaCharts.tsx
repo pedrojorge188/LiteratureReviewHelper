@@ -2,8 +2,11 @@ import React, { useState, useMemo } from "react";
 import ReactECharts from "echarts-for-react";
 import { resolveFilterName } from "./mapApiToFlow";
 import { Artigo, Engines, SearchResponseDto, Statistic } from "../../pages/types";
+import { useTranslation } from "react-i18next";
 
 export const PrismaCharts = (data: SearchResponseDto) => {
+  const { t } = useTranslation();
+
   const [property, setProperty] = useState("venueType");
   const [selectedFilter, setSelectedFilter] = useState("");
 
@@ -23,42 +26,42 @@ export const PrismaCharts = (data: SearchResponseDto) => {
   const availableFilters = useMemo(() => {
     const set = new Set<string>();
     Object.values(safeData.filterImpactByEngine || {}).forEach(engineFilters => {
-        Object.keys(engineFilters || {}).forEach(f => set.add(f));
+      Object.keys(engineFilters || {}).forEach(f => set.add(f));
     });
     return Array.from(set);
   }, [safeData.filterImpactByEngine]);
 
-    const aggregatedFilterSteps = (() => {
-      const result: { name: string; value: number }[] = [];
+  const aggregatedFilterSteps = (() => {
+    const result: { name: string; value: number }[] = [];
 
-      availableFilters.forEach(filterName => {
-        let totalOutput = 0;
+    availableFilters.forEach(filterName => {
+      let totalOutput = 0;
 
-        engines.forEach(engine => {
-          const f = safeData.filterImpactByEngine?.[engine as Engines]?.[filterName];
-          if (f?.OUTPUT) totalOutput += f.OUTPUT;
-        });
+      engines.forEach(engine => {
+        const f = safeData.filterImpactByEngine?.[engine as Engines]?.[filterName];
+        if (f?.OUTPUT) totalOutput += f.OUTPUT;
+      });
 
       result.push({
-        name: resolveFilterName(filterName) || filterName,
+        name: resolveFilterName(filterName, t) || filterName,
         value: totalOutput
       });
-  });
+    });
 
-  return result;
-})();
+    return result;
+  })();
 
   React.useEffect(() => {
     if (availableFilters.length > 0 && !availableFilters.includes(selectedFilter)) {
-        setSelectedFilter(availableFilters[0]);
+      setSelectedFilter(availableFilters[0]);
     }
   }, [availableFilters, selectedFilter]);
 
 
   const pipelineSteps = [
-      { name: "Total Raw Articles", value: rawCounts.reduce((a, b) => a + b, 0) },
-      ... aggregatedFilterSteps,
-      { name: "Final Filtered Articles", value: safeData.totalArticles ?? 0 }
+    { name: t("prisma:funnel_step_total_raw"), value: rawCounts.reduce((a, b) => a + b, 0) },
+    ...aggregatedFilterSteps,
+    { name: t("prisma:funnel_step_final_filtered"), value: safeData.totalArticles ?? 0 }
   ];
 
   const selectableProperties = [
@@ -105,16 +108,16 @@ export const PrismaCharts = (data: SearchResponseDto) => {
 
     return {
       title: {
-        text: resolveFilterName(filterName),
+        text: resolveFilterName(filterName, t),
         left: 'center',
         textStyle: { color: "#222" }
       },
       tooltip: { trigger: "axis" },
-      legend: { data: ["INPUT", "OUTPUT", "DROPPED"], textStyle: { color: "#222" } },
+      legend: { data: [t("prisma:series_received"), t("prisma:series_gathered"), t("prisma:series_dropped")], textStyle: { color: "#222" } },
       xAxis: {
         type: "category",
         data: engines,
-        name: resolveFilterName(filterName),
+        name: resolveFilterName(filterName, t),
         nameLocation: 'middle',
         nameGap: 25,
         axisLabel: { color: "#222" }
@@ -125,9 +128,9 @@ export const PrismaCharts = (data: SearchResponseDto) => {
         axisLabel: { formatter: (v: number) => Math.floor(v) },
       },
       series: [
-        { name: "Received", type: "bar", data: inputData, itemStyle: { color: "#888" } },
-        { name: "Gathered", type: "bar", data: outputData, itemStyle: { color: "#444" } },
-        { name: "Dropped", type: "bar", data: droppedData, itemStyle: { color: "#222" } },
+        { name: t("prisma:series_received"), type: "bar", data: inputData, itemStyle: { color: "#888" } },
+        { name: t("prisma:series_gathered"), type: "bar", data: outputData, itemStyle: { color: "#444" } },
+        { name: t("prisma:series_dropped"), type: "bar", data: droppedData, itemStyle: { color: "#222" } },
       ],
     };
   };
@@ -148,7 +151,7 @@ export const PrismaCharts = (data: SearchResponseDto) => {
     <div className="prisma-charts">
 
       <div className="chart-section">
-        <h2>Overall Filtering Funnel (Global Summary)</h2>
+        <h2>{t("prisma:charts_overall_funnel_title")}</h2>
         <ReactECharts
           className="echarts-container"
           style={{ height: 260 }}
@@ -157,7 +160,7 @@ export const PrismaCharts = (data: SearchResponseDto) => {
               trigger: "item",
               formatter: (params: any) => {
                 const pct = ((params.data.value / pipelineSteps[0].value) * 100 || 0).toFixed(1);
-                return `${params.name}<br/>${params.value} articles<br/>(${pct}% retained)`;
+                return `${params.name}<br/>${params.value} ${t("prisma:tooltip_articles")}<br/>(${pct}% ${t("prisma:tooltip_retained")})`;
               }
             },
             series: [
@@ -200,7 +203,7 @@ export const PrismaCharts = (data: SearchResponseDto) => {
 
       <div className="grid-two-cols">
         <div className="chart-section">
-          <h2>Articles per Engine</h2>
+          <h2>{t("prisma:charts_articles_per_engine_title")}</h2>
           <ReactECharts
             className="echarts-container"
             style={{ height: 320 }}
@@ -214,18 +217,20 @@ export const PrismaCharts = (data: SearchResponseDto) => {
         </div>
 
         <div className="chart-section">
-          <h2>Raw vs Final Articles</h2>
+          <h2>{t("prisma:charts_raw_vs_final_title")}</h2>
           <ReactECharts
             className="echarts-container"
             style={{ height: 320 }}
             option={{
               tooltip: { trigger: "axis" },
-              legend: { data: ["Raw", "Final"] },
+              legend: {
+                data: [t("prisma:series_raw"), t("prisma:series_final")]
+              },
               xAxis: { type: "category", data: engines },
               yAxis: { type: "value", minInterval: 1, axisLabel: { formatter: (v: number) => Math.floor(v) } },
               series: [
-                { name: "Raw", type: "bar", data: rawCounts, itemStyle: { color: "#777" } },
-                { name: "Final", type: "bar", data: finalCounts, itemStyle: { color: "#333" } }
+                { name: t("prisma:series_raw"), type: "bar", data: rawCounts, itemStyle: { color: "#777" } },
+                { name: t("prisma:series_final"), type: "bar", data: finalCounts, itemStyle: { color: "#333" } }
               ]
             }}
           />
@@ -233,14 +238,21 @@ export const PrismaCharts = (data: SearchResponseDto) => {
       </div>
 
       <div className="chart-section">
-        <h2>Articles per Selected Property</h2>
+        <h2>{t("prisma:charts_property_distribution_title")}</h2>
 
         <div className="property-selector" style={{ marginBottom: 12 }}>
-          <label style={{ marginRight: 12 }}>Property:</label>
+          <label style={{ marginRight: 12 }}>{t("prisma:label_property")}</label>
           <select value={property} onChange={e => setProperty(e.target.value)} style={{ padding: "4px 6px" }}>
             {selectableProperties.map(p => (
               <option key={p} value={p}>
-                {p === "publicationYear" ? "Publication Year" : p === "venueType" ? "Venue Type" : p === "authors" ? "Authors" : p}
+                {p === "publicationYear"
+                  ? t("prisma:property_publicationYear")
+                  : p === "venueType"
+                    ? t("prisma:property_venueType")
+                    : p === "authors"
+                      ? t("prisma:property_authors")
+                      : p
+                }
               </option>
             ))}
           </select>
@@ -259,10 +271,10 @@ export const PrismaCharts = (data: SearchResponseDto) => {
       </div>
 
       <div className="chart-section">
-        <h2>Filter Impact by Engine</h2>
+        <h2>{t("prisma:charts_filter_impact_title")}</h2>
 
         <div className="filter-selector" style={{ marginBottom: 12 }}>
-          <label style={{ marginRight: 12 }}>Filter:</label>
+          <label style={{ marginRight: 12 }}>{t("prisma:label_filter")}</label>
           <select
             value={selectedFilter}
             onChange={e => setSelectedFilter(e.target.value)}
@@ -270,7 +282,7 @@ export const PrismaCharts = (data: SearchResponseDto) => {
           >
             {availableFilters.map(filter => (
               <option key={filter} value={filter}>
-                  {resolveFilterName(filter) || filter}
+                {resolveFilterName(filter, t) || filter}
               </option>
             ))}
           </select>

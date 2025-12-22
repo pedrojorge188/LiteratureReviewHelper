@@ -1,6 +1,6 @@
 {
   "appId": "com.isec.literaturereviewhelper",
-  "productName": "Literature Review Helper",
+  "productName": "UniSearchAcademy",
   "copyright": "Copyright © 2025 ISEC",
   "publish": null,
   "npmRebuild": false,
@@ -49,7 +49,7 @@
     "allowToChangeInstallationDirectory": true,
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
-    "shortcutName": "Literature Review Helper"
+    "shortcutName": "UniSearchAcademy"
   },
   "portable": {
     "artifactName": "${productName}-${version}-Windows-${arch}-Portable.${ext}"

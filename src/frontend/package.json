@@ -1,8 +1,8 @@
 {
   "name": "literature-review-helper",
   "private": true,
-  "version": "0.0.0",
-  "description": "Literature Review Helper",
+  "version": "1.0.0",
+  "description": "UniSearchAcademy",
   "author": "ISEC",
   "type": "module",
   "main": "electron-main.cjs",

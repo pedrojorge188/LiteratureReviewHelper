@@ -8,6 +8,9 @@
   flex-direction: column;
   height: 100%;
   background-color: vars.$background-color;
+  .link_ref {
+    font-weight: 600;
+  }
   &__top {
     display: flex;
 
@@ -112,14 +115,14 @@ body {
 }
 
 .reset-btn {
-  background-color: #9b2e2cff; 
-  color: #fff;             
+  background-color: #9b2e2cff;
+  color: #fff;
   border: none;
   border-radius: 4px;
 }
 
 .reset-btn:hover {
-  background-color: rgb(186, 25, 25); 
+  background-color: rgb(186, 25, 25);
 }
 textarea::-webkit-scrollbar {
   width: 2px;

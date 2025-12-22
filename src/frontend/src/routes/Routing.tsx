@@ -9,12 +9,9 @@ import { setLang } from "../store/ducks/home";
 import App from "../App";
 import { NotFound } from "../pages/NotFound";
 import { MainPage } from "../pages";
-import { KeepAlive } from "react-activation";
 
 export const Routing = () => {
-  const { lang, langLoaded } = useSelector(
-    (state: ApplicationState) => state.HOME
-  );
+  const { lang, langLoaded } = useSelector((state: ApplicationState) => state.HOME);
   const dispatch = useDispatch<any>();
   const location = useLocation();
 
@@ -30,15 +27,9 @@ export const Routing = () => {
     <Routes>
       <Route path="/" element={<App />}>
         <Route index element={<MainPage />} />
-        {Object.entries(allRelativePaths).map(
-          ([key, { path, element }], index) => (
-            <Route
-              path={path}
-              element={<KeepAlive id={path}>{element}</KeepAlive>}
-              key={index}
-            />
-          )
-        )}
+        {Object.entries(allRelativePaths).map(([key, { path, element }], index) => (
+          <Route path={path} element={element} key={index} />
+        ))}
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>

@@ -22,6 +22,9 @@
     "academicQuote": "Our Goal: The development of this application served as a practical challenge to apply advanced software engineering methodologies, resulting in a tool that offers a real and tangible contribution to the research community.",
 
     "ctaTitle": "Your Research Starts Now",
-    "ctaText": "As UniSearchAcademy is your desktop research application, you are already ready to use the power of unified search."
+    "ctaText": "As UniSearchAcademy is your desktop research application, you are already ready to use the power of unified search.",
+
+    "quoteText": "We want to thank J. Eduardo Ferreira Ribeiro and J. Antonio Dantas Macedo for their substantial contributions in developing and providing ",
+    "quoteTextFinal": "this replication package builder."
   }
 }
